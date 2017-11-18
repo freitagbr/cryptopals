@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     fp = fopen(argv[1], "r");
 
     if (fp == NULL) {
-        exit(EXIT_FAILURE);
+        error("file error");
     }
 
     int global_max = 0;
