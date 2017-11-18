@@ -37,9 +37,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("%s\n", a);
-    printf("%s\n", b);
-
     unsigned char *c = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
     for (int i = 0, s = 0; i < len; i += 1, s += 2) {
@@ -47,5 +44,6 @@ int main(int argc, char **argv) {
     }
 
     printf("%s\n", c);
+
     exit(EXIT_SUCCESS);
 }

@@ -37,8 +37,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("%s\n", src);
-
     const int dstlen = ((srclen + (srclen % 3)) / 3) * 4;
     unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
@@ -47,5 +45,6 @@ int main(int argc, char **argv) {
     }
 
     printf("%s\n", dst);
+
     exit(EXIT_SUCCESS);
 }
