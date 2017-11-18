@@ -1,10 +1,12 @@
 .POSIX:
-include ../Makefile.inc
+include ../inc.mk
 
-all: c1
+EXECS = c1 c2
 
-c1:
-	$(CC) $(CFLAGS) -o c1 c1.c
+all: $(EXECS)
+
+$(EXECS):
+	$(CC) $(CFLAGS) -o $@ $@.c
 
 clean:
-	rm -f c1
+	rm -f $(EXECS)

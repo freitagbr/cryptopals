@@ -1,5 +1,5 @@
 .POSIX:
-include Makefile.inc
+include inc.mk
 
 DIRS = set1
 
