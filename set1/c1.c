@@ -11,19 +11,40 @@ void base64decode(const unsigned char *src, unsigned char *dst, int len) {
     dst[3] = (len > 2) ? b64[(int) (  src[2] & 0x3F)                                  ] : '=';
 }
 
+void error(const char *msg) {
+    fprintf(stderr, "%s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
-        fprintf(stderr, "one argument required\n");
-        exit(EXIT_FAILURE);
+        error("one argument required");
     }
 
-    const unsigned char *src = (unsigned char *) argv[1];
-    const int srclen = strlen((const char *) src);
+    const unsigned char *inp = (unsigned char *) argv[1];
+    const int inplen = strlen((const char *) inp);
+    const int srclen = (inplen + (inplen % 2)) / 2;
+    const unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * srclen);
+
+    if ((inplen % 2) != 0) {
+        error("input must be a valid hex string");
+    }
+
+    for (int i = 0, s = 0; i < inplen; i += 2, s += 1) {
+        int r = sscanf((const char *) &inp[i], "%2hhx", (unsigned char *) &src[s]);
+        if (r != 1) {
+            error("input must be a valid hex string");
+        }
+    }
+
+    printf("%s\n", src);
+
     const int dstlen = ((srclen + (srclen % 3)) / 3) * 4;
     unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
-    for (int s = 0, d = 0; s < srclen; s += 3, d += 4)
+    for (int s = 0, d = 0; s < srclen; s += 3, d += 4) {
         base64decode(&src[s], &dst[d], srclen - s);
+    }
 
     printf("%s\n", dst);
     exit(EXIT_SUCCESS);
