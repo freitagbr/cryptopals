@@ -44,6 +44,9 @@ int main(int argc, char **argv) {
     }
 
     printf("%s\n", c);
+    free((void *) a);
+    free((void *) b);
+    free((void *) c);
 
     exit(EXIT_SUCCESS);
 }
