@@ -1,7 +1,7 @@
 .POSIX:
 include ../inc.mk
 
-EXECS = c1 c2
+EXECS = c1 c2 c3
 
 all: $(EXECS)
 
