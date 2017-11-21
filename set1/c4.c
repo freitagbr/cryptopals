@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
         }
 
         int local_max = 0;
-        unsigned char key;
+        unsigned char key = 0;
 
         for (int k = 0; k <= 0xFF; ++k) {
             int s = score(src, (unsigned char) k);
