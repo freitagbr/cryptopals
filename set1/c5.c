@@ -4,9 +4,9 @@
 
 static const unsigned char key[] = "ICE";
 
-void error(const char *msg) {
+int error(const char *msg) {
     fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {
@@ -25,5 +25,5 @@ int main(int argc, char **argv) {
     printf("%s\n", dst);
     free((void *) dst);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

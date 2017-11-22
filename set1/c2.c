@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 
-void error(const char *msg) {
+int error(const char *msg) {
     fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        error("two arguments required");
+        return error("two arguments required");
     }
 
     const unsigned char *a_inp = (unsigned char *) argv[1];
@@ -18,11 +18,11 @@ int main(int argc, char **argv) {
     const int blen = strlen((const char *) b_inp);
 
     if (alen != blen) {
-        error("inputs must the same length");
+        return error("inputs must the same length");
     }
 
     if ((alen % 2) != 0) {
-        error("inputs must be valid hex strings");
+        return error("inputs must be valid hex strings");
     }
 
     const int len = (alen + (alen % 2)) / 2;
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
         int ra = sscanf((const char *) &a_inp[i], "%2hhx", (unsigned char *) &a[s]);
         int rb = sscanf((const char *) &b_inp[i], "%2hhx", (unsigned char *) &b[s]);
         if ((ra != 1) || (rb != 1)) {
-            error("inputs must be valid hex strings");
+            return error("inputs must be valid hex strings");
         }
     }
 
@@ -48,5 +48,5 @@ int main(int argc, char **argv) {
     free((void *) b);
     free((void *) c);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

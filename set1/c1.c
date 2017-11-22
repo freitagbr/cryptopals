@@ -11,14 +11,14 @@ void base64encode(const unsigned char *src, unsigned char *dst, int len) {
     dst[3] = (len > 2) ? eb64[(int) (  src[2] & 0x3F)                                  ] : '=';
 }
 
-void error(const char *msg) {
+int error(const char *msg) {
     fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        error("one argument required");
+        return error("one argument required");
     }
 
     const unsigned char *inp = (unsigned char *) argv[1];
@@ -27,13 +27,13 @@ int main(int argc, char **argv) {
     const unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * srclen);
 
     if ((inplen % 2) != 0) {
-        error("input must be a valid hex string");
+        return error("input must be a valid hex string");
     }
 
     for (int i = 0, s = 0; i < inplen; i += 2, s += 1) {
         int r = sscanf((const char *) &inp[i], "%2hhx", (unsigned char *) &src[s]);
         if (r != 1) {
-            error("input must be a valid hex string");
+            return error("input must be a valid hex string");
         }
     }
 
@@ -48,5 +48,5 @@ int main(int argc, char **argv) {
     free((void *) src);
     free((void *) dst);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

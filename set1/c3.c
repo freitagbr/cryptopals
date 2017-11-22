@@ -17,21 +17,21 @@ int score(const unsigned char *str, const int len, unsigned char key) {
     return s;
 }
 
-void error(const char *msg) {
+int error(const char *msg) {
     fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        error("one argument required");
+        return error("one argument required");
     }
 
     const unsigned char *inp = (unsigned char *) argv[1];
     const int inplen = strlen((const char *) inp);
 
     if ((inplen % 2) != 0) {
-        error("inputs must be valid hex strings");
+        return error("inputs must be valid hex strings");
     }
 
     const int len = (inplen + (inplen % 2)) / 2;
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     for (int i = 0, s = 0; i < inplen; i += 2, s += 1) {
         int r = sscanf((const char *) &inp[i], "%2hhx", (unsigned char *) &src[s]);
         if (r != 1) {
-            error("input must be a valid hex string");
+            return error("input must be a valid hex string");
         }
     }
 
@@ -65,5 +65,5 @@ int main(int argc, char **argv) {
     free((void *) src);
     free((void *) dst);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

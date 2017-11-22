@@ -17,14 +17,14 @@ int score(unsigned char *str, unsigned char key) {
     return s;
 }
 
-void error(const char *msg) {
+int error(const char *msg) {
     fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        error("one argument required");
+        return error("one argument required");
     }
 
     FILE *fp;
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     fp = fopen(argv[1], "r");
 
     if (fp == NULL) {
-        error("file error");
+        return error("file error");
     }
 
     int global_max = 0;
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
             int r = sscanf((const char *) &line[i], "%2hhx", (unsigned char *) &src[s]);
             if (r != 1) {
                 fclose(fp);
-                error("input must be a valid hex string");
+                return error("input must be a valid hex string");
             }
         }
 
@@ -78,5 +78,5 @@ int main(int argc, char **argv) {
         free((void *) line);
     }
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
