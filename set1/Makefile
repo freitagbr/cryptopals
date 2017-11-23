@@ -8,11 +8,14 @@ all: $(CS)
 c1: c1.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o c1 c1.o
 
-c1.o: c1.cpp base64.h ../error.h
+c1.o: c1.cpp base64.h hex.h ../error.h
 	$(CXX) $(CXXFLAGS) -c c1.cpp
 
-c2:
-	echo
+c2: c2.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o c2 c2.o
+
+c2.o: c2.cpp hex.h ../error.h
+	$(CXX) $(CXXFLAGS) -c c2.cpp
 
 c3:
 	echo
