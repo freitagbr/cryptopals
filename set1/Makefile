@@ -29,11 +29,8 @@ c4: c4.o
 c4.o: c4.cpp hex.h ../error.h
 	$(CXX) $(CXXFLAGS) -c c4.cpp
 
-c5: c5.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o c5 c5.o
-
-c5.o: c4.cpp hex.h ../error.h
-	$(CXX) $(CXXFLAGS) -c c5.cpp
+c5:
+	echo
 
 c6:
 	echo
