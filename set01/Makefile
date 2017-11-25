@@ -1,12 +1,12 @@
 .POSIX:
 include ../inc.mk
 
-EXECS = c1 c2 c3 c4 c5
+CS = c01 c02 c03 c04 c05
 
-all: $(EXECS)
+all: $(CS)
 
-$(EXECS):
+$(CS):
 	$(CC) $(CFLAGS) -o $@ $@.c
 
 clean:
-	rm -f $(EXECS)
+	rm -f $(CS)

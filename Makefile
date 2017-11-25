@@ -1,10 +1,10 @@
 .POSIX:
 include inc.mk
 
-DIRS = set1
+SETS = set01
 
 all:
-	-for d in $(DIRS); do (cd $$d; $(MAKE)); done
+	-for s in $(SETS); do (cd $$s; $(MAKE)); done
 
 clean:
-	-for d in $(DIRS); do (cd $$d; $(MAKE) clean); done
+	-for s in $(SETS); do (cd $$s; $(MAKE) clean); done
