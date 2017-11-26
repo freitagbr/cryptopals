@@ -2,22 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hex.h"
+#include "score.h"
 #include "../error.h"
-
-static const unsigned char freq[] = "etaoin shrdlu";
-
-int score(const unsigned char *str, const int len, unsigned char key) {
-    int s = 0;
-    for (int i = 0; i < 13; ++i) {
-        unsigned char c = freq[i];
-        for (int l = 0; l < len; ++l) {
-            if ((str[l] ^ key) == c) {
-                ++s;
-            }
-        }
-    }
-    return s;
-}
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -25,20 +12,17 @@ int main(int argc, char **argv) {
     }
 
     const unsigned char *inp = (unsigned char *) argv[1];
-    const int inplen = strlen((const char *) inp);
+    const size_t inplen = strlen((const char *) inp);
 
     if ((inplen % 2) != 0) {
         return error("inputs must be valid hex strings");
     }
 
-    const int len = (inplen + (inplen % 2)) / 2;
-    const unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    const size_t len = hex_decoded_length(inplen);
+    unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
-    for (int i = 0, s = 0; i < inplen; i += 2, s += 1) {
-        int r = sscanf((const char *) &inp[i], "%2hhx", (unsigned char *) &src[s]);
-        if (r != 1) {
-            return error("input must be a valid hex string");
-        }
+    if (!hex_decode(inp, inplen, src, len)) {
+        return error("input must be a valid hex string");
     }
 
     int max_score = 0;
@@ -54,7 +38,7 @@ int main(int argc, char **argv) {
 
     unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
-    for (int i = 0, s = 0; i < len; i += 1, s += 2) {
+    for (size_t i = 0; i < len; i++) {
         dst[i] = src[i] ^ key;
     }
 

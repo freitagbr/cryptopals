@@ -8,9 +8,11 @@ all: $(CS)
 debug: CFLAGS += -DDEBUG
 debug: $(CS)
 
+base64.o: base64.c base64.h
+
 hex.o: hex.c hex.h
 
-base64.o: base64.c base64.h
+score.o: score.c score.h
 
 c01: c01.o base64.o hex.o
 	$(CC) $(CFLAGS) -o $@ $^
@@ -22,10 +24,10 @@ c02: c02.o hex.o
 
 c02.o: c02.c hex.h ../error.h
 
-c03: c03.o
+c03: c03.o hex.o score.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-c03.o: c03.c ../error.h
+c03.o: c03.c hex.h score.h ../error.h
 
 c04: c04.o
 	$(CC) $(CFLAGS) -o $@ $^
