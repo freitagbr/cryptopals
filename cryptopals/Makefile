@@ -13,9 +13,8 @@ LDFLAGS   = -O
 LDLIBS    = -lm
 
 LIB       = $(LIB_DIR)/$(NAME).a
-LIB_OBJS  = $(OBJ_DIR)/base64.o \
-			$(OBJ_DIR)/hex.o \
-			$(OBJ_DIR)/score.o
+LIB_SRCS  = $(wildcard $(SRC_DIR)/*.c)
+LIB_OBJS  = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(LIB_SRCS)))
 
 SETS      = set01
 
