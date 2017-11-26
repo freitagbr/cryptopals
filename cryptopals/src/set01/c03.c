@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,23 +7,16 @@
 #include "score.h"
 #include "error.h"
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        return error("one argument required");
+int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **dst) {
+    if ((hexlen % 2) != 0) {
+        return -1;
     }
 
-    const unsigned char *inp = (unsigned char *) argv[1];
-    const size_t inplen = strlen((const char *) inp);
-
-    if ((inplen % 2) != 0) {
-        return error("inputs must be valid hex strings");
-    }
-
-    const size_t len = hex_decoded_length(inplen);
+    const size_t len = hex_decoded_length(hexlen);
     unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
-    if (!hex_decode(inp, inplen, src, len)) {
-        return error("input must be a valid hex string");
+    if (!hex_decode(hex, hexlen, src, len)) {
+        return -1;
     }
 
     int max_score = 0;
@@ -36,15 +30,20 @@ int main(int argc, char **argv) {
         }
     }
 
-    unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    *dst = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
     for (size_t i = 0; i < len; i++) {
-        dst[i] = src[i] ^ key;
+        (*dst)[i] = src[i] ^ key;
     }
 
-    printf("%s\n", dst);
-    free((void *) src);
-    free((void *) dst);
+    return 0;
+}
 
-    return EXIT_SUCCESS;
+int main() {
+    const unsigned char input[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+    const unsigned char expected[] = "Cooking MC's like a pound of bacon";
+    unsigned char *output = NULL;
+
+    assert(challenge_03(input, 68, &output) == 0);
+    assert(strcmp((const char *) output, (const char *) expected) == 0);
 }

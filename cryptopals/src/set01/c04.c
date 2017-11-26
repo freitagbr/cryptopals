@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,32 +7,28 @@
 #include "score.h"
 #include "error.h"
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        return error("one argument required");
-    }
-
+int challenge_04(const char *file, unsigned char **dst) {
     FILE *fp;
     char *line = NULL;
     size_t len = 0;
     ssize_t read;
 
-    fp = fopen(argv[1], "r");
+    fp = fopen(file, "r");
 
     if (fp == NULL) {
-        return error("file error");
+        return -1;
     }
 
     int global_max = 0;
     unsigned char src[30];
-    unsigned char dst[30];
+    *dst = (unsigned char *) malloc(sizeof (unsigned char) * 30);
 
     while ((read = getline(&line, &len, fp)) != -1) {
         for (int i = 0, s = 0; i < 60; i += 2, s += 1) {
             int r = sscanf((const char *) &line[i], "%2hhx", (unsigned char *) &src[s]);
             if (r != 1) {
                 fclose(fp);
-                return error("input must be a valid hex string");
+                return -1;
             }
         }
 
@@ -49,12 +46,10 @@ int main(int argc, char **argv) {
         if (local_max > global_max) {
             global_max = local_max;
             for (int i = 0; i < 30; ++i) {
-                dst[i] = src[i] ^ key;
+                (*dst)[i] = src[i] ^ key;
             }
         }
     }
-
-    printf("%s\n", dst);
 
     fclose(fp);
 
@@ -62,5 +57,13 @@ int main(int argc, char **argv) {
         free((void *) line);
     }
 
-    return EXIT_SUCCESS;
+    return 0;
+}
+
+int main() {
+    const unsigned char expected[] = "Now that the party is jumping\n";
+    unsigned char *output = NULL;
+
+    assert(challenge_04("data/c04.txt", &output) == 0);
+    assert(strcmp((const char *) output, (const char *) expected) == 0);
 }
