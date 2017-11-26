@@ -17,7 +17,6 @@ LIB_OBJS  = $(OBJ_DIR)/base64.o \
 			$(OBJ_DIR)/score.o
 
 SETS      = set01
-CS        = c01 c02 c03 c04 c05
 
 
 all: sets
@@ -38,54 +37,26 @@ $(LIB): $(LIB_OBJS)
 
 # objects
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(LIB_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
 # set 01
 
-set01: c01 c02 c03 c04 c05
+SET01_SRCS = $(wildcard $(SRC_DIR)/set01/*.c)
+SET01_OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(SET01_SRCS)))
+SET01      = $(notdir $(basename $(SET01_SRCS)))
 
-c01: $(OBJ_DIR)/c01.o $(LIB)
+set01: $(SET01)
+
+$(SET01): %: $(OBJ_DIR)/%.o $(LIB)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
-$(OBJ_DIR)/c01.o: $(SRC_DIR)/set01/c01.c
+$(SET01_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set01/%.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-c02: $(OBJ_DIR)/c02.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
-
-$(OBJ_DIR)/c02.o: $(SRC_DIR)/set01/c02.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-c03: $(OBJ_DIR)/c03.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
-
-$(OBJ_DIR)/c03.o: $(SRC_DIR)/set01/c03.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-c04: $(OBJ_DIR)/c04.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
-
-$(OBJ_DIR)/c04.o: $(SRC_DIR)/set01/c04.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-c05: $(OBJ_DIR)/c05.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
-
-$(OBJ_DIR)/c05.o: $(SRC_DIR)/set01/c05.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $^
 
 
 clean:
