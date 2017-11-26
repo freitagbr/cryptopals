@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../error.h"
+
 static const unsigned char freq[] = "etaoin shrdlu";
 
 int score(const unsigned char *str, const int len, unsigned char key) {
@@ -15,11 +17,6 @@ int score(const unsigned char *str, const int len, unsigned char key) {
         }
     }
     return s;
-}
-
-int error(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv) {

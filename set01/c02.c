@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int error(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-    return EXIT_FAILURE;
-}
+#include "../error.h"
 
 int main(int argc, char **argv) {
     if (argc != 3) {

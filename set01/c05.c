@@ -2,16 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
-static const unsigned char key[] = "ICE";
+#include "../error.h"
 
-int error(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-    return EXIT_FAILURE;
-}
+static const unsigned char key[] = "ICE";
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        error("one argument required");
+        return error("one argument required");
     }
 
     const unsigned char *src = (const unsigned char *) argv[1];
