@@ -4,6 +4,7 @@ INCLUDE   = include
 SRC_DIR   = src
 BUILD_DIR = build
 OBJ_DIR   = $(BUILD_DIR)/obj
+LIB_DIR   = $(BUILD_DIR)/lib
 BIN_DIR   = $(BUILD_DIR)/bin
 
 CC        = cc
@@ -11,7 +12,7 @@ CFLAGS    = -Wall -Wextra -Werror -O --std=c99 -I$(INCLUDE)
 LDFLAGS   = -O
 LDLIBS    = -lm
 
-LIB       = $(BIN_DIR)/$(NAME).a
+LIB       = $(LIB_DIR)/$(NAME).a
 LIB_OBJS  = $(OBJ_DIR)/base64.o \
 			$(OBJ_DIR)/hex.o \
 			$(OBJ_DIR)/score.o
@@ -20,6 +21,9 @@ SETS      = set01
 
 
 all: sets
+
+test: sets
+	-for c in $(wildcard $(BIN_DIR)/*); do $$c; done
 
 debug: CFLAGS += -DDEBUG
 debug: sets
@@ -30,7 +34,7 @@ sets: $(SETS)
 # library
 
 $(LIB): $(LIB_OBJS)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
+	@[ -d $(LIB_DIR) ] || mkdir -p $(LIB_DIR)
 	$(LD) -r -o $(OBJ_DIR)/$(NAME).o $(LIB_OBJS)
 	ar rvs $@ $(OBJ_DIR)/$(NAME).o
 

@@ -5,7 +5,7 @@
 
 static const unsigned char hex_encode_table[16] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', 'a', 'B', 'c', 'd', 'e', 'f',
+    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 };
 
 static inline char htob(const unsigned char c) {

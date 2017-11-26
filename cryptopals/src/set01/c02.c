@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -5,45 +6,42 @@
 #include "hex.h"
 #include "error.h"
 
-int main(int argc, char **argv) {
-    if (argc != 3) {
-        return error("two arguments required");
-    }
-
-    const unsigned char *a_inp = (unsigned char *) argv[1];
-    const unsigned char *b_inp = (unsigned char *) argv[2];
-    const size_t alen = strlen((const char *) a_inp);
-    const size_t blen = strlen((const char *) b_inp);
-
+int challenge_02(const unsigned char *ahex, const size_t alen, const unsigned char *bhex, const size_t blen, unsigned char **dst) {
     if (alen != blen) {
-        return error("inputs must the same length");
+        return -1;
     }
-
     if (((alen % 2) != 0) || ((blen % 2) != 0)) {
-        return error("inputs must be valid hex strings");
+        return -1;
     }
 
     const size_t len = hex_decoded_length(alen);
     unsigned char *a = (unsigned char *) malloc(sizeof (unsigned char) * len);
     unsigned char *b = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
-    if (!hex_decode(a_inp, alen, a, len) || !hex_decode(b_inp, blen, b, len)) {
-        return error("inputs must be valid hex strings");
+    if (!hex_decode(ahex, alen, a, len) || !hex_decode(bhex, blen, b, len)) {
+        return -1;
     }
 
     for (size_t i = 0; i < len; i++) {
         a[i] = a[i] ^ b[i];
     }
 
-    const size_t clen = hex_encoded_length(len);
-    unsigned char *c = (unsigned char *) malloc(sizeof (unsigned char) * clen);
+    const size_t dstlen = hex_encoded_length(len);
+    *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
-    hex_encode(a, len, c, clen);
-
-    printf("%s\n", c);
+    hex_encode(a, len, *dst, dstlen);
     free((void *) a);
     free((void *) b);
-    free((void *) c);
 
-    return EXIT_SUCCESS;
+    return 0;
+}
+
+int main() {
+    const unsigned char input_a[] = "1c0111001f010100061a024b53535009181c";
+    const unsigned char input_b[] = "686974207468652062756c6c277320657965";
+    const unsigned char expected[] = "746865206b696420646f6e277420706c6179";
+    unsigned char *output = NULL;
+
+    assert(challenge_02(input_a, 36, input_b, 36, &output) == 0);
+    assert(strcmp((const char *) output, (const char *) expected) == 0);
 }
