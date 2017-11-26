@@ -11,7 +11,7 @@ debug: $(CS)
 c01: c01.o
 	$(CC) $(CFLAGS) -o c01 c01.o
 
-c01.o: c01.c base64.h ../error.h
+c01.o: c01.c base64.h hex.h ../error.h
 
 $(CS):
 	$(CC) $(CFLAGS) -o $@ $@.c
