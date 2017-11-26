@@ -8,8 +8,12 @@ all: $(CS)
 debug: CFLAGS += -DDEBUG
 debug: $(CS)
 
-c01: c01.o
-	$(CC) $(CFLAGS) -o c01 c01.o
+hex.o: hex.c hex.h
+
+base64.o: base64.c base64.h
+
+c01: c01.o base64.o hex.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 c01.o: c01.c base64.h hex.h ../error.h
 
