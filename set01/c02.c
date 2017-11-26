@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hex.h"
 #include "../error.h"
 
 int main(int argc, char **argv) {
@@ -11,34 +12,33 @@ int main(int argc, char **argv) {
 
     const unsigned char *a_inp = (unsigned char *) argv[1];
     const unsigned char *b_inp = (unsigned char *) argv[2];
-    const int alen = strlen((const char *) a_inp);
-    const int blen = strlen((const char *) b_inp);
+    const size_t alen = strlen((const char *) a_inp);
+    const size_t blen = strlen((const char *) b_inp);
 
     if (alen != blen) {
         return error("inputs must the same length");
     }
 
-    if ((alen % 2) != 0) {
+    if (((alen % 2) != 0) || ((blen % 2) != 0)) {
         return error("inputs must be valid hex strings");
     }
 
-    const int len = (alen + (alen % 2)) / 2;
-    const unsigned char *a = (unsigned char *) malloc(sizeof (unsigned char) * len);
-    const unsigned char *b = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    const size_t len = hex_decoded_length(alen);
+    unsigned char *a = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    unsigned char *b = (unsigned char *) malloc(sizeof (unsigned char) * len);
 
-    for (int i = 0, s = 0; i < alen; i += 2, s += 1) {
-        int ra = sscanf((const char *) &a_inp[i], "%2hhx", (unsigned char *) &a[s]);
-        int rb = sscanf((const char *) &b_inp[i], "%2hhx", (unsigned char *) &b[s]);
-        if ((ra != 1) || (rb != 1)) {
-            return error("inputs must be valid hex strings");
-        }
+    if (!hex_decode(a_inp, alen, a, len) || !hex_decode(b_inp, blen, b, len)) {
+        return error("inputs must be valid hex strings");
     }
 
-    unsigned char *c = (unsigned char *) malloc(sizeof (unsigned char) * len);
-
-    for (int i = 0, s = 0; i < len; i += 1, s += 2) {
-        sprintf((char *) &c[s], "%02x", a[i] ^ b[i]);
+    for (size_t i = 0; i < len; i++) {
+        a[i] = a[i] ^ b[i];
     }
+
+    const size_t clen = hex_encoded_length(len);
+    unsigned char *c = (unsigned char *) malloc(sizeof (unsigned char) * clen);
+
+    hex_encode(a, len, c, clen);
 
     printf("%s\n", c);
     free((void *) a);

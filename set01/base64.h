@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-static const unsigned char encode_table[64] = {
+static const unsigned char base64_encode_table[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
     'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
     'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
@@ -14,7 +14,7 @@ static const unsigned char encode_table[64] = {
     '4', '5', '6', '7', '8', '9', '+', '/',
 };
 
-static const char decode_table[256] = {
+static const char base64_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,

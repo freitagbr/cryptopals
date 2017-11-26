@@ -17,10 +17,10 @@ int base64_encode(const unsigned char *src, size_t srclen, unsigned char *dst, s
         if (i == 3) {
             btoa(a, b);
 
-            *dst++ = encode_table[a[0]];
-            *dst++ = encode_table[a[1]];
-            *dst++ = encode_table[a[2]];
-            *dst++ = encode_table[a[3]];
+            *dst++ = base64_encode_table[a[0]];
+            *dst++ = base64_encode_table[a[1]];
+            *dst++ = base64_encode_table[a[2]];
+            *dst++ = base64_encode_table[a[3]];
 
             i = 0;
         }
@@ -34,7 +34,7 @@ int base64_encode(const unsigned char *src, size_t srclen, unsigned char *dst, s
         btoa(a, b);
 
         for (j = 0; j < i + 1; j++) {
-            *dst++ = encode_table[a[j]];
+            *dst++ = base64_encode_table[a[j]];
         }
 
         while ((i++ < 3)) {
@@ -64,10 +64,10 @@ int base64_decode(const unsigned char *src, size_t srclen, unsigned char *dst, s
 
         a[i++] = *(src++);
         if (i == 4) {
-            a[0] = decode_table[a[0]];
-            a[1] = decode_table[a[1]];
-            a[2] = decode_table[a[2]];
-            a[3] = decode_table[a[3]];
+            a[0] = base64_decode_table[a[0]];
+            a[1] = base64_decode_table[a[1]];
+            a[2] = base64_decode_table[a[2]];
+            a[3] = base64_decode_table[a[3]];
 
             atob(b, a);
 
@@ -84,10 +84,10 @@ int base64_decode(const unsigned char *src, size_t srclen, unsigned char *dst, s
             a[j] = '\0';
         }
 
-        a[0] = decode_table[a[0]];
-        a[1] = decode_table[a[1]];
-        a[2] = decode_table[a[2]];
-        a[3] = decode_table[a[3]];
+        a[0] = base64_decode_table[a[0]];
+        a[1] = base64_decode_table[a[1]];
+        a[2] = base64_decode_table[a[2]];
+        a[3] = base64_decode_table[a[3]];
 
         atob(b, a);
 

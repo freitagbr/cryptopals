@@ -17,10 +17,10 @@ c01: c01.o base64.o hex.o
 
 c01.o: c01.c base64.h hex.h ../error.h
 
-c02: c02.o
+c02: c02.o hex.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-c02.o: c02.c ../error.h
+c02.o: c02.c hex.h ../error.h
 
 c03: c03.o
 	$(CC) $(CFLAGS) -o $@ $^
