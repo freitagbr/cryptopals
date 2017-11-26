@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,35 +7,31 @@
 #include "hex.h"
 #include "error.h"
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        return error("one argument required");
+int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **dst) {
+    const size_t hexlen = hex_decoded_length(srclen);
+    unsigned char *hex = (unsigned char *) malloc(sizeof (unsigned char) * hexlen);
+
+    if (!hex_decode(src, srclen, hex, hexlen)) {
+        return -1;
     }
 
-    const unsigned char *inp = (unsigned char *) argv[1];
-    const int inplen = strlen((const char *) inp);
+    const int dstlen = encoded_length(hexlen);
+    *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
-    if ((inplen % 2) != 0) {
-        return error("input must be a valid hex string");
+    if (!base64_encode(hex, hexlen, *dst, dstlen)) {
+        return -1;
     }
 
-    const int srclen = hex_decoded_length(inplen);
-    unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * srclen);
+    free((void *) hex);
 
-    if (!hex_decode(inp, inplen, src, srclen)) {
-        return error("input must be a valid hex string");
-    }
+    return 0;
+}
 
-    const int dstlen = encoded_length(srclen);
-    unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
+int main() {
+    const unsigned char input[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+    const unsigned char expected[] = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+    unsigned char *output = NULL;
 
-    if (!base64_encode(src, srclen, dst, dstlen)) {
-        return error("failed to encode in base64");
-    }
-
-    printf("%s\n", dst);
-    free((void *) src);
-    free((void *) dst);
-
-    return EXIT_SUCCESS;
+    assert(challenge_01(input, 96, &output) == 0);
+    assert(strcmp((const char *) output, (const char *) expected) == 0);
 }
