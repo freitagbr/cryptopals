@@ -51,7 +51,7 @@ c01: $(OBJ_DIR)/c01.o $(LIB)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
-$(OBJ_DIR)/c01.o: $(SRC_DIR)/set01/c01.c $(INCLUDE)/base64.h $(INCLUDE)/hex.h
+$(OBJ_DIR)/c01.o: $(SRC_DIR)/set01/c01.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
@@ -59,7 +59,7 @@ c02: $(OBJ_DIR)/c02.o $(LIB)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
-$(OBJ_DIR)/c02.o: $(SRC_DIR)/set01/c02.c $(INCLUDE)/hex.h
+$(OBJ_DIR)/c02.o: $(SRC_DIR)/set01/c02.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
@@ -67,7 +67,7 @@ c03: $(OBJ_DIR)/c03.o $(LIB)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
-$(OBJ_DIR)/c03.o: $(SRC_DIR)/set01/c03.c $(INCLUDE)/hex.h $(INCLUDE)/score.h
+$(OBJ_DIR)/c03.o: $(SRC_DIR)/set01/c03.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
@@ -75,7 +75,7 @@ c04: $(OBJ_DIR)/c04.o $(LIB)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
-$(OBJ_DIR)/c04.o: $(SRC_DIR)/set01/c04.c $(INCLUDE)/score.h
+$(OBJ_DIR)/c04.o: $(SRC_DIR)/set01/c04.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
