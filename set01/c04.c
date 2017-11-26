@@ -2,22 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hex.h"
+#include "score.h"
 #include "../error.h"
-
-static const unsigned char freq[] = "etaoin shrdlu";
-
-int score(unsigned char *str, unsigned char key) {
-    int s = 0;
-    for (int i = 0; i < 13; ++i) {
-        unsigned char c = freq[i];
-        for (int l = 0; l < 30; ++l) {
-            if ((str[l] ^ key) == c) {
-                ++s;
-            }
-        }
-    }
-    return s;
-}
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -52,7 +39,7 @@ int main(int argc, char **argv) {
         unsigned char key = 0;
 
         for (int k = 0; k <= 0xFF; ++k) {
-            int s = score(src, (unsigned char) k);
+            int s = score(src, 30, (unsigned char) k);
             if (s > local_max) {
                 local_max = s;
                 key = (unsigned char) k;

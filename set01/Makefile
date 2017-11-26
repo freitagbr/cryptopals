@@ -29,10 +29,10 @@ c03: c03.o hex.o score.o
 
 c03.o: c03.c hex.h score.h ../error.h
 
-c04: c04.o
+c04: c04.o score.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-c04.o: c04.c ../error.h
+c04.o: c04.c score.h ../error.h
 
 c05: c05.o
 	$(CC) $(CFLAGS) -o $@ $^
