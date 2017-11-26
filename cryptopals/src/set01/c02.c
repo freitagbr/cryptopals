@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "hex.h"
-#include "error.h"
 
 /**
  * Fixed XOR

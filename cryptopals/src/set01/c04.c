@@ -5,7 +5,6 @@
 
 #include "hex.h"
 #include "score.h"
-#include "error.h"
 
 /**
  * Detect single-character XOR

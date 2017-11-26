@@ -5,7 +5,6 @@
 
 #include "hex.h"
 #include "score.h"
-#include "error.h"
 
 /**
  * Single-byte XOR cipher

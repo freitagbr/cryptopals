@@ -5,7 +5,6 @@
 
 #include "base64.h"
 #include "hex.h"
-#include "error.h"
 
 /**
  * Convert hex to base64
