@@ -7,6 +7,17 @@
 #include "score.h"
 #include "error.h"
 
+/**
+ * Detect single-character XOR
+ *
+ * One of the 60-character strings in this file has been encrypted by single-
+ * character XOR.
+ *
+ * Find it.
+ *
+ * (Your code from #3 should help.)
+ */
+
 int challenge_04(const char *file, unsigned char **dst) {
     FILE *fp;
     char *line = NULL;
