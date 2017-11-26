@@ -2,19 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static const unsigned char eb64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-void base64encode(const unsigned char *src, unsigned char *dst, int len) {
-    dst[0] =             eb64[(int) (  src[0]         >> 2)                            ];
-    dst[1] =             eb64[(int) (((src[0] & 0x03) << 4) | (((src[1] & 0xF0) >> 4)))];
-    dst[2] = (len > 1) ? eb64[(int) (((src[1] & 0x0F) << 2) | (((src[2] & 0xC0) >> 6)))] : '=';
-    dst[3] = (len > 2) ? eb64[(int) (  src[2] & 0x3F)                                  ] : '=';
-}
-
-int error(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-    return EXIT_FAILURE;
-}
+#include "base64.h"
+#include "../error.h"
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -37,12 +26,10 @@ int main(int argc, char **argv) {
         }
     }
 
-    const int dstlen = ((srclen + (srclen % 3)) / 3) * 4;
+    const int dstlen = encoded_length(srclen);
     unsigned char *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
-    for (int s = 0, d = 0; s < srclen; s += 3, d += 4) {
-        base64encode(&src[s], &dst[d], srclen - s);
-    }
+    base64_encode(src, srclen, dst, dstlen);
 
     printf("%s\n", dst);
     free((void *) src);
