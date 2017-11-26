@@ -29,7 +29,7 @@ int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **
         return -1;
     }
 
-    const size_t dstlen = encoded_length(hexlen);
+    const size_t dstlen = base64_encoded_length(hexlen);
     *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
 
     if (!base64_encode(hex, hexlen, *dst, dstlen)) {

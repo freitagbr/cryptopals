@@ -46,7 +46,7 @@ static inline void atob(unsigned char *b, unsigned char *a) {
     b[2] = ((a[2] & 0x3) << 6) +   a[3];
 }
 
-inline int decoded_length(const unsigned char *src, size_t srclen) {
+inline int base64_decoded_length(const unsigned char *src, size_t srclen) {
     int eqs = 0;
     const unsigned char *in_end = src + srclen;
 
@@ -57,12 +57,14 @@ inline int decoded_length(const unsigned char *src, size_t srclen) {
     return ((srclen * 6) / 8) - eqs;
 }
 
-inline int encoded_length(size_t len) {
+inline int base64_encoded_length(size_t len) {
     return (len + 2 - ((len + 2) % 3)) / 3 * 4;
 }
 
 int base64_encode(const unsigned char *, size_t, unsigned char *, size_t);
 
 int base64_decode(const unsigned char *, size_t, unsigned char *, size_t);
+
+int base64_decode_file(const char *, unsigned char **, size_t *);
 
 #endif // BASE64_H

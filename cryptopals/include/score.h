@@ -3,8 +3,8 @@
 
 #include <stdlib.h>
 
-static const unsigned char score_freq[13] = "etaoin shrdlu";
+static const unsigned char score_english_chars[13] = "etaoin shrdlu";
 
-int score(const unsigned char *, const size_t, unsigned char);
+int score_english(const unsigned char *, const size_t, unsigned char);
 
 #endif // SCORE_H

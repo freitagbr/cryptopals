@@ -46,7 +46,7 @@ int challenge_04(const char *file, unsigned char **dst) {
         unsigned char key = 0;
 
         for (int k = 0; k <= 0xFF; ++k) {
-            int s = score(src, 30, (unsigned char) k);
+            int s = score_english(src, 30, (unsigned char) k);
             if (s > local_max) {
                 local_max = s;
                 key = (unsigned char) k;
