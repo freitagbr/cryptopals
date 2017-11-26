@@ -4,7 +4,7 @@
 
 #include "hex.h"
 #include "score.h"
-#include "../error.h"
+#include "error.h"
 
 int main(int argc, char **argv) {
     if (argc != 2) {

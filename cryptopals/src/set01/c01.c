@@ -4,7 +4,7 @@
 
 #include "base64.h"
 #include "hex.h"
-#include "../error.h"
+#include "error.h"
 
 int main(int argc, char **argv) {
     if (argc != 2) {

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../error.h"
+#include "error.h"
 
 static const unsigned char key[] = "ICE";
 
