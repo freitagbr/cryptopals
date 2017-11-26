@@ -3,7 +3,12 @@ include inc.mk
 
 SETS = set01
 
-all:
+all: sets
+
+debug: CFLAGS += -DDEBUG
+debug: sets
+
+sets:
 	-for s in $(SETS); do (cd $$s; $(MAKE)); done
 
 clean:
