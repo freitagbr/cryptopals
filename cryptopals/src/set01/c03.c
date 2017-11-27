@@ -47,7 +47,10 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
         }
     }
 
-    fixed_xor(src, len, dst, key);
+    if (!fixed_xor(src, len, dst, key)) {
+        free((void *) src);
+        return -1;
+    }
 
     free((void *) src);
 

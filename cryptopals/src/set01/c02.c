@@ -52,7 +52,11 @@ int challenge_02(const unsigned char *ahex, const size_t ahexlen, const unsigned
 
     size_t dstlen = 0;
 
-    hex_encode(a, alen, dst, &dstlen);
+    if (!hex_encode(a, alen, dst, &dstlen)) {
+        free((void *) a);
+        free((void *) b);
+        return -1;
+    }
 
     free((void *) a);
     free((void *) b);

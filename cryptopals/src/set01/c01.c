@@ -33,6 +33,11 @@ int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **
     const size_t dstlen = base64_encoded_length(hexlen);
     *dst = (unsigned char *) malloc((sizeof (unsigned char) * dstlen) + 1);
 
+    if (*dst == NULL) {
+        free((void *) hex);
+        return -1;
+    }
+
     if (!base64_encode(hex, hexlen, *dst, dstlen)) {
         return -1;
     }

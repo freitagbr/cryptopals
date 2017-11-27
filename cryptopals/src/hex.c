@@ -7,10 +7,15 @@ int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **ds
     *dstlen = hex_decoded_length(srclen);
     unsigned char *d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
 
+    if (d == NULL) {
+        return 0;
+    }
+
     for (size_t i = 0; i < srclen; i += 2) {
         char a = htob(src[i]);
         char b = htob(src[i + 1]);
         if ((a == -1) || (b == -1)) {
+            free((void *) d);
             return 0;
         }
         *d++ = (unsigned char) ((a << 4) | b);
@@ -24,6 +29,10 @@ int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **ds
 int hex_encode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen) {
     *dstlen = hex_encoded_length(srclen);
     unsigned char *d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
+
+    if (d == NULL) {
+        return 0;
+    }
 
     for (size_t i = 0; i < srclen; i++) {
         btoh(src[i], d);

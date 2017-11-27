@@ -125,6 +125,10 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
         long srclen = buflen + 1;
         src = (unsigned char *) malloc(sizeof (unsigned char) * srclen);
 
+        if (src == NULL) {
+            return 0;
+        }
+
         if (fseek(fp, 0, SEEK_SET) != 0) {
             free((void *) src);
             fclose(fp);
@@ -146,6 +150,12 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
     fclose(fp);
 
     unsigned char *base64 = (unsigned char *) malloc(sizeof (unsigned char) * read);
+
+    if (base64 == NULL) {
+        free((void *) src);
+        return 0;
+    }
+
     size_t i = 0;
     size_t j = 0;
     size_t b = 0;
@@ -166,6 +176,12 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
 
     const size_t len = base64_decoded_length(base64, b);
     *dst = (unsigned char *) malloc(sizeof (unsigned char) * len);
+
+    if (*dst == NULL) {
+        free((void *) base64);
+        return 0;
+    }
+
     int r = base64_decode(base64, b, *dst, len);
 
     free((void *) base64);

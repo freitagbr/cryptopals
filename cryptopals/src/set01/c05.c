@@ -34,11 +34,16 @@
 int challenge_05(const unsigned char *src, const size_t srclen, unsigned char **dst) {
     unsigned char *tmp = NULL;
 
-    repeating_xor(src, srclen, &tmp, "ICE", 3);
+    if (!repeating_xor(src, srclen, &tmp, "ICE", 3)) {
+        return -1;
+    }
 
     size_t dstlen = 0;
 
-    hex_encode(tmp, srclen, dst, &dstlen);
+    if (!hex_encode(tmp, srclen, dst, &dstlen)) {
+        free((void *) tmp);
+        return -1;
+    }
 
     free((void *) tmp);
 
