@@ -1,6 +1,7 @@
 #ifndef HEX_H
 #define HEX_H
 
+#include <stddef.h>
 #include <stdlib.h>
 
 static const unsigned char hex_encode_table[16] = {

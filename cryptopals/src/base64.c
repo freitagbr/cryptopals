@@ -1,7 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-
 #include "base64.h"
+
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int base64_encode(const unsigned char *src, size_t srclen, unsigned char *dst, size_t dstlen) {
     int i = 0, j = 0;

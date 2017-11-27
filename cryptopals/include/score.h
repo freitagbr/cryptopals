@@ -1,7 +1,7 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 static const unsigned char score_english_chars[13] = "etaoin shrdlu";
 

@@ -1,5 +1,6 @@
 #include "hex.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 
 int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen) {

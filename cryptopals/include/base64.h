@@ -1,7 +1,10 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static const unsigned char base64_encode_table[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',

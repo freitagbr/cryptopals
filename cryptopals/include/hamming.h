@@ -1,7 +1,7 @@
 #ifndef HAMMING_H
 #define HAMMING_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 static inline int popcount(unsigned char n) {
     int count = 0;
