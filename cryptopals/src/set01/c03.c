@@ -5,6 +5,7 @@
 
 #include "hex.h"
 #include "score.h"
+#include "xor.h"
 
 /**
  * Single-byte XOR cipher
@@ -27,10 +28,10 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
         return -1;
     }
 
-    const size_t len = hex_decoded_length(hexlen);
-    unsigned char *src = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    size_t len = 0;
+    unsigned char *src = NULL;
 
-    if (!hex_decode(hex, hexlen, src, len)) {
+    if (!hex_decode(hex, hexlen, &src, &len)) {
         return -1;
     }
 
@@ -45,11 +46,9 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
         }
     }
 
-    *dst = (unsigned char *) malloc(sizeof (unsigned char) * len);
+    fixed_xor(src, len, dst, key);
 
-    for (size_t i = 0; i < len; i++) {
-        (*dst)[i] = src[i] ^ key;
-    }
+    free((void *) src);
 
     return 0;
 }
@@ -61,4 +60,6 @@ int main() {
 
     assert(challenge_03(input, 68, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }

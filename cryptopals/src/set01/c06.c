@@ -78,6 +78,8 @@ int challenge_06(const char *file) {
         printf("keysize: %d\tdistance: %f\n", k, dist);
     }
 
+    free((void *) decoded);
+
     return 0;
 }
 

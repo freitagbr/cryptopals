@@ -34,8 +34,8 @@ inline size_t hex_encoded_length(const size_t len) {
     return len * 2;
 }
 
-int hex_decode(const unsigned char *, const size_t, unsigned char *, const size_t);
+int hex_decode(const unsigned char *, const size_t, unsigned char **, size_t *);
 
-int hex_encode(const unsigned char *, const size_t, unsigned char *, const size_t);
+int hex_encode(const unsigned char *, const size_t, unsigned char **, size_t *);
 
 #endif // HEX_H

@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hex.h"
+#include "xor.h"
+
 /**
  * Implement repeating-key XOR
  *
@@ -27,14 +30,16 @@
  * promise, we aren't wasting your time with this.
  */
 
-static const unsigned char key[] = "ICE";
-
 int challenge_05(const unsigned char *src, const size_t srclen, unsigned char **dst) {
-    *dst = (unsigned char *) malloc(sizeof (unsigned char) * srclen * 2);
+    unsigned char *tmp = NULL;
 
-    for (size_t i = 0, s = 0, k = 0; i < srclen; i += 1, s += 2, k = (k + 1) % 3) {
-        sprintf((char *) &(*dst)[s], "%02x", src[i] ^ key[k]);
-    }
+    repeating_xor(src, srclen, &tmp, "ICE", 3);
+
+    size_t dstlen = 0;
+
+    hex_encode(tmp, srclen, dst, &dstlen);
+
+    free((void *) tmp);
 
     return 0;
 }
@@ -50,4 +55,6 @@ int main() {
 
     assert(challenge_05(input, 74, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }

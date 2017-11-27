@@ -24,30 +24,35 @@
  * 746865206b696420646f6e277420706c6179
  */
 
-int challenge_02(const unsigned char *ahex, const size_t alen, const unsigned char *bhex, const size_t blen, unsigned char **dst) {
+int challenge_02(const unsigned char *ahex, const size_t ahexlen, const unsigned char *bhex, const size_t bhexlen, unsigned char **dst) {
+    if (ahexlen != bhexlen) {
+        return -1;
+    }
+    if (((ahexlen % 2) != 0) || ((bhexlen % 2) != 0)) {
+        return -1;
+    }
+
+    size_t alen = 0;
+    size_t blen = 0;
+    unsigned char *a = NULL;
+    unsigned char *b = NULL;
+
+    if (!hex_decode(ahex, ahexlen, &a, &alen) || !hex_decode(bhex, bhexlen, &b, &blen)) {
+        return -1;
+    }
+
     if (alen != blen) {
         return -1;
     }
-    if (((alen % 2) != 0) || ((blen % 2) != 0)) {
-        return -1;
-    }
 
-    const size_t len = hex_decoded_length(alen);
-    unsigned char *a = (unsigned char *) malloc(sizeof (unsigned char) * len);
-    unsigned char *b = (unsigned char *) malloc(sizeof (unsigned char) * len);
-
-    if (!hex_decode(ahex, alen, a, len) || !hex_decode(bhex, blen, b, len)) {
-        return -1;
-    }
-
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < alen; i++) {
         a[i] = a[i] ^ b[i];
     }
 
-    const size_t dstlen = hex_encoded_length(len);
-    *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
+    size_t dstlen = 0;
 
-    hex_encode(a, len, *dst, dstlen);
+    hex_encode(a, alen, dst, &dstlen);
+
     free((void *) a);
     free((void *) b);
 
@@ -62,4 +67,6 @@ int main() {
 
     assert(challenge_02(input_a, 36, input_b, 36, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }

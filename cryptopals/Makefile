@@ -11,6 +11,7 @@ CC        = cc
 CFLAGS    = -Wall -Wextra -Werror -O --std=c99 -I$(INCLUDE)
 LDFLAGS   = -O
 LDLIBS    = -lm
+VALGRIND  = valgrind
 
 LIB       = $(LIB_DIR)/$(NAME).a
 LIB_SRCS  = $(wildcard $(SRC_DIR)/*.c)
@@ -26,6 +27,9 @@ test: sets
 
 debug: CFLAGS += -DDEBUG
 debug: sets
+
+valgrind: debug
+	-for c in $(wildcard $(BIN_DIR)/*); do $(VALGRIND) $$c; done
 
 sets: $(SETS)
 

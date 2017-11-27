@@ -22,15 +22,15 @@
  */
 
 int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **dst) {
-    const size_t hexlen = hex_decoded_length(srclen);
-    unsigned char *hex = (unsigned char *) malloc(sizeof (unsigned char) * hexlen);
+    size_t hexlen = 0;
+    unsigned char *hex = NULL;
 
-    if (!hex_decode(src, srclen, hex, hexlen)) {
+    if (!hex_decode(src, srclen, &hex, &hexlen)) {
         return -1;
     }
 
     const size_t dstlen = base64_encoded_length(hexlen);
-    *dst = (unsigned char *) malloc(sizeof (unsigned char) * dstlen);
+    *dst = (unsigned char *) malloc((sizeof (unsigned char) * dstlen) + 1);
 
     if (!base64_encode(hex, hexlen, *dst, dstlen)) {
         return -1;
@@ -48,4 +48,6 @@ int main() {
 
     assert(challenge_01(input, 96, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }

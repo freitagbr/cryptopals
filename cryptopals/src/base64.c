@@ -6,8 +6,8 @@
 int base64_encode(const unsigned char *src, size_t srclen, unsigned char *dst, size_t dstlen) {
     int i = 0, j = 0;
     unsigned char *dst_begin = dst;
-    unsigned char b[3];
-    unsigned char a[4];
+    unsigned char b[3] = {0, 0, 0};
+    unsigned char a[4] = {0, 0, 0, 0};
 
     size_t encoded_len = base64_encoded_length(srclen);
 
@@ -45,14 +45,16 @@ int base64_encode(const unsigned char *src, size_t srclen, unsigned char *dst, s
         }
     }
 
+    *dst = '\0';
+
     return (dst == (dst_begin + encoded_len));
 }
 
 int base64_decode(const unsigned char *src, size_t srclen, unsigned char *dst, size_t dstlen) {
     int i = 0, j = 0;
     unsigned char *dst_begin = dst;
-    unsigned char b[3];
-    unsigned char a[4];
+    unsigned char b[3] = {0, 0, 0};
+    unsigned char a[4] = {0, 0, 0, 0};
 
     size_t decoded_len = base64_decoded_length(src, srclen);
 

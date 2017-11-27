@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -5,6 +6,9 @@
 
 #include "hex.h"
 #include "score.h"
+#include "xor.h"
+
+#define LINE_LENGTH 30
 
 /**
  * Detect single-character XOR
@@ -30,8 +34,7 @@ int challenge_04(const char *file, unsigned char **dst) {
     }
 
     int global_max = 0;
-    unsigned char src[30];
-    *dst = (unsigned char *) malloc(sizeof (unsigned char) * 30);
+    unsigned char src[LINE_LENGTH];
 
     while ((read = getline(&line, &len, fp)) != -1) {
         for (int i = 0, s = 0; i < 60; i += 2, s += 1) {
@@ -46,7 +49,7 @@ int challenge_04(const char *file, unsigned char **dst) {
         unsigned char key = 0;
 
         for (int k = 0; k <= 0xFF; ++k) {
-            int s = score_english(src, 30, (unsigned char) k);
+            int s = score_english(src, LINE_LENGTH, (unsigned char) k);
             if (s > local_max) {
                 local_max = s;
                 key = (unsigned char) k;
@@ -55,9 +58,7 @@ int challenge_04(const char *file, unsigned char **dst) {
 
         if (local_max > global_max) {
             global_max = local_max;
-            for (int i = 0; i < 30; ++i) {
-                (*dst)[i] = src[i] ^ key;
-            }
+            fixed_xor(src, LINE_LENGTH, dst, key);
         }
     }
 
@@ -76,4 +77,6 @@ int main() {
 
     assert(challenge_04("data/c04.txt", &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }
