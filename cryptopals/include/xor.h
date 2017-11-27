@@ -4,7 +4,19 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static inline int fixed_xor(const unsigned char *src, size_t srclen, unsigned char **dst, unsigned char key) {
+static inline int xor_fixed(unsigned char *a, size_t alen, unsigned char *b, size_t blen) {
+    if (alen != blen) {
+        return 0;
+    }
+
+    for (size_t i = 0; i < alen; i++) {
+        a[i] = a[i] ^ b[i];
+    }
+
+    return 1;
+}
+
+static inline int xor_single_byte(const unsigned char *src, size_t srclen, unsigned char **dst, unsigned char key) {
     if (*dst == NULL) {
         *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
         if (*dst == NULL) {
@@ -20,7 +32,7 @@ static inline int fixed_xor(const unsigned char *src, size_t srclen, unsigned ch
     return 1;
 }
 
-static inline int repeating_xor(const unsigned char *src, size_t srclen, unsigned char **dst, const char *key, size_t keylen) {
+static inline int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, const char *key, size_t keylen) {
     if (*dst == NULL) {
         *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
         if (*dst == NULL) {

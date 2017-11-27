@@ -1,4 +1,5 @@
 #include "hex.h"
+#include "xor.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -46,8 +47,10 @@ int challenge_02(const unsigned char *ahex, const size_t ahexlen, const unsigned
         return -1;
     }
 
-    for (size_t i = 0; i < alen; i++) {
-        a[i] = a[i] ^ b[i];
+    if (!xor_fixed(a, alen, b, blen)) {
+        free((void *) a);
+        free((void *) b);
+        return -1;
     }
 
     size_t dstlen = 0;

@@ -60,7 +60,7 @@ int challenge_04(const char *file, unsigned char **dst) {
 
         if (local_max > global_max) {
             global_max = local_max;
-            if (!fixed_xor(src, LINE_LENGTH, dst, key)) {
+            if (!xor_single_byte(src, LINE_LENGTH, dst, key)) {
                 fclose(fp);
                 if (line) {
                     free((void *) line);

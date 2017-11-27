@@ -47,7 +47,7 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
         }
     }
 
-    if (!fixed_xor(src, len, dst, key)) {
+    if (!xor_single_byte(src, len, dst, key)) {
         free((void *) src);
         return -1;
     }

@@ -34,7 +34,7 @@
 int challenge_05(const unsigned char *src, const size_t srclen, unsigned char **dst) {
     unsigned char *tmp = NULL;
 
-    if (!repeating_xor(src, srclen, &tmp, "ICE", 3)) {
+    if (!xor_repeating(src, srclen, &tmp, "ICE", 3)) {
         return -1;
     }
 
