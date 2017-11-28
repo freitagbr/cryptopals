@@ -1,4 +1,5 @@
 #include "base64.h"
+#include "file.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -107,47 +108,12 @@ int base64_decode(const unsigned char *src, size_t srclen, unsigned char *dst, s
 }
 
 int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
-    FILE *fp = fopen(file, "rb");
     unsigned char *src = NULL;
     size_t read = 0;
 
-    if (fp == NULL) {
+    if (!file_read(file, &src, &read)) {
         return 0;
     }
-
-    if (fseek(fp, 0, SEEK_END) == 0) {
-        long buflen = ftell(fp);
-        if (buflen == -1) {
-            fclose(fp);
-            return 0;
-        }
-
-        long srclen = buflen + 1;
-        src = (unsigned char *) malloc(sizeof (unsigned char) * srclen);
-
-        if (src == NULL) {
-            return 0;
-        }
-
-        if (fseek(fp, 0, SEEK_SET) != 0) {
-            free((void *) src);
-            fclose(fp);
-            return 0;
-        }
-
-        read = fread(src, sizeof (unsigned char), buflen, fp);
-
-        if (ferror(fp) != 0) {
-            free((void *) src);
-            fclose(fp);
-            return 0;
-        }
-        else {
-            src[read++] = '\0';
-        }
-    }
-
-    fclose(fp);
 
     unsigned char *base64 = (unsigned char *) malloc(sizeof (unsigned char) * read);
 

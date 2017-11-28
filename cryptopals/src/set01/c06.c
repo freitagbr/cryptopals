@@ -1,4 +1,5 @@
 #include "base64.h"
+#include "file.h"
 #include "hamming.h"
 #include "score.h"
 #include "xor.h"
@@ -64,7 +65,7 @@
  * important.
  */
 
-int challenge_06(const char *file) {
+int challenge_06(const char *file, unsigned char **dst) {
     unsigned char *decoded = NULL;
     size_t len = 0;
 
@@ -142,23 +143,21 @@ int challenge_06(const char *file) {
         key[b] = block_key;
     }
 
-    unsigned char *dst = (unsigned char *) malloc((sizeof (unsigned char) * len) + 1);
-    if (dst == NULL) {
+    *dst = (unsigned char *) malloc((sizeof (unsigned char) * len) + 1);
+    if (*dst == NULL) {
         free((void *) key);
         free((void *) block);
         free((void *) decoded);
         return -1;
     }
-    dst[len] = '\0';
+    (*dst)[len] = '\0';
 
-    if (!xor_repeating(decoded, len, &dst, (const char *) key, keysize)) {
+    if (!xor_repeating(decoded, len, dst, (const char *) key, keysize)) {
         free((void *) key);
         free((void *) block);
         free((void *) decoded);
         return -1;
     }
-
-    printf("%s\n", dst);
 
     free((void *) key);
     free((void *) block);
@@ -170,6 +169,18 @@ int challenge_06(const char *file) {
 int main() {
     const unsigned char a[15] = "this is a test";
     const unsigned char b[15] = "wokka wokka!!!";
+
     assert(hamming_distance(a, b, 15) == 37);
-    challenge_06("data/c06.txt");
+
+    unsigned char *expected = NULL;
+    size_t read = 0;
+
+    assert(file_read("data/c06_test.txt", &expected, &read));
+
+    unsigned char *output = NULL;
+
+    assert(challenge_06("data/c06.txt", &output) == 0);
+    assert(strcmp((const char *) output, (const char *) expected) == 0);
+
+    free((void *) output);
 }

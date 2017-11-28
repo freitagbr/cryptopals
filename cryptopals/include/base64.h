@@ -1,6 +1,8 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include "file.h"
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
