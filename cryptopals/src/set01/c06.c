@@ -1,7 +1,10 @@
 #include "base64.h"
 #include "hamming.h"
+#include "score.h"
+#include "xor.h"
 
 #include <assert.h>
+#include <float.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,14 +74,94 @@ int challenge_06(const char *file) {
 
     unsigned char block_a[MAX_KEYSIZE + 1];
     unsigned char block_b[MAX_KEYSIZE + 1];
+    float min_dist = FLT_MAX;
+    size_t keysize = 0;
 
-    for (int k = 2; k <= MAX_KEYSIZE; k++) {
-        memcpy(block_a, decoded, k);
-        memcpy(block_b, &decoded[k], k);
-        float dist = (float) ((float) hamming_distance(block_a, block_b, k) / (float) k);
-        printf("keysize: %d\tdistance: %f\n", k, dist);
+    block_a[MAX_KEYSIZE] = '\0';
+    block_b[MAX_KEYSIZE] = '\0';
+
+    // check keysizes between 2 and MAX_KEYSIZE (default 40)
+    for (size_t k = 2; k <= MAX_KEYSIZE; k++) {
+        // break the data into blocks of size of the key
+        const size_t nblocks = len / k;
+        float dist = 0;
+
+        // sum the hamming distances,
+        // normalized by the keysize,
+        // between adjacent blocks
+        for (size_t b = 0; b < nblocks; b++) {
+            const int offset_a = (int) (b * k);
+            const int offset_b = offset_a + (int) k;
+            memcpy(block_a, &decoded[offset_a], k);
+            memcpy(block_b, &decoded[offset_b], k);
+            float hd = (float) hamming_distance(block_a, block_b, k);
+            dist += (float) (hd / (float) k);
+        }
+
+        // average the hamming distances
+        dist /= (float) nblocks;
+
+        if (dist < min_dist) {
+            min_dist = dist;
+            keysize = (size_t) k;
+        }
     }
 
+    const size_t blocklen = len / keysize;
+    unsigned char *block = (unsigned char *) malloc((sizeof (unsigned char) * blocklen) + 1);
+    if (block == NULL) {
+        free((void *) decoded);
+        return -1;
+    }
+
+    unsigned char *key = (unsigned char *) malloc((sizeof (unsigned char) * keysize) + 1);
+    if (key == NULL) {
+        free((void *) block);
+        free((void *) decoded);
+        return -1;
+    }
+    key[keysize] = '\0';
+
+    // transpose blocks
+    for (size_t b = 0; b < keysize; b++) {
+        for (size_t i = 0, j = b; (i < blocklen) && (j < len); i++, j += keysize) {
+            block[i] = decoded[j];
+        }
+
+        int max_score = 0;
+        unsigned char block_key = 0;
+
+        for (int k = 0; k <= 0xFF; ++k) {
+            int s = score_english(block, blocklen, (unsigned char) k);
+            if (s > max_score) {
+                max_score = s;
+                block_key = (unsigned char) k;
+            }
+        }
+
+        key[b] = block_key;
+    }
+
+    unsigned char *dst = (unsigned char *) malloc((sizeof (unsigned char) * len) + 1);
+    if (dst == NULL) {
+        free((void *) key);
+        free((void *) block);
+        free((void *) decoded);
+        return -1;
+    }
+    dst[len] = '\0';
+
+    if (!xor_repeating(decoded, len, &dst, (const char *) key, keysize)) {
+        free((void *) key);
+        free((void *) block);
+        free((void *) decoded);
+        return -1;
+    }
+
+    printf("%s\n", dst);
+
+    free((void *) key);
+    free((void *) block);
     free((void *) decoded);
 
     return 0;
