@@ -128,7 +128,6 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
     }
 
     base64 = (unsigned char *) malloc(sizeof (unsigned char) * read);
-
     if (base64 == NULL) {
         goto end;
     }

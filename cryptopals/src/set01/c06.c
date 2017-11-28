@@ -11,7 +11,8 @@
 
 #define MAX_KEYSIZE 40
 
-/** Break repeating-key XOR
+/**
+ * Break repeating-key XOR
  *
  * There's a file here. It's been base64'd after being encrypted with
  * repeating-key XOR.
