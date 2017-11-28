@@ -1,10 +1,9 @@
 #include "base64.h"
+#include "block.h"
 #include "file.h"
-#include "hamming.h"
 #include "xor.h"
 
 #include <assert.h>
-#include <float.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,79 +68,16 @@ int challenge_06(const char *file, unsigned char **dst) {
     unsigned char *block = NULL;
     unsigned char *key = NULL;
     size_t len = 0;
+    size_t keysize = 0;
     int status = -1;
 
     if (!base64_decode_file(file, &decoded, &len)) {
         goto end;
     }
 
-    unsigned char block_a[MAX_KEYSIZE + 1];
-    unsigned char block_b[MAX_KEYSIZE + 1];
-    float min_dist = FLT_MAX;
-    size_t keysize = 0;
-
-    // check keysizes between 2 and MAX_KEYSIZE (default 40)
-    for (size_t k = 2; k <= MAX_KEYSIZE; k++) {
-        // break the data into blocks of size of the key,
-        // but ignore the trailing block, which may be
-        // smaller than the other blocks, preventing
-        // out-of-bounds memory access
-        const size_t nblocks = (len / k) - 1;
-        float dist = 0;
-
-        // clear the blocks
-        memset(block_a, '\0', MAX_KEYSIZE);
-        memset(block_b, '\0', MAX_KEYSIZE);
-
-        // sum the hamming distances, normalized
-        // by the keysize, between adjacent blocks
-        for (size_t b = 0; b < nblocks; b++) {
-            const size_t offset_a = b * k;
-            const size_t offset_b = offset_a + k;
-            memcpy(block_a, &decoded[offset_a], k);
-            memcpy(block_b, &decoded[offset_b], k);
-            float hd = (float) hamming_distance(block_a, block_b, k);
-            dist += (float) (hd / (float) k);
-        }
-
-        // average the hamming distances
-        dist /= (float) nblocks;
-
-        if (dist < min_dist) {
-            min_dist = dist;
-            keysize = (size_t) k;
-        }
-    }
-
-    const size_t blocklen = len / keysize;
-    block = (unsigned char *) malloc((sizeof (unsigned char) * blocklen) + 1);
-    if (block == NULL) {
+    if (!block_transpose_get_key(decoded, len, &key, &keysize, MAX_KEYSIZE)) {
         goto end;
     }
-
-    key = (unsigned char *) malloc((sizeof (unsigned char) * keysize) + 1);
-    if (key == NULL) {
-        goto end;
-    }
-    key[keysize] = '\0';
-
-    // transpose blocks
-    for (size_t b = 0; b < keysize; b++) {
-        for (size_t i = 0, j = b; (i < blocklen) && (j < len); i++, j += keysize) {
-            block[i] = decoded[j];
-        }
-
-        int max_score = 0;
-        unsigned char block_key = xor_find_cipher(block, blocklen, &max_score);
-
-        key[b] = block_key;
-    }
-
-    *dst = (unsigned char *) malloc((sizeof (unsigned char) * len) + 1);
-    if (*dst == NULL) {
-        goto end;
-    }
-    (*dst)[len] = '\0';
 
     if (!xor_repeating(decoded, len, dst, (const char *) key, keysize)) {
         goto end;
@@ -150,7 +86,6 @@ int challenge_06(const char *file, unsigned char **dst) {
     status = 0;
 
 end:
-
     // the C standard says that free(NULL) is a no-op,
     // but it causes trouble on certain platforms,
     // so it is best to be defensive here
@@ -168,11 +103,6 @@ end:
 }
 
 int main() {
-    const unsigned char a[15] = "this is a test";
-    const unsigned char b[15] = "wokka wokka!!!";
-
-    assert(hamming_distance(a, b, 15) == 37);
-
     unsigned char *expected = NULL;
     size_t read = 0;
 
