@@ -129,7 +129,7 @@ int challenge_06(const char *file, unsigned char **dst) {
         }
 
         int max_score = 0;
-        unsigned char block_key = xor_find_english_cipher(block, blocklen, &max_score);
+        unsigned char block_key = xor_find_cipher(block, blocklen, &max_score);
 
         key[b] = block_key;
     }

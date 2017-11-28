@@ -47,7 +47,7 @@ int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, 
     return 1;
 }
 
-unsigned char xor_find_english_cipher(const unsigned char *str, const size_t len, int *max) {
+unsigned char xor_find_cipher(const unsigned char *str, const size_t len, int *max) {
     int max_score = 0;
     unsigned char key = 0;
 

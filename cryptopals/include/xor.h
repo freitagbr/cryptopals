@@ -12,6 +12,6 @@ int xor_single_byte(const unsigned char *, size_t, unsigned char **, unsigned ch
 
 int xor_repeating(const unsigned char *, size_t, unsigned char **, const char *, size_t);
 
-unsigned char xor_find_english_cipher(const unsigned char *, const size_t, int *);
+unsigned char xor_find_cipher(const unsigned char *, const size_t, int *);
 
 #endif // XOR_H

@@ -47,7 +47,7 @@ int challenge_04(const char *file, unsigned char **dst) {
         }
 
         int local_max = 0;
-        unsigned char key = xor_find_english_cipher(src, LINE_LENGTH, &local_max);
+        unsigned char key = xor_find_cipher(src, LINE_LENGTH, &local_max);
 
         if (local_max > global_max) {
             global_max = local_max;

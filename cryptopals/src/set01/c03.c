@@ -36,7 +36,7 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
     }
 
     int max_score = 0;
-    unsigned char key = xor_find_english_cipher(src, len, &max_score);
+    unsigned char key = xor_find_cipher(src, len, &max_score);
 
     if (!xor_single_byte(src, len, dst, key)) {
         free((void *) src);
