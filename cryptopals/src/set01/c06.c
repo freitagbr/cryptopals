@@ -66,10 +66,13 @@
 
 int challenge_06(const char *file, unsigned char **dst) {
     unsigned char *decoded = NULL;
+    unsigned char *block = NULL;
+    unsigned char *key = NULL;
     size_t len = 0;
+    int status = -1;
 
     if (!base64_decode_file(file, &decoded, &len)) {
-        return -1;
+        goto end;
     }
 
     unsigned char block_a[MAX_KEYSIZE + 1];
@@ -108,17 +111,14 @@ int challenge_06(const char *file, unsigned char **dst) {
     }
 
     const size_t blocklen = len / keysize;
-    unsigned char *block = (unsigned char *) malloc((sizeof (unsigned char) * blocklen) + 1);
+    block = (unsigned char *) malloc((sizeof (unsigned char) * blocklen) + 1);
     if (block == NULL) {
-        free((void *) decoded);
-        return -1;
+        goto end;
     }
 
-    unsigned char *key = (unsigned char *) malloc((sizeof (unsigned char) * keysize) + 1);
+    key = (unsigned char *) malloc((sizeof (unsigned char) * keysize) + 1);
     if (key == NULL) {
-        free((void *) block);
-        free((void *) decoded);
-        return -1;
+        goto end;
     }
     key[keysize] = '\0';
 
@@ -136,25 +136,32 @@ int challenge_06(const char *file, unsigned char **dst) {
 
     *dst = (unsigned char *) malloc((sizeof (unsigned char) * len) + 1);
     if (*dst == NULL) {
-        free((void *) key);
-        free((void *) block);
-        free((void *) decoded);
-        return -1;
+        goto end;
     }
     (*dst)[len] = '\0';
 
     if (!xor_repeating(decoded, len, dst, (const char *) key, keysize)) {
-        free((void *) key);
-        free((void *) block);
-        free((void *) decoded);
-        return -1;
+        goto end;
     }
 
-    free((void *) key);
-    free((void *) block);
-    free((void *) decoded);
+    status = 0;
 
-    return 0;
+end:
+
+    // the C standard says that free(NULL) is a no-op,
+    // but it causes trouble on certain platforms,
+    // so it is best to be defensive here
+    if (key != NULL) {
+        free((void *) key);
+    }
+    if (block != NULL) {
+        free((void *) block);
+    }
+    if (decoded != NULL) {
+        free((void *) decoded);
+    }
+
+    return status;
 }
 
 int main() {
