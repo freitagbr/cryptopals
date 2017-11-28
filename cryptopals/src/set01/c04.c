@@ -1,7 +1,6 @@
 #define _GNU_SOURCE
 
 #include "hex.h"
-#include "score.h"
 #include "xor.h"
 
 #include <assert.h>
@@ -48,15 +47,7 @@ int challenge_04(const char *file, unsigned char **dst) {
         }
 
         int local_max = 0;
-        unsigned char key = 0;
-
-        for (int k = 0; k <= 0xFF; ++k) {
-            int s = score_english(src, LINE_LENGTH, (unsigned char) k);
-            if (s > local_max) {
-                local_max = s;
-                key = (unsigned char) k;
-            }
-        }
+        unsigned char key = xor_find_english_cipher(src, LINE_LENGTH, &local_max);
 
         if (local_max > global_max) {
             global_max = local_max;

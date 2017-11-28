@@ -1,7 +1,6 @@
 #include "base64.h"
 #include "file.h"
 #include "hamming.h"
-#include "score.h"
 #include "xor.h"
 
 #include <assert.h>
@@ -130,15 +129,7 @@ int challenge_06(const char *file, unsigned char **dst) {
         }
 
         int max_score = 0;
-        unsigned char block_key = 0;
-
-        for (int k = 0; k <= 0xFF; ++k) {
-            int s = score_english(block, blocklen, (unsigned char) k);
-            if (s > max_score) {
-                max_score = s;
-                block_key = (unsigned char) k;
-            }
-        }
+        unsigned char block_key = xor_find_english_cipher(block, blocklen, &max_score);
 
         key[b] = block_key;
     }

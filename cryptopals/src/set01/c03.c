@@ -1,5 +1,4 @@
 #include "hex.h"
-#include "score.h"
 #include "xor.h"
 
 #include <assert.h>
@@ -37,15 +36,7 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
     }
 
     int max_score = 0;
-    unsigned char key = 0;
-
-    for (int k = 0; k <= 0xFF; ++k) {
-        int s = score_english(src, len, (unsigned char) k);
-        if (s > max_score) {
-            max_score = s;
-            key = (unsigned char) k;
-        }
-    }
+    unsigned char key = xor_find_english_cipher(src, len, &max_score);
 
     if (!xor_single_byte(src, len, dst, key)) {
         free((void *) src);

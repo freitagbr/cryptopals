@@ -4,48 +4,14 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static inline int xor_fixed(unsigned char *a, size_t alen, unsigned char *b, size_t blen) {
-    if (alen != blen) {
-        return 0;
-    }
+static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
 
-    for (size_t i = 0; i < alen; i++) {
-        a[i] = a[i] ^ b[i];
-    }
+int xor_fixed(unsigned char *, size_t, unsigned char *, size_t);
 
-    return 1;
-}
+int xor_single_byte(const unsigned char *, size_t, unsigned char **, unsigned char);
 
-static inline int xor_single_byte(const unsigned char *src, size_t srclen, unsigned char **dst, unsigned char key) {
-    if (*dst == NULL) {
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
-        if (*dst == NULL) {
-            return 0;
-        }
-        (*dst)[srclen] = '\0';
-    }
+int xor_repeating(const unsigned char *, size_t, unsigned char **, const char *, size_t);
 
-    for (size_t i = 0; i < srclen; i++) {
-        (*dst)[i] = src[i] ^ key;
-    }
-
-    return 1;
-}
-
-static inline int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, const char *key, size_t keylen) {
-    if (*dst == NULL) {
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
-        if (*dst == NULL) {
-            return 0;
-        }
-        (*dst)[srclen] = '\0';
-    }
-
-    for (size_t i = 0, k = 0; i < srclen; i++, k = (k + 1) % keylen) {
-        (*dst)[i] = src[i] ^ key[k];
-    }
-
-    return 1;
-}
+unsigned char xor_find_english_cipher(const unsigned char *, const size_t, int *);
 
 #endif // XOR_H
