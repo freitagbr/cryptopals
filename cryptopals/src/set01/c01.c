@@ -25,26 +25,27 @@
 int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **dst) {
     size_t hexlen = 0;
     unsigned char *hex = NULL;
+    int status = -1;
 
     if (!hex_decode(src, srclen, &hex, &hexlen)) {
-        return -1;
+        goto end;
     }
 
-    const size_t dstlen = base64_encoded_length(hexlen);
-    *dst = (unsigned char *) malloc((sizeof (unsigned char) * dstlen) + 1);
+    size_t dstlen = 0;
 
-    if (*dst == NULL) {
+    if (!base64_encode(hex, hexlen, dst, &dstlen)) {
+        goto end;
+    }
+
+    status = 0;
+
+end:
+
+    if (hex != NULL) {
         free((void *) hex);
-        return -1;
     }
 
-    if (!base64_encode(hex, hexlen, *dst, dstlen)) {
-        return -1;
-    }
-
-    free((void *) hex);
-
-    return 0;
+    return status;
 }
 
 int main() {

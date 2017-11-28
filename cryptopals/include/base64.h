@@ -66,9 +66,9 @@ inline int base64_encoded_length(size_t len) {
     return (len + 2 - ((len + 2) % 3)) / 3 * 4;
 }
 
-int base64_encode(const unsigned char *, size_t, unsigned char *, size_t);
+int base64_encode(const unsigned char *, size_t, unsigned char **, size_t *);
 
-int base64_decode(const unsigned char *, size_t, unsigned char *, size_t);
+int base64_decode(const unsigned char *, size_t, unsigned char **, size_t *);
 
 int base64_decode_file(const char *, unsigned char **, size_t *);
 
