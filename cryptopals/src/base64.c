@@ -112,6 +112,8 @@ int base64_decode(const unsigned char *src, size_t srclen, unsigned char **dst, 
         }
     }
 
+    *d = '\0';
+
     return (d == (dst_begin + *dstlen));
 }
 
@@ -146,7 +148,6 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
     }
 
     base64[b] = '\0';
-
 
     if (!base64_decode(base64, b, dst, dstlen)) {
         goto end;

@@ -80,21 +80,24 @@ int challenge_06(const char *file, unsigned char **dst) {
     float min_dist = FLT_MAX;
     size_t keysize = 0;
 
-    block_a[MAX_KEYSIZE] = '\0';
-    block_b[MAX_KEYSIZE] = '\0';
-
     // check keysizes between 2 and MAX_KEYSIZE (default 40)
     for (size_t k = 2; k <= MAX_KEYSIZE; k++) {
-        // break the data into blocks of size of the key
-        const size_t nblocks = len / k;
+        // break the data into blocks of size of the key,
+        // but ignore the trailing block, which may be
+        // smaller than the other blocks, preventing
+        // out-of-bounds memory access
+        const size_t nblocks = (len / k) - 1;
         float dist = 0;
 
-        // sum the hamming distances,
-        // normalized by the keysize,
-        // between adjacent blocks
+        // clear the blocks
+        memset(block_a, '\0', MAX_KEYSIZE);
+        memset(block_b, '\0', MAX_KEYSIZE);
+
+        // sum the hamming distances, normalized
+        // by the keysize, between adjacent blocks
         for (size_t b = 0; b < nblocks; b++) {
-            const int offset_a = (int) (b * k);
-            const int offset_b = offset_a + (int) k;
+            const size_t offset_a = b * k;
+            const size_t offset_b = offset_a + k;
             memcpy(block_a, &decoded[offset_a], k);
             memcpy(block_b, &decoded[offset_b], k);
             float hd = (float) hamming_distance(block_a, block_b, k);
@@ -180,5 +183,6 @@ int main() {
     assert(challenge_06("data/c06.txt", &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
 
+    free((void *) expected);
     free((void *) output);
 }
