@@ -16,33 +16,39 @@ int xor_fixed(unsigned char *a, size_t alen, unsigned char *b, size_t blen) {
 }
 
 int xor_single_byte(const unsigned char *src, size_t srclen, unsigned char **dst, unsigned char key) {
-    if (*dst == NULL) {
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
-        if (*dst == NULL) {
+    unsigned char *d = *dst;
+
+    if (d == NULL) {
+        d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
+        if (d == NULL) {
             return 0;
         }
-        (*dst)[srclen] = '\0';
     }
 
     for (size_t i = 0; i < srclen; i++) {
-        (*dst)[i] = src[i] ^ key;
+        *d++ = src[i] ^ key;
     }
+
+    *d = '\0';
 
     return 1;
 }
 
 int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, const char *key, size_t keylen) {
-    if (*dst == NULL) {
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
-        if (*dst == NULL) {
+    unsigned char *d = *dst;
+
+    if (d == NULL) {
+        d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
+        if (d == NULL) {
             return 0;
         }
-        (*dst)[srclen] = '\0';
     }
 
     for (size_t i = 0, k = 0; i < srclen; i++, k = (k + 1) % keylen) {
-        (*dst)[i] = src[i] ^ key[k];
+        *d++ = src[i] ^ key[k];
     }
+
+    *d = '\0';
 
     return 1;
 }
