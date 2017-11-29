@@ -5,43 +5,49 @@
 #include <stdlib.h>
 
 int file_read(const char *file, unsigned char **buf, size_t *read) {
-    FILE *fp = fopen(file, "rb");
+    FILE *fp = NULL;
+    unsigned char *b = NULL;
+    int status = 0;
 
+    *read = 0;
+
+    fp = fopen(file, "rb");
     if (fp == NULL) {
-        return 0;
+        goto end;
     }
 
     if (fseek(fp, 0, SEEK_END) == 0) {
         long buflen = ftell(fp);
         if (buflen == -1) {
-            fclose(fp);
-            return 0;
+            goto end;
         }
 
-        *buf = (unsigned char *) malloc((sizeof (unsigned char) * buflen) + 1);
-
-        if (*buf == NULL) {
-            fclose(fp);
-            return 0;
+        b = *buf = (unsigned char *) malloc((sizeof (unsigned char) * buflen) + 1);
+        if (b == NULL) {
+            goto end;
         }
 
         if (fseek(fp, 0, SEEK_SET) != 0) {
-            free((void *) *buf);
-            fclose(fp);
-            return 0;
+            free((void *) b);
+            goto end;
         }
 
-        *read = fread(*buf, sizeof (unsigned char), buflen, fp);
+        *read = fread(b, sizeof (unsigned char), buflen, fp);
 
         if (ferror(fp) != 0) {
-            free((void *) *buf);
-            fclose(fp);
-            return 0;
+            free((void *) b);
+            *read = 0;
+            goto end;
         }
     }
 
-    fclose(fp);
-    (*buf)[*read] = '\0';
+    b[*read] = '\0';
+    status = 1;
 
-    return 1;
+end:
+    if (fp != NULL) {
+        fclose(fp);
+    }
+
+    return status;
 }
