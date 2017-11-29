@@ -19,7 +19,7 @@ LIB_OBJS  = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(LIB_SRCS)))
 
 DEPS      = -lssl -lcrypto
 
-SETS      = set01
+SETS      = set01 set02
 
 
 all: sets
@@ -64,6 +64,23 @@ $(SET01): %: $(OBJ_DIR)/%.o $(LIB) $(DEPS)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
 $(SET01_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set01/%.c
+	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+
+# set 02
+
+SET02_SRCS = $(wildcard $(SRC_DIR)/set02/*.c)
+SET02_OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(SET02_SRCS)))
+SET02      = $(notdir $(basename $(SET02_SRCS)))
+
+set02: $(SET02)
+
+$(SET02): %: $(OBJ_DIR)/%.o $(LIB) $(DEPS)
+	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
+
+$(SET02_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set02/%.c
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $^
 
