@@ -20,34 +20,46 @@
  * 16 byte ciphertext.
  */
 
-int handle_line(unsigned char *line, size_t len) {
-    unsigned char *buf = NULL;
-    size_t buflen = 0;
-
-    if (!hex_decode(line, len, &buf, &buflen)) {
-        return 0;
-    }
-
-    printf("line: ");
-    for (size_t i = 0; i < buflen; i++) {
-        printf("%x", buf[i]);
-    }
-    printf("\n");
-
-    free((void *) buf);
-
-    return 1;
-}
-
-
 int challenge_08(const char *file) {
-    file_eachline_cb_t cb = &handle_line;
+    unsigned char *buf = NULL;
+    file_line *lines = NULL;
+    file_line *curr = NULL;
+    int nline = 0;
+    int status = -1;
 
-    if (!file_eachline(file, &cb)) {
-        return -1;
+    if (!file_getlines(file, &buf, &lines)) {
+        goto end;
     }
 
-    return 0;
+    curr = lines;
+
+    while (curr != NULL) {
+        unsigned char *line = NULL;
+        size_t linelen = 0;
+
+        if (!hex_decode(curr->line, curr->len, &line, &linelen)) {
+            goto end;
+        }
+
+        printf("line: %d\tlength: %zu\taddr: %p\n", ++nline, curr->len, curr->line);
+        for (size_t i = 0; i < linelen; i++) {
+            printf("%x", line[i]);
+        }
+        printf("\n");
+
+        free((void *) line);
+        curr = curr->next;
+    }
+
+    status = 0;
+
+end:
+    if (buf != NULL) {
+        free((void *) buf);
+    }
+    file_line_delete(lines);
+
+    return status;
 }
 
 int main() {

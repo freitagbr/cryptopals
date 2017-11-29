@@ -4,12 +4,28 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-typedef int (*file_eachline_cb_t)(unsigned char *line, size_t len);
+typedef struct file_line {
+    struct file_line *next;
+    unsigned char *line;
+    size_t len;
+} file_line;
+
+static inline file_line *file_line_new() {
+    file_line *line = (file_line *) malloc(sizeof (file_line));
+    if (line == NULL) {
+        return NULL;
+    }
+    line->next = NULL;
+    line->line = NULL;
+    line->len = 0;
+    return line;
+}
+
+void file_line_delete(file_line *lines);
 
 int file_read(const char *file, unsigned char **buf, size_t *read);
 
-int file_eachline(const char *file, file_eachline_cb_t *cb);
+int file_getlines(const char *file, unsigned char **buf, file_line **lines);
 
 #endif

@@ -3,7 +3,15 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+void file_line_delete(file_line *lines) {
+    file_line *next = NULL;
+    while (lines != NULL) {
+        next = lines->next;
+        free((void *) lines);
+        lines = next;
+    }
+}
 
 int file_read(const char *file, unsigned char **buf, size_t *read) {
     FILE *fp = NULL;
@@ -53,58 +61,42 @@ end:
     return status;
 }
 
-int file_eachline(const char *file, file_eachline_cb_t *cb) {
-    unsigned char *buf = NULL;
-    unsigned char *line = NULL;
+int file_getlines(const char *file, unsigned char **buf, file_line **lines) {
+    file_line **pp = &(*lines);
     size_t read = 0;
     int status = 0;
 
-    if (!file_read(file, &buf, &read)) {
+    if (!file_read(file, buf, &read)) {
         goto end;
     }
 
+    size_t len = 0;
     size_t i = 0;
     size_t j = 0;
-    size_t len = 0;
-    size_t allocated = 0;
 
+    // use forward-chaining to create a linked list of
+    // structures that contain a pointer to the beginning
+    // of each line and the length of the line
     while (i < read) {
-        while (buf[i] != '\n') {
+        while ((*buf)[i] != '\n') {
             i++;
         }
         len = i - j;
-        if (line == NULL) {
-            allocated = (sizeof (unsigned char) * len) + 1;
-            line = (unsigned char *) malloc(allocated);
-            if (line == NULL) {
-                goto end;
-            }
-            line[allocated] = '\0';
-        }
-        else if (len > allocated) {
-            allocated = (sizeof (unsigned char) * len) + 1;
-            line = (unsigned char *) realloc(line, allocated);
-            if (line == NULL) {
-                goto end;
-            }
-            line[allocated] = '\0';
-        }
-        memcpy(line, &buf[j], len);
-        if (!(*cb)(line, len)) {
+        *pp = file_line_new();
+        if (*pp == NULL) {
             goto end;
         }
+        (*pp)->line = &(*buf)[j];
+        (*pp)->len = len;
+        pp = &(*pp)->next;
         j = ++i;
     }
 
+    // end list
+    *pp = NULL;
     status = 1;
 
 end:
-    if (buf != NULL) {
-        free((void *) buf);
-    }
-    if (line != NULL) {
-        free((void *) line);
-    }
 
     return status;
 }
