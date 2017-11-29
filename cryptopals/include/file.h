@@ -5,6 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int file_read(const char *, unsigned char **, size_t *);
+int file_read(const char *file, unsigned char **buf, size_t *read);
 
 #endif

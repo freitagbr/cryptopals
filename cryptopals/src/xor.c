@@ -53,7 +53,7 @@ int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, 
     return 1;
 }
 
-unsigned char xor_find_cipher(const unsigned char *str, const size_t len, int *max) {
+unsigned char xor_find_cipher(const unsigned char *buf, const size_t len, int *max) {
     int max_score = 0;
     unsigned char key = 0;
 
@@ -62,7 +62,7 @@ unsigned char xor_find_cipher(const unsigned char *str, const size_t len, int *m
         for (int i = 0; i < 13; i++) {
             unsigned char c = xor_english_cipher_chars[i];
             for (size_t l = 0; l < len; l++) {
-                if ((str[l] ^ (unsigned char) k) == c) {
+                if ((buf[l] ^ (unsigned char) k) == c) {
                     s++;
                 }
             }

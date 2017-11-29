@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int block_get_keysize(unsigned char *buf, size_t len, size_t *keysize, size_t max_keysize) {
+static int block_get_keysize(unsigned char *buf, size_t len, size_t *keysize, size_t max_keysize) {
     unsigned char *block_a = NULL;
     unsigned char *block_b = NULL;
     float min_dist = FLT_MAX;

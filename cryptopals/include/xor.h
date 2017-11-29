@@ -6,12 +6,12 @@
 
 static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
 
-int xor_fixed(unsigned char *, size_t, unsigned char *, size_t);
+int xor_fixed(unsigned char *a, size_t alen, unsigned char *b, size_t blen);
 
-int xor_single_byte(const unsigned char *, size_t, unsigned char **, unsigned char);
+int xor_single_byte(const unsigned char *src, size_t srclen, unsigned char **dst, unsigned char key);
 
-int xor_repeating(const unsigned char *, size_t, unsigned char **, const char *, size_t);
+int xor_repeating(const unsigned char *src, size_t srclen, unsigned char **dst, const char *key, size_t keylen);
 
-unsigned char xor_find_cipher(const unsigned char *, const size_t, int *);
+unsigned char xor_find_cipher(const unsigned char *buf, const size_t len, int *max);
 
 #endif // XOR_H

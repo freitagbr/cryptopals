@@ -27,16 +27,16 @@ static inline void btoh(unsigned char src, unsigned char *dst) {
     dst[1] = hex_encode_table[src & 0x0F];
 }
 
-inline size_t hex_decoded_length(const size_t len) {
+static inline size_t hex_decoded_length(const size_t len) {
     return (len + (len % 2)) / 2;
 }
 
-inline size_t hex_encoded_length(const size_t len) {
+static inline size_t hex_encoded_length(const size_t len) {
     return len * 2;
 }
 
-int hex_decode(const unsigned char *, const size_t, unsigned char **, size_t *);
+int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen);
 
-int hex_encode(const unsigned char *, const size_t, unsigned char **, size_t *);
+int hex_encode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen);
 
 #endif // HEX_H

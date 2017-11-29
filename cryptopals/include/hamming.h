@@ -12,6 +12,6 @@ static inline int popcount(unsigned char n) {
     return count;
 }
 
-int hamming_distance(const unsigned char *, const unsigned char *, const size_t);
+int hamming_distance(const unsigned char *a, const unsigned char *b, const size_t len);
 
 #endif
