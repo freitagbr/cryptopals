@@ -1,5 +1,4 @@
-#define _GNU_SOURCE
-
+#include "file.h"
 #include "hex.h"
 #include "xor.h"
 
@@ -8,8 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define LINE_LENGTH 30
 
 /**
  * Detect single-character XOR
@@ -23,51 +20,50 @@
  */
 
 int challenge_04(const char *file, unsigned char **dst) {
-    FILE *fp;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
+    unsigned char *buf = NULL;
+    file_line *lines = NULL;
+    file_line *curr = NULL;
+    int global_max = 0;
+    int status = -1;
 
-    fp = fopen(file, "r");
-
-    if (fp == NULL) {
-        return -1;
+    if (!file_getlines(file, &buf, &lines)) {
+        goto end;
     }
 
-    int global_max = 0;
-    unsigned char src[LINE_LENGTH];
+    curr = lines;
 
-    while ((read = getline(&line, &len, fp)) != -1) {
-        for (int i = 0, s = 0; i < 60; i += 2, s += 1) {
-            int r = sscanf((const char *) &line[i], "%2hhx", (unsigned char *) &src[s]);
-            if (r != 1) {
-                fclose(fp);
-                return -1;
-            }
+    while (curr != NULL) {
+        unsigned char *line = NULL;
+        size_t linelen = 0;
+
+        if (!hex_decode(curr->line, curr->len, &line, &linelen)) {
+            goto end;
         }
 
         int local_max = 0;
-        unsigned char key = xor_find_cipher(src, LINE_LENGTH, &local_max);
+        unsigned char key = xor_find_cipher(line, linelen, &local_max);
 
         if (local_max > global_max) {
             global_max = local_max;
-            if (!xor_single_byte(src, LINE_LENGTH, dst, key)) {
-                fclose(fp);
-                if (line) {
-                    free((void *) line);
-                }
-                return -1;
+            if (!xor_single_byte(line, linelen, dst, key)) {
+                free((void *) line);
+                goto end;
             }
         }
-    }
 
-    fclose(fp);
-
-    if (line) {
         free((void *) line);
+        curr = curr->next;
     }
 
-    return 0;
+    status = 0;
+
+end:
+    if (buf != NULL) {
+        free((void *) buf);
+    }
+    file_line_delete(lines);
+
+    return status;
 }
 
 int main() {
