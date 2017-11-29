@@ -1,3 +1,5 @@
+#include "pad.h"
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -26,25 +28,11 @@
  * "YELLOW SUBMARINE\x04\x04\x04\x04"
  */
 
-int challenge_09(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t dstlen) {
-    int status = -1;
-
-    if (dstlen < srclen) {
-        goto end;
+int challenge_09(const unsigned char *src, const size_t srclen, unsigned char **dst, const size_t dstlen) {
+    if (!pad_bytes(src, srclen, dst, dstlen, IV)) {
+        return -1;
     }
-
-    *dst = (unsigned char *) malloc((sizeof (unsigned char) * dstlen) + 1);
-    if (*dst == NULL) {
-        goto end;
-    }
-
-    memset(*dst, IV, dstlen);
-    memcpy(*dst, src, srclen);
-    (*dst)[dstlen] = '\0';
-    status = 0;
-
-end:
-    return status;
+    return 0;
 }
 
 int main() {
