@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int block_get_keysize(unsigned char *buf, size_t len, size_t *keysize, size_t max_keysize) {
+int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
     unsigned char *block_a = NULL;
     unsigned char *block_b = NULL;
-    float min_dist = FLT_MAX;
 
+    *min_dist = FLT_MAX;
     *keysize = 0;
     block_a = (unsigned char *) malloc((sizeof (unsigned char) * max_keysize) + 1);
     block_b = (unsigned char *) malloc((sizeof (unsigned char) * max_keysize) + 1);
@@ -47,8 +47,8 @@ static int block_get_keysize(unsigned char *buf, size_t len, size_t *keysize, si
         // average the hamming distances
         dist /= (float) nblocks;
 
-        if (dist < min_dist) {
-            min_dist = dist;
+        if (dist < *min_dist) {
+            *min_dist = dist;
             *keysize = (size_t) k;
         }
     }
@@ -62,9 +62,10 @@ static int block_get_keysize(unsigned char *buf, size_t len, size_t *keysize, si
 int block_transpose_get_key(unsigned char *buf, size_t len, unsigned char **key, size_t *keysize, size_t max_keysize) {
     unsigned char *block = NULL;
     unsigned char *k = NULL;
+    float min_dist = 0;
     int status = 0;
 
-    if (!block_get_keysize(buf, len, keysize, max_keysize)) {
+    if (!block_get_keysize(buf, len, &min_dist, keysize, max_keysize)) {
         *keysize = 0;
         goto end;
     }

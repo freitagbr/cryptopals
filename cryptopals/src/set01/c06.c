@@ -65,22 +65,22 @@
  */
 
 int challenge_06(const char *file, unsigned char **dst) {
-    unsigned char *decoded = NULL;
+    unsigned char *buf = NULL;
     unsigned char *block = NULL;
     unsigned char *key = NULL;
-    size_t len = 0;
+    size_t buflen = 0;
     size_t keysize = 0;
     int status = -1;
 
-    if (!base64_decode_file(file, &decoded, &len)) {
+    if (!base64_decode_file(file, &buf, &buflen)) {
         goto end;
     }
 
-    if (!block_transpose_get_key(decoded, len, &key, &keysize, MAX_KEYSIZE)) {
+    if (!block_transpose_get_key(buf, buflen, &key, &keysize, MAX_KEYSIZE)) {
         goto end;
     }
 
-    if (!xor_repeating(decoded, len, dst, (const char *) key, keysize)) {
+    if (!xor_repeating(buf, buflen, dst, (const char *) key, keysize)) {
         goto end;
     }
 
@@ -96,8 +96,8 @@ end:
     if (block != NULL) {
         free((void *) block);
     }
-    if (decoded != NULL) {
-        free((void *) decoded);
+    if (buf != NULL) {
+        free((void *) buf);
     }
 
     return status;
