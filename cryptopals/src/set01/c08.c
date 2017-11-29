@@ -24,10 +24,12 @@
 
 int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
     unsigned char *buf = NULL;
+    unsigned char *line = NULL;
     file_line *lines = NULL;
     file_line *curr = NULL;
     file_line *aes = NULL;
     float global_min_dist = FLT_MAX;
+    size_t linelen = 0;
     int status = -1;
 
     if (!file_getlines(file, &buf, &lines)) {
@@ -37,11 +39,7 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
     curr = lines;
 
     while (curr != NULL) {
-        unsigned char *line = NULL;
-        size_t linelen = 0;
-
         if (!hex_decode(curr->line, curr->len, &line, &linelen)) {
-            free((void *) line);
             goto end;
         }
 
@@ -50,7 +48,6 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
         size_t local_keysize = 0;
 
         if (!block_get_keysize(line, linelen, &local_min_dist, &local_keysize, local_max_keysize)) {
-            free((void *) line);
             goto end;
         }
 
@@ -59,7 +56,6 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
             aes = curr;
         }
 
-        free((void *) line);
         curr = curr->next;
     }
 
@@ -72,6 +68,9 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
 end:
     if (buf != NULL) {
         free((void *) buf);
+    }
+    if (line != NULL) {
+        free((void *) line);
     }
     file_line_delete(lines);
 
