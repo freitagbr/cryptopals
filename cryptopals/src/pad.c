@@ -9,14 +9,13 @@ int pad_bytes(unsigned char **dst, const size_t dstlen, const unsigned char *src
         return 0;
     }
 
-    *dst = (unsigned char *) malloc((sizeof (unsigned char) * dstlen) + 1);
+    *dst = (unsigned char *) calloc(dstlen + 1, sizeof (unsigned char));
     if (*dst == NULL) {
         return 0;
     }
 
     memset(*dst, iv, dstlen);
     memcpy(*dst, src, srclen);
-    (*dst)[dstlen] = '\0';
 
     return 1;
 }

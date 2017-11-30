@@ -31,7 +31,7 @@ int file_read(const char *file, unsigned char **buf, size_t *read) {
             goto end;
         }
 
-        b = *buf = (unsigned char *) malloc((sizeof (unsigned char) * buflen) + 1);
+        b = *buf = (unsigned char *) calloc(buflen + 1, sizeof (unsigned char));
         if (b == NULL) {
             goto end;
         }
@@ -50,7 +50,6 @@ int file_read(const char *file, unsigned char **buf, size_t *read) {
         }
     }
 
-    b[*read] = '\0';
     status = 1;
 
 end:

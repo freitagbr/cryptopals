@@ -60,9 +60,8 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
     }
 
     *dstlen = aes->len;
-    *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
+    *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
     memcpy(*dst, aes->line, *dstlen);
-    (*dst)[*dstlen] = '\0';
     status = 0;
 
 end:

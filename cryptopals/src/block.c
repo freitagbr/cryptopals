@@ -13,8 +13,8 @@ int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *k
 
     *min_dist = FLT_MAX;
     *keysize = 0;
-    block_a = (unsigned char *) malloc((sizeof (unsigned char) * max_keysize) + 1);
-    block_b = (unsigned char *) malloc((sizeof (unsigned char) * max_keysize) + 1);
+    block_a = (unsigned char *) calloc(max_keysize + 1, sizeof (unsigned char));
+    block_b = (unsigned char *) calloc(max_keysize + 1, sizeof (unsigned char));
 
     if ((block_a == NULL) || (block_b == NULL)) {
         return 0;
@@ -30,8 +30,8 @@ int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *k
         float dist = 0;
 
         // clear the blocks
-        memset(block_a, '\0', max_keysize);
-        memset(block_b, '\0', max_keysize);
+        memset(block_a, 0, max_keysize);
+        memset(block_b, 0, max_keysize);
 
         // sum the hamming distances, normalized
         // by the keysize, between adjacent blocks
@@ -72,12 +72,12 @@ int block_transpose_get_key(unsigned char *buf, size_t len, unsigned char **key,
 
     const size_t blocklen = len / *keysize;
 
-    block = (unsigned char *) malloc((sizeof (unsigned char) * blocklen) + 1);
+    block = (unsigned char *) calloc(blocklen + 1, sizeof (unsigned char));
     if (block == NULL) {
         goto end;
     }
 
-    k = *key = (unsigned char *) malloc((sizeof (unsigned char) * *keysize) + 1);
+    k = *key = (unsigned char *) calloc(*keysize + 1, sizeof (unsigned char));
     if (k == NULL) {
         goto end;
     }
@@ -92,7 +92,6 @@ int block_transpose_get_key(unsigned char *buf, size_t len, unsigned char **key,
         *k++ = xor_find_cipher(block, blocklen, &max_score);
     }
 
-    *k = '\0';
     status = 1;
 
 end:

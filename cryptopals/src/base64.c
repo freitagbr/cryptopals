@@ -15,7 +15,7 @@ int base64_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
     int j = 0;
 
     *dstlen = base64_encoded_length(srclen);
-    d = dst_begin = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
+    d = dst_begin = *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
 
     if (d == NULL) {
         *dstlen = 0;
@@ -52,8 +52,6 @@ int base64_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
         }
     }
 
-    *d = '\0';
-
     return (d == (dst_begin + *dstlen));
 }
 
@@ -66,7 +64,7 @@ int base64_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
     int j = 0;
 
     *dstlen = base64_decoded_length(src, srclen);
-    d = dst_begin = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
+    d = dst_begin = *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
 
     if (d == NULL) {
         *dstlen = 0;
@@ -112,8 +110,6 @@ int base64_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
         }
     }
 
-    *d = '\0';
-
     return (d == (dst_begin + *dstlen));
 }
 
@@ -127,7 +123,7 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
         goto end;
     }
 
-    base64 = (unsigned char *) malloc(sizeof (unsigned char) * read);
+    base64 = (unsigned char *) calloc(read + 1, sizeof (unsigned char));
     if (base64 == NULL) {
         goto end;
     }
@@ -145,8 +141,6 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
         b += t;
         j = ++i;
     }
-
-    base64[b] = '\0';
 
     if (!base64_decode(dst, dstlen, base64, b)) {
         goto end;

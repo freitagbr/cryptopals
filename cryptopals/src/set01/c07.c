@@ -44,7 +44,7 @@ int challenge_07(const char *file, const unsigned char *key, unsigned char **pla
         goto end;
     }
 
-    unsigned char *p = *plaintext = (unsigned char *) malloc((sizeof (unsigned char) * ciphertextlen) + 1);
+    unsigned char *p = *plaintext = (unsigned char *) calloc(ciphertextlen + 1, sizeof (unsigned char));
     if (p == NULL) {
         goto end;
     }

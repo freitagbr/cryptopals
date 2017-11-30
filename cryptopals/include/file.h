@@ -12,7 +12,7 @@ typedef struct file_line {
 } file_line;
 
 static inline file_line *file_line_new() {
-    file_line *line = (file_line *) malloc(sizeof (file_line));
+    file_line *line = (file_line *) calloc(1, sizeof (file_line));
     if (line == NULL) {
         return NULL;
     }

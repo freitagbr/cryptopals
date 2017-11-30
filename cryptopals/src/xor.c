@@ -19,7 +19,7 @@ int xor_single_byte(unsigned char **dst, const unsigned char *src, size_t srclen
     unsigned char *d = *dst;
 
     if (d == NULL) {
-        d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
+        d = *dst = (unsigned char *) calloc(srclen + 1, sizeof (unsigned char));
         if (d == NULL) {
             return 0;
         }
@@ -29,8 +29,6 @@ int xor_single_byte(unsigned char **dst, const unsigned char *src, size_t srclen
         *d++ = src[i] ^ key;
     }
 
-    *d = '\0';
-
     return 1;
 }
 
@@ -38,7 +36,7 @@ int xor_repeating(unsigned char **dst, const unsigned char *src, size_t srclen, 
     unsigned char *d = *dst;
 
     if (d == NULL) {
-        d = *dst = (unsigned char *) malloc((sizeof (unsigned char) * srclen) + 1);
+        d = *dst = (unsigned char *) calloc(srclen + 1, sizeof (unsigned char));
         if (d == NULL) {
             return 0;
         }
@@ -47,8 +45,6 @@ int xor_repeating(unsigned char **dst, const unsigned char *src, size_t srclen, 
     for (size_t i = 0, k = 0; i < srclen; i++, k = (k + 1) % keylen) {
         *d++ = src[i] ^ key[k];
     }
-
-    *d = '\0';
 
     return 1;
 }

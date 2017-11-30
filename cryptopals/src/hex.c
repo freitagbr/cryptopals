@@ -11,12 +11,12 @@ int hex_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, co
     if (*dst != NULL) {
         if (*dstlen < declen) {
             *dstlen = declen;
-            *dst = (unsigned char *) realloc(*dst, (sizeof (unsigned char) * declen) + 1);
+            *dst = (unsigned char *) realloc(*dst, sizeof (unsigned char) * (declen + 1));
         }
     }
     else {
         *dstlen = declen;
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * declen) + 1);
+        *dst = (unsigned char *) calloc(declen + 1, sizeof (unsigned char));
     }
 
     d = *dst;
@@ -48,12 +48,12 @@ int hex_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src, co
     if (*dst != NULL) {
         if (*dstlen < enclen) {
             *dstlen = enclen;
-            *dst = (unsigned char *) realloc(*dst, (sizeof (unsigned char) * enclen) + 1);
+            *dst = (unsigned char *) realloc(*dst, sizeof (unsigned char) * (enclen + 1));
         }
     }
     else {
         *dstlen = enclen;
-        *dst = (unsigned char *) malloc((sizeof (unsigned char) * enclen) + 1);
+        *dst = (unsigned char *) calloc(enclen + 1, sizeof (unsigned char));
     }
 
     d = *dst;
