@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen) {
+int hex_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, const size_t srclen) {
     unsigned char *d = NULL;
     size_t declen = hex_decoded_length(srclen);
 
@@ -40,7 +40,7 @@ int hex_decode(const unsigned char *src, const size_t srclen, unsigned char **ds
     return 1;
 }
 
-int hex_encode(const unsigned char *src, const size_t srclen, unsigned char **dst, size_t *dstlen) {
+int hex_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src, const size_t srclen) {
     unsigned char *d = NULL;
     size_t enclen = hex_encoded_length(srclen);
 

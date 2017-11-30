@@ -6,13 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-int base64_encode(const unsigned char *src, size_t srclen, unsigned char **dst, size_t *dstlen) {
-    int i = 0;
-    int j = 0;
+int base64_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src, size_t srclen) {
+    unsigned char *d = NULL;
+    unsigned char *dst_begin = NULL;
     unsigned char b[3] = {0, 0, 0};
     unsigned char a[4] = {0, 0, 0, 0};
-    unsigned char *dst_begin = NULL;
-    unsigned char *d = NULL;
+    int i = 0;
+    int j = 0;
 
     *dstlen = base64_encoded_length(srclen);
     d = dst_begin = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
@@ -57,13 +57,13 @@ int base64_encode(const unsigned char *src, size_t srclen, unsigned char **dst, 
     return (d == (dst_begin + *dstlen));
 }
 
-int base64_decode(const unsigned char *src, size_t srclen, unsigned char **dst, size_t *dstlen) {
-    int i = 0;
-    int j = 0;
+int base64_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, size_t srclen) {
+    unsigned char *d = NULL;
+    unsigned char *dst_begin = NULL;
     unsigned char b[3] = {0, 0, 0};
     unsigned char a[4] = {0, 0, 0, 0};
-    unsigned char *dst_begin = NULL;
-    unsigned char *d = NULL;
+    int i = 0;
+    int j = 0;
 
     *dstlen = base64_decoded_length(src, srclen);
     d = dst_begin = *dst = (unsigned char *) malloc((sizeof (unsigned char) * *dstlen) + 1);
@@ -148,14 +148,13 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
 
     base64[b] = '\0';
 
-    if (!base64_decode(base64, b, dst, dstlen)) {
+    if (!base64_decode(dst, dstlen, base64, b)) {
         goto end;
     }
 
     status = 1;
 
 end:
-
     if (src != NULL) {
         free((void *) src);
     }

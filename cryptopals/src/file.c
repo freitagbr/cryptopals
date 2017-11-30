@@ -97,6 +97,5 @@ int file_getlines(const char *file, unsigned char **buf, file_line **lines) {
     status = 1;
 
 end:
-
     return status;
 }

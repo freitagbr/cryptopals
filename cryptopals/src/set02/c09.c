@@ -29,7 +29,7 @@
  */
 
 int challenge_09(const unsigned char *src, const size_t srclen, unsigned char **dst, const size_t dstlen) {
-    if (!pad_bytes(src, srclen, dst, dstlen, IV)) {
+    if (!pad_bytes(dst, dstlen, src, srclen, IV)) {
         return -1;
     }
     return 0;

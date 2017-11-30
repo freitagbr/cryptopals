@@ -27,44 +27,47 @@
  */
 
 int challenge_02(const unsigned char *ahex, const size_t ahexlen, const unsigned char *bhex, const size_t bhexlen, unsigned char **dst) {
-    if (ahexlen != bhexlen) {
-        return -1;
-    }
-    if (((ahexlen % 2) != 0) || ((bhexlen % 2) != 0)) {
-        return -1;
-    }
-
-    size_t alen = 0;
-    size_t blen = 0;
     unsigned char *a = NULL;
     unsigned char *b = NULL;
+    size_t alen = 0;
+    size_t blen = 0;
+    size_t dstlen = 0;
+    int status = -1;
 
-    if (!hex_decode(ahex, ahexlen, &a, &alen) || !hex_decode(bhex, bhexlen, &b, &blen)) {
-        return -1;
+    if (ahexlen != bhexlen) {
+        goto end;
+    }
+    if (((ahexlen % 2) != 0) || ((bhexlen % 2) != 0)) {
+        goto end;
+    }
+
+    if (!hex_decode(&a, &alen, ahex, ahexlen) || !hex_decode(&b, &blen, bhex, bhexlen)) {
+        goto end;
     }
 
     if (alen != blen) {
-        return -1;
+        goto end;
     }
 
     if (!xor_fixed(a, alen, b, blen)) {
-        free((void *) a);
-        free((void *) b);
-        return -1;
+        goto end;
     }
 
-    size_t dstlen = 0;
-
-    if (!hex_encode(a, alen, dst, &dstlen)) {
-        free((void *) a);
-        free((void *) b);
-        return -1;
+    if (!hex_encode(dst, &dstlen, a, alen)) {
+        goto end;
     }
 
-    free((void *) a);
-    free((void *) b);
+    status = 0;
 
-    return 0;
+end:
+    if (a != NULL) {
+        free((void *) a);
+    }
+    if (b != NULL) {
+        free((void *) b);
+    }
+
+    return status;
 }
 
 int main() {

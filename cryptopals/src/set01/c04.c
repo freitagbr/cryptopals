@@ -21,8 +21,10 @@
 
 int challenge_04(const char *file, unsigned char **dst) {
     unsigned char *buf = NULL;
+    unsigned char *line = NULL;
     file_line *lines = NULL;
     file_line *curr = NULL;
+    size_t linelen = 0;
     int global_max = 0;
     int status = -1;
 
@@ -33,10 +35,7 @@ int challenge_04(const char *file, unsigned char **dst) {
     curr = lines;
 
     while (curr != NULL) {
-        unsigned char *line = NULL;
-        size_t linelen = 0;
-
-        if (!hex_decode(curr->line, curr->len, &line, &linelen)) {
+        if (!hex_decode(&line, &linelen, curr->line, curr->len)) {
             goto end;
         }
 
@@ -45,13 +44,11 @@ int challenge_04(const char *file, unsigned char **dst) {
 
         if (local_max > global_max) {
             global_max = local_max;
-            if (!xor_single_byte(line, linelen, dst, key)) {
-                free((void *) line);
+            if (!xor_single_byte(dst, line, linelen, key)) {
                 goto end;
             }
         }
 
-        free((void *) line);
         curr = curr->next;
     }
 
@@ -60,6 +57,9 @@ int challenge_04(const char *file, unsigned char **dst) {
 end:
     if (buf != NULL) {
         free((void *) buf);
+    }
+    if (line != NULL) {
+        free((void *) line);
     }
     file_line_delete(lines);
 

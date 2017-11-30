@@ -33,21 +33,25 @@
 
 int challenge_05(const unsigned char *src, const size_t srclen, unsigned char **dst) {
     unsigned char *tmp = NULL;
-
-    if (!xor_repeating(src, srclen, &tmp, "ICE", 3)) {
-        return -1;
-    }
-
     size_t dstlen = 0;
+    int status = -1;
 
-    if (!hex_encode(tmp, srclen, dst, &dstlen)) {
-        free((void *) tmp);
-        return -1;
+    if (!xor_repeating(&tmp, src, srclen, "ICE", 3)) {
+        goto end;
     }
 
-    free((void *) tmp);
+    if (!hex_encode(dst, &dstlen, tmp, srclen)) {
+        goto end;
+    }
 
-    return 0;
+    status = 0;
+
+end:
+    if (tmp != NULL) {
+        free((void *) tmp);
+    }
+
+    return status;
 }
 
 int main() {

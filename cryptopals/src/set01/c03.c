@@ -24,28 +24,33 @@
  */
 
 int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **dst) {
+    unsigned char *src = NULL;
+    size_t len = 0;
+    int status = -1;
+
     if ((hexlen % 2) != 0) {
-        return -1;
+        goto end;
     }
 
-    size_t len = 0;
-    unsigned char *src = NULL;
-
-    if (!hex_decode(hex, hexlen, &src, &len)) {
-        return -1;
+    if (!hex_decode(&src, &len, hex, hexlen)) {
+        goto end;
     }
 
     int max_score = 0;
     unsigned char key = xor_find_cipher(src, len, &max_score);
 
-    if (!xor_single_byte(src, len, dst, key)) {
-        free((void *) src);
-        return -1;
+    if (!xor_single_byte(dst, src, len, key)) {
+        goto end;
     }
 
-    free((void *) src);
+    status = 0;
 
-    return 0;
+end:
+    if (src != NULL) {
+        free((void *) src);
+    }
+
+    return status;
 }
 
 int main() {

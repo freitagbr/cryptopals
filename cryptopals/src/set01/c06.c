@@ -80,7 +80,7 @@ int challenge_06(const char *file, unsigned char **dst) {
         goto end;
     }
 
-    if (!xor_repeating(buf, buflen, dst, (const char *) key, keysize)) {
+    if (!xor_repeating(dst, buf, buflen, (const char *) key, keysize)) {
         goto end;
     }
 

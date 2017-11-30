@@ -27,20 +27,19 @@ int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **
     unsigned char *hex = NULL;
     int status = -1;
 
-    if (!hex_decode(src, srclen, &hex, &hexlen)) {
+    if (!hex_decode(&hex, &hexlen, src, srclen)) {
         goto end;
     }
 
     size_t dstlen = 0;
 
-    if (!base64_encode(hex, hexlen, dst, &dstlen)) {
+    if (!base64_encode(dst, &dstlen, hex, hexlen)) {
         goto end;
     }
 
     status = 0;
 
 end:
-
     if (hex != NULL) {
         free((void *) hex);
     }

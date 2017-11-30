@@ -39,7 +39,7 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
     curr = lines;
 
     while (curr != NULL) {
-        if (!hex_decode(curr->line, curr->len, &line, &linelen)) {
+        if (!hex_decode(&line, &linelen, curr->line, curr->len)) {
             goto end;
         }
 
