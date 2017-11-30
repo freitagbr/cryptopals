@@ -21,9 +21,10 @@ challenge is implemented as a single function in its source file, with the
 - `openssl`
   - On Linux, the headers should already be included in `/usr/include/openssl`.
   - On macOS, the headers can be installed with `brew`:
-	$ brew install openssl
-	$ cd /usr/local/include/
-	$ ln -s ../opt/openssl/include/openssl .
+
+		$ brew install openssl
+		$ cd /usr/local/include/
+		$ ln -s ../opt/openssl/include/openssl .
 
 
 ## Building
