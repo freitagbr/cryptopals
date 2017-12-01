@@ -8,7 +8,7 @@ LIB_DIR   = $(BUILD_DIR)/lib
 BIN_DIR   = $(BUILD_DIR)/bin
 
 CC        = cc
-CFLAGS    = -Wall -Wextra -Werror -O --std=c99 -I$(INCLUDE)
+CFLAGS    = -Wall -Wextra -Werror -pedantic -O -std=c99 -I$(INCLUDE)
 LDFLAGS   = -O
 LDLIBS    = -lm
 VALGRIND  = valgrind
