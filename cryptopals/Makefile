@@ -85,7 +85,7 @@ $(SET02_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set02/%.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 
-.PHONY: clean $(DEPS)
+.PHONY: all test debug valgrind sets $(SETS) clean $(DEPS)
 
 clean:
 	rm -rf $(BUILD_DIR)
