@@ -3,11 +3,12 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 typedef struct file_line {
     struct file_line *next;
-    unsigned char *line;
+    uint8_t *line;
     size_t len;
 } file_line;
 
@@ -24,8 +25,8 @@ static inline file_line *file_line_new() {
 
 void file_line_delete(file_line *lines);
 
-int file_read(const char *file, unsigned char **buf, size_t *read);
+int file_read(const char *file, uint8_t **buf, size_t *read);
 
-int file_getlines(const char *file, unsigned char **buf, file_line **lines);
+int file_getlines(const char *file, uint8_t **buf, file_line **lines);
 
 #endif

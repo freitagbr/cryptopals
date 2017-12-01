@@ -1,6 +1,7 @@
 #include "file.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,9 +14,9 @@ void file_line_delete(file_line *lines) {
     }
 }
 
-int file_read(const char *file, unsigned char **buf, size_t *read) {
+int file_read(const char *file, uint8_t **buf, size_t *read) {
     FILE *fp = NULL;
-    unsigned char *b = NULL;
+    uint8_t *b = NULL;
     int status = 0;
 
     *read = 0;
@@ -31,7 +32,7 @@ int file_read(const char *file, unsigned char **buf, size_t *read) {
             goto end;
         }
 
-        b = *buf = (unsigned char *) calloc(buflen + 1, sizeof (unsigned char));
+        b = *buf = (uint8_t *) calloc(buflen + 1, sizeof (uint8_t));
         if (b == NULL) {
             goto end;
         }
@@ -41,7 +42,7 @@ int file_read(const char *file, unsigned char **buf, size_t *read) {
             goto end;
         }
 
-        *read = fread(b, sizeof (unsigned char), buflen, fp);
+        *read = fread(b, sizeof (uint8_t), buflen, fp);
 
         if (ferror(fp) != 0) {
             free((void *) b);
@@ -60,7 +61,7 @@ end:
     return status;
 }
 
-int file_getlines(const char *file, unsigned char **buf, file_line **lines) {
+int file_getlines(const char *file, uint8_t **buf, file_line **lines) {
     file_line **pp = &(*lines);
     size_t read = 0;
     int status = 0;

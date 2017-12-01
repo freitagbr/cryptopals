@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,7 +29,7 @@
  * "YELLOW SUBMARINE\x04\x04\x04\x04"
  */
 
-int challenge_09(const unsigned char *src, const size_t srclen, unsigned char **dst, const size_t dstlen) {
+int challenge_09(const uint8_t *src, const size_t srclen, uint8_t **dst, const size_t dstlen) {
     if (!pad_bytes(dst, dstlen, src, srclen, IV)) {
         return -1;
     }
@@ -36,9 +37,9 @@ int challenge_09(const unsigned char *src, const size_t srclen, unsigned char **
 }
 
 int main() {
-    const unsigned char input[] = "YELLOW SUBMARINE";
-    const unsigned char expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
-    unsigned char *output = NULL;
+    const uint8_t input[] = "YELLOW SUBMARINE";
+    const uint8_t expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
+    uint8_t *output = NULL;
 
     assert(challenge_09(input, 16, &output, 20) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);

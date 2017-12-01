@@ -4,6 +4,7 @@
 #include <openssl/evp.h>
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,9 +25,9 @@
  * Easiest way: use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
  */
 
-int challenge_07(const char *file, const unsigned char *key, unsigned char **plaintext, int *plaintextlen) {
+int challenge_07(const char *file, const uint8_t *key, uint8_t **plaintext, int *plaintextlen) {
     EVP_CIPHER_CTX *ctx = NULL;
-    unsigned char *ciphertext = NULL;
+    uint8_t *ciphertext = NULL;
     size_t ciphertextlen = 0;
     int len = 0;
     int status = -1;
@@ -44,7 +45,7 @@ int challenge_07(const char *file, const unsigned char *key, unsigned char **pla
         goto end;
     }
 
-    unsigned char *p = *plaintext = (unsigned char *) calloc(ciphertextlen + 1, sizeof (unsigned char));
+    uint8_t *p = *plaintext = (uint8_t *) calloc(ciphertextlen + 1, sizeof (uint8_t));
     if (p == NULL) {
         goto end;
     }
@@ -75,13 +76,13 @@ end:
 }
 
 int main() {
-    unsigned char *expected = NULL;
+    uint8_t *expected = NULL;
     size_t read = 0;
 
     assert(file_read("data/c07_test.txt", &expected, &read));
 
-    const unsigned char key[16] = "YELLOW SUBMARINE";
-    unsigned char *output = NULL;
+    const uint8_t key[16] = "YELLOW SUBMARINE";
+    uint8_t *output = NULL;
     int len = 0;
 
     assert(challenge_07("data/c07.txt", key, &output, &len) == 0);

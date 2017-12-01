@@ -3,19 +3,20 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-int base64_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src, size_t srclen) {
-    unsigned char *d = NULL;
-    unsigned char *dst_begin = NULL;
-    unsigned char b[3] = {0, 0, 0};
-    unsigned char a[4] = {0, 0, 0, 0};
+int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
+    uint8_t *d = NULL;
+    uint8_t *dst_begin = NULL;
+    uint8_t b[3] = {0, 0, 0};
+    uint8_t a[4] = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
 
     *dstlen = base64_encoded_length(srclen);
-    d = dst_begin = *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
+    d = dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
 
     if (d == NULL) {
         *dstlen = 0;
@@ -55,16 +56,16 @@ int base64_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
     return (d == (dst_begin + *dstlen));
 }
 
-int base64_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, size_t srclen) {
-    unsigned char *d = NULL;
-    unsigned char *dst_begin = NULL;
-    unsigned char b[3] = {0, 0, 0};
-    unsigned char a[4] = {0, 0, 0, 0};
+int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
+    uint8_t *d = NULL;
+    uint8_t *dst_begin = NULL;
+    uint8_t b[3] = {0, 0, 0};
+    uint8_t a[4] = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
 
     *dstlen = base64_decoded_length(src, srclen);
-    d = dst_begin = *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
+    d = dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
 
     if (d == NULL) {
         *dstlen = 0;
@@ -113,9 +114,9 @@ int base64_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src,
     return (d == (dst_begin + *dstlen));
 }
 
-int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
-    unsigned char *src = NULL;
-    unsigned char *base64 = NULL;
+int base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen) {
+    uint8_t *src = NULL;
+    uint8_t *base64 = NULL;
     size_t read = 0;
     int status = 0;
 
@@ -123,7 +124,7 @@ int base64_decode_file(const char *file, unsigned char **dst, size_t *dstlen) {
         goto end;
     }
 
-    base64 = (unsigned char *) calloc(read + 1, sizeof (unsigned char));
+    base64 = (uint8_t *) calloc(read + 1, sizeof (uint8_t));
     if (base64 == NULL) {
         goto end;
     }

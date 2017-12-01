@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,8 +24,8 @@
  * one with the best score.
  */
 
-int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **dst) {
-    unsigned char *src = NULL;
+int challenge_03(const uint8_t *hex, const size_t hexlen, uint8_t **dst) {
+    uint8_t *src = NULL;
     size_t len = 0;
     int status = -1;
 
@@ -37,7 +38,7 @@ int challenge_03(const unsigned char *hex, const size_t hexlen, unsigned char **
     }
 
     int max_score = 0;
-    unsigned char key = xor_find_cipher(src, len, &max_score);
+    uint8_t key = xor_find_cipher(src, len, &max_score);
 
     if (!xor_single_byte(dst, src, len, key)) {
         goto end;
@@ -54,9 +55,9 @@ end:
 }
 
 int main() {
-    const unsigned char input[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-    const unsigned char expected[] = "Cooking MC's like a pound of bacon";
-    unsigned char *output = NULL;
+    const uint8_t input[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+    const uint8_t expected[] = "Cooking MC's like a pound of bacon";
+    uint8_t *output = NULL;
 
     assert(challenge_03(input, 68, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);

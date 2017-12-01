@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,12 +32,12 @@
  * promise, we aren't wasting your time with this.
  */
 
-int challenge_05(const unsigned char *src, const size_t srclen, unsigned char **dst) {
-    unsigned char *tmp = NULL;
+int challenge_05(const uint8_t *src, const size_t srclen, uint8_t **dst) {
+    uint8_t *tmp = NULL;
     size_t dstlen = 0;
     int status = -1;
 
-    if (!xor_repeating(&tmp, src, srclen, "ICE", 3)) {
+    if (!xor_repeating(&tmp, src, srclen, (const uint8_t *) "ICE", 3)) {
         goto end;
     }
 
@@ -55,13 +56,13 @@ end:
 }
 
 int main() {
-    const unsigned char input[] =
+    const uint8_t input[] =
         "Burning 'em, if you ain't quick and nimble\n"
         "I go crazy when I hear a cymbal";
-    const unsigned char expected[] =
+    const uint8_t expected[] =
         "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
         "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
-    unsigned char *output = NULL;
+    uint8_t *output = NULL;
 
     assert(challenge_05(input, 74, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);

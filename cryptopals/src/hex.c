@@ -1,22 +1,23 @@
 #include "hex.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
-int hex_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, const size_t srclen) {
-    unsigned char *d = NULL;
+int hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
+    uint8_t *d = NULL;
     size_t declen = hex_decoded_length(srclen);
 
     // reuse old memory if possible
     if (*dst != NULL) {
         if (*dstlen < declen) {
             *dstlen = declen;
-            *dst = (unsigned char *) realloc(*dst, sizeof (unsigned char) * (declen + 1));
+            *dst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (declen + 1));
         }
     }
     else {
         *dstlen = declen;
-        *dst = (unsigned char *) calloc(declen + 1, sizeof (unsigned char));
+        *dst = (uint8_t *) calloc(declen + 1, sizeof (uint8_t));
     }
 
     d = *dst;
@@ -26,13 +27,13 @@ int hex_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, co
     }
 
     for (size_t i = 0; i < srclen; i += 2) {
-        char a = htob(src[i]);
-        char b = htob(src[i + 1]);
+        int8_t a = htob(src[i]);
+        int8_t b = htob(src[i + 1]);
         if ((a == -1) || (b == -1)) {
             *dstlen = 0;
             return 0;
         }
-        *d++ = (unsigned char) ((a << 4) | b);
+        *d++ = (uint8_t) ((a << 4) | b);
     }
 
     *d = '\0';
@@ -40,20 +41,20 @@ int hex_decode(unsigned char **dst, size_t *dstlen, const unsigned char *src, co
     return 1;
 }
 
-int hex_encode(unsigned char **dst, size_t *dstlen, const unsigned char *src, const size_t srclen) {
-    unsigned char *d = NULL;
+int hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
+    uint8_t *d = NULL;
     size_t enclen = hex_encoded_length(srclen);
 
     // reuse old memory if possible
     if (*dst != NULL) {
         if (*dstlen < enclen) {
             *dstlen = enclen;
-            *dst = (unsigned char *) realloc(*dst, sizeof (unsigned char) * (enclen + 1));
+            *dst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (enclen + 1));
         }
     }
     else {
         *dstlen = enclen;
-        *dst = (unsigned char *) calloc(enclen + 1, sizeof (unsigned char));
+        *dst = (uint8_t *) calloc(enclen + 1, sizeof (uint8_t));
     }
 
     d = *dst;

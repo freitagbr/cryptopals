@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <float.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,9 +23,9 @@
  * 16 byte ciphertext.
  */
 
-int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
-    unsigned char *buf = NULL;
-    unsigned char *line = NULL;
+int challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
+    uint8_t *buf = NULL;
+    uint8_t *line = NULL;
     file_line *lines = NULL;
     file_line *curr = NULL;
     file_line *aes = NULL;
@@ -60,7 +61,7 @@ int challenge_08(const char *file, unsigned char **dst, size_t *dstlen) {
     }
 
     *dstlen = aes->len;
-    *dst = (unsigned char *) calloc(*dstlen + 1, sizeof (unsigned char));
+    *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
     memcpy(*dst, aes->line, *dstlen);
     status = 0;
 
@@ -77,12 +78,12 @@ end:
 }
 
 int main() {
-    const unsigned char expected[] = "d880619740a8a19b7840a8a31c810a3d08649af70"
+    const uint8_t expected[] = "d880619740a8a19b7840a8a31c810a3d08649af70"
         "dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb5708649af70dc06f4"
         "fd5d2d69c744cd2839475c9dfdbc1d46597949d9c7e82bf5a08649af70dc06f4fd5d2d"
         "69c744cd28397a93eab8d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744"
         "cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
-    unsigned char *output = NULL;
+    uint8_t *output = NULL;
     size_t len = 0;
 
     assert(challenge_08("data/c08.txt", &output, &len) == 0);

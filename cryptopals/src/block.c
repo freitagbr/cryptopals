@@ -4,17 +4,18 @@
 
 #include <float.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
-    unsigned char *block_a = NULL;
-    unsigned char *block_b = NULL;
+int block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
+    uint8_t *block_a = NULL;
+    uint8_t *block_b = NULL;
 
     *min_dist = FLT_MAX;
     *keysize = 0;
-    block_a = (unsigned char *) calloc(max_keysize + 1, sizeof (unsigned char));
-    block_b = (unsigned char *) calloc(max_keysize + 1, sizeof (unsigned char));
+    block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
+    block_b = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
 
     if ((block_a == NULL) || (block_b == NULL)) {
         return 0;
@@ -55,9 +56,9 @@ int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *k
     return 1;
 }
 
-int block_transpose_get_key(unsigned char *buf, size_t len, unsigned char **key, size_t *keysize, size_t max_keysize) {
-    unsigned char *block = NULL;
-    unsigned char *k = NULL;
+int block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *keysize, size_t max_keysize) {
+    uint8_t *block = NULL;
+    uint8_t *k = NULL;
     float min_dist = 0;
     int status = 0;
 
@@ -68,12 +69,12 @@ int block_transpose_get_key(unsigned char *buf, size_t len, unsigned char **key,
 
     const size_t blocklen = len / *keysize;
 
-    block = (unsigned char *) calloc(blocklen + 1, sizeof (unsigned char));
+    block = (uint8_t *) calloc(blocklen + 1, sizeof (uint8_t));
     if (block == NULL) {
         goto end;
     }
 
-    k = *key = (unsigned char *) calloc(*keysize + 1, sizeof (unsigned char));
+    k = *key = (uint8_t *) calloc(*keysize + 1, sizeof (uint8_t));
     if (k == NULL) {
         goto end;
     }

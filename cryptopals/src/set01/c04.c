@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,9 +20,9 @@
  * (Your code from #3 should help.)
  */
 
-int challenge_04(const char *file, unsigned char **dst) {
-    unsigned char *buf = NULL;
-    unsigned char *line = NULL;
+int challenge_04(const char *file, uint8_t **dst) {
+    uint8_t *buf = NULL;
+    uint8_t *line = NULL;
     file_line *lines = NULL;
     file_line *curr = NULL;
     size_t linelen = 0;
@@ -40,7 +41,7 @@ int challenge_04(const char *file, unsigned char **dst) {
         }
 
         int local_max = 0;
-        unsigned char key = xor_find_cipher(line, linelen, &local_max);
+        uint8_t key = xor_find_cipher(line, linelen, &local_max);
 
         if (local_max > global_max) {
             global_max = local_max;
@@ -67,8 +68,8 @@ end:
 }
 
 int main() {
-    const unsigned char expected[] = "Now that the party is jumping\n";
-    unsigned char *output = NULL;
+    const uint8_t expected[] = "Now that the party is jumping\n";
+    uint8_t *output = NULL;
 
     assert(challenge_04("data/c04.txt", &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);

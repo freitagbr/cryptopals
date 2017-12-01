@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,9 +23,9 @@
  * of the exercises.
  */
 
-int challenge_01(const unsigned char *src, const size_t srclen, unsigned char **dst) {
+int challenge_01(const uint8_t *src, const size_t srclen, uint8_t **dst) {
     size_t hexlen = 0;
-    unsigned char *hex = NULL;
+    uint8_t *hex = NULL;
     int status = -1;
 
     if (!hex_decode(&hex, &hexlen, src, srclen)) {
@@ -48,9 +49,9 @@ end:
 }
 
 int main() {
-    const unsigned char input[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    const unsigned char expected[] = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
-    unsigned char *output = NULL;
+    const uint8_t input[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+    const uint8_t expected[] = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+    uint8_t *output = NULL;
 
     assert(challenge_01(input, 96, &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);

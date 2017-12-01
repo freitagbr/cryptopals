@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,10 +65,10 @@
  * important.
  */
 
-int challenge_06(const char *file, unsigned char **dst) {
-    unsigned char *buf = NULL;
-    unsigned char *block = NULL;
-    unsigned char *key = NULL;
+int challenge_06(const char *file, uint8_t **dst) {
+    uint8_t *buf = NULL;
+    uint8_t *block = NULL;
+    uint8_t *key = NULL;
     size_t buflen = 0;
     size_t keysize = 0;
     int status = -1;
@@ -80,7 +81,7 @@ int challenge_06(const char *file, unsigned char **dst) {
         goto end;
     }
 
-    if (!xor_repeating(dst, buf, buflen, (const char *) key, keysize)) {
+    if (!xor_repeating(dst, buf, buflen, (const uint8_t *) key, keysize)) {
         goto end;
     }
 
@@ -104,12 +105,12 @@ end:
 }
 
 int main() {
-    unsigned char *expected = NULL;
+    uint8_t *expected = NULL;
     size_t read = 0;
 
     assert(file_read("data/c06_test.txt", &expected, &read));
 
-    unsigned char *output = NULL;
+    uint8_t *output = NULL;
 
     assert(challenge_06("data/c06.txt", &output) == 0);
     assert(strcmp((const char *) output, (const char *) expected) == 0);
