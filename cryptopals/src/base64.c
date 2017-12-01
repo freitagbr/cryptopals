@@ -8,20 +8,18 @@
 #include <string.h>
 
 int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
-    uint8_t *d = NULL;
-    uint8_t *dst_begin = NULL;
-    uint8_t b[3] = {0, 0, 0};
-    uint8_t a[4] = {0, 0, 0, 0};
-    int i = 0;
-    int j = 0;
-
     *dstlen = base64_encoded_length(srclen);
-    d = dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
 
+    uint8_t *dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
+    uint8_t *d = dst_begin;
     if (d == NULL) {
         *dstlen = 0;
         return 0;
     }
+
+    uint8_t b[3] = {0, 0, 0};
+    uint8_t a[4] = {0, 0, 0, 0};
+    int i = 0;
 
     while (srclen--) {
         b[i++] = *src++;
@@ -38,13 +36,13 @@ int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
     }
 
     if (i) {
-        for (j = i; j < 3; j++) {
+        for (int j = i; j < 3; j++) {
             b[j] = '\0';
         }
 
         btoa(a, b);
 
-        for (j = 0; j < i + 1; j++) {
+        for (int j = 0; j < i + 1; j++) {
             *d++ = base64_encode_table[a[j]];
         }
 
@@ -57,20 +55,18 @@ int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
 }
 
 int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
-    uint8_t *d = NULL;
-    uint8_t *dst_begin = NULL;
-    uint8_t b[3] = {0, 0, 0};
-    uint8_t a[4] = {0, 0, 0, 0};
-    int i = 0;
-    int j = 0;
-
     *dstlen = base64_decoded_length(src, srclen);
-    d = dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
 
+    uint8_t *dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
+    uint8_t *d = dst_begin;
     if (d == NULL) {
         *dstlen = 0;
         return 0;
     }
+
+    uint8_t b[3] = {0, 0, 0};
+    uint8_t a[4] = {0, 0, 0, 0};
+    int i = 0;
 
     while (srclen--) {
         if (*src == '=') {
@@ -95,7 +91,7 @@ int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
     }
 
     if (i) {
-        for (j = i; j < 4; j++) {
+        for (int j = i; j < 4; j++) {
             a[j] = '\0';
         }
 
@@ -106,7 +102,7 @@ int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
 
         atob(b, a);
 
-        for (j = 0; j < i - 1; j++) {
+        for (int j = 0; j < i - 1; j++) {
             *d++ = b[j];
         }
     }

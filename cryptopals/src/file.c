@@ -15,16 +15,14 @@ void file_line_delete(file_line *lines) {
 }
 
 int file_read(const char *file, uint8_t **buf, size_t *read) {
-    FILE *fp = NULL;
-    uint8_t *b = NULL;
+    FILE *fp = fopen(file, "rb");
     int status = 0;
 
-    *read = 0;
-
-    fp = fopen(file, "rb");
     if (fp == NULL) {
         goto end;
     }
+
+    *read = 0;
 
     if (fseek(fp, 0, SEEK_END) == 0) {
         long buflen = ftell(fp);
@@ -32,20 +30,20 @@ int file_read(const char *file, uint8_t **buf, size_t *read) {
             goto end;
         }
 
-        b = *buf = (uint8_t *) calloc(buflen + 1, sizeof (uint8_t));
-        if (b == NULL) {
+        *buf = (uint8_t *) calloc(buflen + 1, sizeof (uint8_t));
+        if (*buf == NULL) {
             goto end;
         }
 
         if (fseek(fp, 0, SEEK_SET) != 0) {
-            free((void *) b);
+            free((void *) *buf);
             goto end;
         }
 
-        *read = fread(b, sizeof (uint8_t), buflen, fp);
+        *read = fread(*buf, sizeof (uint8_t), buflen, fp);
 
         if (ferror(fp) != 0) {
-            free((void *) b);
+            free((void *) *buf);
             *read = 0;
             goto end;
         }
@@ -62,7 +60,7 @@ end:
 }
 
 int file_getlines(const char *file, uint8_t **buf, file_line **lines) {
-    file_line **pp = &(*lines);
+    file_line **pp = lines;
     size_t read = 0;
     int status = 0;
 

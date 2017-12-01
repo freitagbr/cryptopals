@@ -9,17 +9,15 @@
 #include <string.h>
 
 int block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
-    uint8_t *block_a = NULL;
-    uint8_t *block_b = NULL;
+    uint8_t *block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
+    uint8_t *block_b = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
+
+    if ((block_a == NULL) || (block_b == NULL)) {
+        goto end;
+    }
 
     *min_dist = FLT_MAX;
     *keysize = 0;
-    block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
-    block_b = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
-
-    if ((block_a == NULL) || (block_b == NULL)) {
-        return 0;
-    }
 
     // check keysizes between 2 and max_keysize
     for (size_t k = 2; k <= max_keysize; k++) {
@@ -50,8 +48,13 @@ int block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize
         }
     }
 
-    free((void *) block_a);
-    free((void *) block_b);
+end:
+    if (block_a != NULL) {
+        free((void *) block_a);
+    }
+    if (block_b != NULL) {
+        free((void *) block_b);
+    }
 
     return 1;
 }
