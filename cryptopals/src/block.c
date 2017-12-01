@@ -29,10 +29,6 @@ int block_get_keysize(unsigned char *buf, size_t len, float *min_dist, size_t *k
         const size_t nblocks = (len / k) - 1;
         float dist = 0;
 
-        // clear the blocks
-        memset(block_a, 0, max_keysize);
-        memset(block_b, 0, max_keysize);
-
         // sum the hamming distances, normalized
         // by the keysize, between adjacent blocks
         for (size_t b = 0; b < nblocks; b++) {
