@@ -1,13 +1,13 @@
-#include "block.h"
-#include "file.h"
-#include "hex.h"
-
 #include <assert.h>
 #include <float.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/block.h"
+#include "cryptopals/file.h"
+#include "cryptopals/hex.h"
 
 /**
  * Detect AES in ECB mode

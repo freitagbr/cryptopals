@@ -1,4 +1,4 @@
-#include "hex.h"
+#include "cryptopals/hex.h"
 
 #include <stddef.h>
 #include <stdint.h>

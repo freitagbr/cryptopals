@@ -1,11 +1,12 @@
-#include "base64.h"
-#include "file.h"
+#include "cryptopals/base64.h"
 
 #include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/file.h"
 
 int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
     *dstlen = base64_encoded_length(srclen);

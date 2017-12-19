@@ -1,4 +1,4 @@
-#include "pad.h"
+#include "cryptopals/pad.h"
 
 #include <stddef.h>
 #include <stdint.h>

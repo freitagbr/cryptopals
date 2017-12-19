@@ -1,14 +1,13 @@
 .POSIX:
 NAME      = cryptopals
-INCLUDE   = include
-SRC_DIR   = src
+SRC_DIR   = cryptopals
 BUILD_DIR = build
 OBJ_DIR   = $(BUILD_DIR)/obj
 LIB_DIR   = $(BUILD_DIR)/lib
 BIN_DIR   = $(BUILD_DIR)/bin
 
 CC        = cc
-CFLAGS    = -Wall -Wextra -Werror -pedantic -O -std=c99 -I$(INCLUDE)
+CFLAGS    = -Wall -Wextra -Werror -pedantic -O -std=c99 -I./
 LDFLAGS   = -O
 LDLIBS    = -lm
 VALGRIND  = valgrind

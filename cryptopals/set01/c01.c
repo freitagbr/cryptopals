@@ -1,12 +1,12 @@
-#include "base64.h"
-#include "hex.h"
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/base64.h"
+#include "cryptopals/hex.h"
 
 /**
  * Convert hex to base64

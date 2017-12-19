@@ -1,5 +1,5 @@
-#ifndef HEX_H
-#define HEX_H
+#ifndef CRYPTOPALS_HEX_H_
+#define CRYPTOPALS_HEX_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -50,4 +50,4 @@ int hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t s
 
 int hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen);
 
-#endif // HEX_H
+#endif // CRYPTOPALS_HEX_H_

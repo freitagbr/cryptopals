@@ -1,4 +1,4 @@
-#include "hamming.h"
+#include "cryptopals/hamming.h"
 
 #include <stddef.h>
 #include <stdint.h>

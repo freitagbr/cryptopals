@@ -1,13 +1,13 @@
-#ifndef BASE64_H
-#define BASE64_H
-
-#include "file.h"
+#ifndef CRYPTOPALS_BASE64_H_
+#define CRYPTOPALS_BASE64_H_
 
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/file.h"
 
 static const uint8_t base64_encode_table[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -71,4 +71,4 @@ int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
 
 int base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen);
 
-#endif // BASE64_H
+#endif // CRYPTOPALS_BASE64_H_

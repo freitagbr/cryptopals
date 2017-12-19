@@ -1,4 +1,4 @@
-#include "xor.h"
+#include "cryptopals/xor.h"
 
 #include <stddef.h>
 #include <stdint.h>

@@ -1,5 +1,5 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef CRYPTOPALS_FILE_H_
+#define CRYPTOPALS_FILE_H_
 
 #include <stddef.h>
 #include <stdio.h>
@@ -29,4 +29,4 @@ int file_read(const char *file, uint8_t **buf, size_t *read);
 
 int file_getlines(const char *file, uint8_t **buf, file_line **lines);
 
-#endif
+#endif // CRYPTOPALS_FILE_H_

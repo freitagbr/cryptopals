@@ -1,12 +1,12 @@
-#include "hex.h"
-#include "xor.h"
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/hex.h"
+#include "cryptopals/xor.h"
 
 /**
  * Fixed XOR

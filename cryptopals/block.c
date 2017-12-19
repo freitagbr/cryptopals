@@ -1,12 +1,13 @@
-#include "block.h"
-#include "hamming.h"
-#include "xor.h"
+#include "cryptopals/block.h"
 
 #include <float.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/hamming.h"
+#include "cryptopals/xor.h"
 
 int block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
     uint8_t *block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));

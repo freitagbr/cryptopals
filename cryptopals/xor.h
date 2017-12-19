@@ -1,5 +1,5 @@
-#ifndef XOR_H
-#define XOR_H
+#ifndef CRYPTOPALS_XOR_H_
+#define CRYPTOPALS_XOR_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -15,4 +15,4 @@ int xor_repeating(uint8_t **dst, const uint8_t *src, size_t srclen, const uint8_
 
 uint8_t xor_find_cipher(const uint8_t *buf, const size_t len, int *max);
 
-#endif // XOR_H
+#endif // CRYPTOPALS_XOR_H_

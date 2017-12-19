@@ -1,10 +1,10 @@
-#include "pad.h"
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cryptopals/pad.h"
 
 #define IV 0x04
 

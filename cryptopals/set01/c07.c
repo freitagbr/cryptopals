@@ -1,13 +1,13 @@
-#include "base64.h"
-#include "file.h"
-
-#include <openssl/evp.h>
-
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <openssl/evp.h>
+
+#include "cryptopals/base64.h"
+#include "cryptopals/file.h"
 
 /**
  * AES in ECB mode
