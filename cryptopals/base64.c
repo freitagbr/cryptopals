@@ -6,16 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
-int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
+error_t base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
     *dstlen = base64_encoded_length(srclen);
 
-    uint8_t *dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
-    uint8_t *d = dst_begin;
+    uint8_t *dstbegin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
+    uint8_t *d = dstbegin;
     if (d == NULL) {
         *dstlen = 0;
-        return 0;
+        return EMALLOC;
     }
 
     uint8_t b[3] = {0, 0, 0};
@@ -52,17 +53,21 @@ int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
         }
     }
 
-    return (d == (dst_begin + *dstlen));
+    if (d != (dstbegin + *dstlen)) {
+        return EBASE64E;
+    }
+
+    return 0;
 }
 
-int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
+error_t base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen) {
     *dstlen = base64_decoded_length(src, srclen);
 
-    uint8_t *dst_begin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
-    uint8_t *d = dst_begin;
+    uint8_t *dstbegin = *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
+    uint8_t *d = dstbegin;
     if (d == NULL) {
         *dstlen = 0;
-        return 0;
+        return EMALLOC;
     }
 
     uint8_t b[3] = {0, 0, 0};
@@ -108,21 +113,27 @@ int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srcl
         }
     }
 
-    return (d == (dst_begin + *dstlen));
+    if (d != (dstbegin + *dstlen)) {
+        return EBASE64D;
+    }
+
+    return 0;
 }
 
-int base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen) {
+error_t base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen) {
     uint8_t *src = NULL;
     uint8_t *base64 = NULL;
     size_t read = 0;
-    int status = 0;
+    int err = 0;
 
-    if (!file_read(file, &src, &read)) {
+    err = file_read(file, &src, &read);
+    if (err) {
         goto end;
     }
 
     base64 = (uint8_t *) calloc(read + 1, sizeof (uint8_t));
     if (base64 == NULL) {
+        err = EMALLOC;
         goto end;
     }
 
@@ -140,11 +151,10 @@ int base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen) {
         j = ++i;
     }
 
-    if (!base64_decode(dst, dstlen, base64, b)) {
+    err = base64_decode(dst, dstlen, base64, b);
+    if (err) {
         goto end;
     }
-
-    status = 1;
 
 end:
     if (src != NULL) {
@@ -154,5 +164,5 @@ end:
         free((void *) base64);
     }
 
-    return status;
+    return err;
 }

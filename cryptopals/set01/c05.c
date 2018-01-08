@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
 
@@ -32,27 +33,27 @@
  * promise, we aren't wasting your time with this.
  */
 
-int challenge_05(const uint8_t *src, const size_t srclen, uint8_t **dst) {
+error_t challenge_05(const uint8_t *src, const size_t srclen, uint8_t **dst) {
     uint8_t *tmp = NULL;
     size_t dstlen = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if (!xor_repeating(&tmp, src, srclen, (const uint8_t *) "ICE", 3)) {
+    err = xor_repeating(&tmp, src, srclen, (const uint8_t *) "ICE", 3);
+    if (err) {
         goto end;
     }
 
-    if (!hex_encode(dst, &dstlen, tmp, srclen)) {
+    err = hex_encode(dst, &dstlen, tmp, srclen);
+    if (err) {
         goto end;
     }
-
-    status = 0;
 
 end:
     if (tmp != NULL) {
         free((void *) tmp);
     }
 
-    return status;
+    return err;
 }
 
 int main() {
@@ -63,9 +64,18 @@ int main() {
         "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
         "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
     uint8_t *output = NULL;
+    error_t err = 0;
 
-    assert(challenge_05(input, 74, &output) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = challenge_05(input, 74, &output);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) output);
+
+    return (int) err;
 }

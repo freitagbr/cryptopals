@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "cryptopals/block.h"
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 #include "cryptopals/hex.h"
 
@@ -23,7 +24,7 @@
  * 16 byte ciphertext.
  */
 
-int challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
+error_t challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
     uint8_t *buf = NULL;
     uint8_t *line = NULL;
     file_line *lines = NULL;
@@ -31,16 +32,18 @@ int challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
     file_line *aes = NULL;
     float global_min_dist = FLT_MAX;
     size_t linelen = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if (!file_getlines(file, &buf, &lines)) {
+    err = file_getlines(file, &buf, &lines);
+    if (err) {
         goto end;
     }
 
     curr = lines;
 
     while (curr != NULL) {
-        if (!hex_decode(&line, &linelen, curr->line, curr->len)) {
+        err = hex_decode(&line, &linelen, curr->line, curr->len);
+        if (err) {
             goto end;
         }
 
@@ -48,7 +51,8 @@ int challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
         float local_min_dist = 0.0;
         size_t local_keysize = 0;
 
-        if (!block_get_keysize(line, linelen, &local_min_dist, &local_keysize, local_max_keysize)) {
+        err = block_get_keysize(line, linelen, &local_min_dist, &local_keysize, local_max_keysize);
+        if (err) {
             goto end;
         }
 
@@ -63,7 +67,6 @@ int challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
     *dstlen = aes->len;
     *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
     memcpy(*dst, aes->line, *dstlen);
-    status = 0;
 
 end:
     if (buf != NULL) {
@@ -74,7 +77,7 @@ end:
     }
     file_line_delete(lines);
 
-    return status;
+    return err;
 }
 
 int main() {
@@ -85,10 +88,23 @@ int main() {
         "cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
     uint8_t *output = NULL;
     size_t len = 0;
+    error_t err = 0;
 
-    assert(challenge_08("data/c08.txt", &output, &len) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
-    assert(len == 320);
+    err = challenge_08("data/c08.txt", &output, &len);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    if (len != 320) {
+        error(ESIZE);
+        goto end;
+    }
+
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) output);
+
+    return (int) err;
 }

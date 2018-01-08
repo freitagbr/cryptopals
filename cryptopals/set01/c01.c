@@ -1,11 +1,10 @@
-#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "cryptopals/base64.h"
+#include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 
 /**
@@ -23,38 +22,47 @@
  * of the exercises.
  */
 
-int challenge_01(const uint8_t *src, const size_t srclen, uint8_t **dst) {
+error_t challenge_01(const uint8_t *src, const size_t srclen, uint8_t **dst) {
     size_t hexlen = 0;
     uint8_t *hex = NULL;
-    int status = -1;
+    error_t err = 0;
 
-    if (!hex_decode(&hex, &hexlen, src, srclen)) {
+    err = hex_decode(&hex, &hexlen, src, srclen);
+    if (err) {
         goto end;
     }
 
     size_t dstlen = 0;
 
-    if (!base64_encode(dst, &dstlen, hex, hexlen)) {
+    err = base64_encode(dst, &dstlen, hex, hexlen);
+    if (err) {
         goto end;
     }
-
-    status = 0;
 
 end:
     if (hex != NULL) {
         free((void *) hex);
     }
 
-    return status;
+    return err;
 }
 
 int main() {
     const uint8_t input[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
     const uint8_t expected[] = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
     uint8_t *output = NULL;
+    error_t err = 0;
 
-    assert(challenge_01(input, 96, &output) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = challenge_01(input, 96, &output);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) output);
+
+    return (int) err;
 }

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
 static const uint8_t base64_encode_table[64] = {
@@ -65,10 +66,10 @@ inline int base64_encoded_length(size_t len) {
     return (len + 2 - ((len + 2) % 3)) / 3 * 4;
 }
 
-int base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
+error_t base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
 
-int base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
+error_t base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
 
-int base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen);
+error_t base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen);
 
 #endif // CRYPTOPALS_BASE64_H_

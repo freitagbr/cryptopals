@@ -1,10 +1,9 @@
-#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
 
@@ -24,43 +23,48 @@
  * one with the best score.
  */
 
-int challenge_03(const uint8_t *hex, const size_t hexlen, uint8_t **dst) {
+error_t challenge_03(const uint8_t *hex, const size_t hexlen, uint8_t **dst) {
     uint8_t *src = NULL;
     size_t len = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if ((hexlen % 2) != 0) {
-        goto end;
-    }
-
-    if (!hex_decode(&src, &len, hex, hexlen)) {
+    err = hex_decode(&src, &len, hex, hexlen);
+    if (err) {
         goto end;
     }
 
     int max_score = 0;
     uint8_t key = xor_find_cipher(src, len, &max_score);
 
-    if (!xor_single_byte(dst, src, len, key)) {
+    err = xor_single_byte(dst, src, len, key);
+    if (err) {
         goto end;
     }
-
-    status = 0;
 
 end:
     if (src != NULL) {
         free((void *) src);
     }
 
-    return status;
+    return err;
 }
 
 int main() {
     const uint8_t input[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     const uint8_t expected[] = "Cooking MC's like a pound of bacon";
     uint8_t *output = NULL;
+    error_t err = 0;
 
-    assert(challenge_03(input, 68, &output) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = challenge_03(input, 68, &output);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) output);
+
+    return (int) err;
 }

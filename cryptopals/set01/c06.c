@@ -7,6 +7,7 @@
 
 #include "cryptopals/base64.h"
 #include "cryptopals/block.h"
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 #include "cryptopals/xor.h"
 
@@ -65,32 +66,30 @@
  * important.
  */
 
-int challenge_06(const char *file, uint8_t **dst) {
+error_t challenge_06(const char *file, uint8_t **dst) {
     uint8_t *buf = NULL;
     uint8_t *block = NULL;
     uint8_t *key = NULL;
     size_t buflen = 0;
     size_t keysize = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if (!base64_decode_file(file, &buf, &buflen)) {
+    err = base64_decode_file(file, &buf, &buflen);
+    if (err) {
         goto end;
     }
 
-    if (!block_transpose_get_key(buf, buflen, &key, &keysize, MAX_KEYSIZE)) {
+    err = block_transpose_get_key(buf, buflen, &key, &keysize, MAX_KEYSIZE);
+    if (err) {
         goto end;
     }
 
-    if (!xor_repeating(dst, buf, buflen, (const uint8_t *) key, keysize)) {
+    err = xor_repeating(dst, buf, buflen, (const uint8_t *) key, keysize);
+    if (err) {
         goto end;
     }
-
-    status = 0;
 
 end:
-    // the C standard says that free(NULL) is a no-op,
-    // but it causes trouble on certain platforms,
-    // so it is best to be defensive here
     if (key != NULL) {
         free((void *) key);
     }
@@ -101,20 +100,32 @@ end:
         free((void *) buf);
     }
 
-    return status;
+    return err;
 }
 
 int main() {
     uint8_t *expected = NULL;
-    size_t read = 0;
-
-    assert(file_read("data/c06_test.txt", &expected, &read));
-
     uint8_t *output = NULL;
+    size_t read = 0;
+    error_t err = 0;
 
-    assert(challenge_06("data/c06.txt", &output) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = file_read("data/c06_test.txt", &expected, &read);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    err = challenge_06("data/c06.txt", &output);
+    if (err) {
+        error(err);
+        goto end;
+    }
+
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) expected);
     free((void *) output);
+
+    return (int) err;
 }

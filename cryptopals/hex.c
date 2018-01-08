@@ -4,8 +4,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
+#include "cryptopals/error.h"
+
+error_t hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
     uint8_t *d = NULL;
+
+    if ((srclen % 2) != 0) {
+        return EHEXLEN;
+    }
+
     size_t declen = hex_decoded_length(srclen);
 
     // reuse old memory if possible
@@ -23,7 +30,7 @@ int hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t s
     d = *dst;
     if (d == NULL) {
         *dstlen = 0;
-        return 0;
+        return EMALLOC;
     }
 
     for (size_t i = 0; i < srclen; i += 2) {
@@ -31,17 +38,17 @@ int hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t s
         int8_t b = htob(src[i + 1]);
         if ((a == -1) || (b == -1)) {
             *dstlen = 0;
-            return 0;
+            return EHEXCHAR;
         }
         *d++ = (uint8_t) ((a << 4) | b);
     }
 
     *d = '\0';
 
-    return 1;
+    return 0;
 }
 
-int hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
+error_t hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen) {
     uint8_t *d = NULL;
     size_t enclen = hex_encoded_length(srclen);
 
@@ -60,7 +67,7 @@ int hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t s
     d = *dst;
     if (d == NULL) {
         *dstlen = 0;
-        return 0;
+        return EMALLOC;
     }
 
     for (size_t i = 0; i < srclen; i++) {
@@ -70,5 +77,5 @@ int hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t s
 
     *d = '\0';
 
-    return 1;
+    return 0;
 }

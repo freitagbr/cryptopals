@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cryptopals/error.h"
+
 void file_line_delete(file_line *lines) {
     file_line *next = NULL;
     while (lines != NULL) {
@@ -14,11 +16,12 @@ void file_line_delete(file_line *lines) {
     }
 }
 
-int file_read(const char *file, uint8_t **buf, size_t *read) {
+error_t file_read(const char *file, uint8_t **buf, size_t *read) {
     FILE *fp = fopen(file, "rb");
-    int status = 0;
+    error_t err = 0;
 
     if (fp == NULL) {
+        err = EFOPEN;
         goto end;
     }
 
@@ -27,15 +30,18 @@ int file_read(const char *file, uint8_t **buf, size_t *read) {
     if (fseek(fp, 0, SEEK_END) == 0) {
         long buflen = ftell(fp);
         if (buflen == -1) {
+            err = EFTELL;
             goto end;
         }
 
         *buf = (uint8_t *) calloc(buflen + 1, sizeof (uint8_t));
         if (*buf == NULL) {
+            err = EMALLOC;
             goto end;
         }
 
         if (fseek(fp, 0, SEEK_SET) != 0) {
+            err = EFSEEK;
             free((void *) *buf);
             goto end;
         }
@@ -43,28 +49,28 @@ int file_read(const char *file, uint8_t **buf, size_t *read) {
         *read = fread(*buf, sizeof (uint8_t), buflen, fp);
 
         if (ferror(fp) != 0) {
+            err = EFREAD;
             free((void *) *buf);
             *read = 0;
             goto end;
         }
     }
 
-    status = 1;
-
 end:
     if (fp != NULL) {
         fclose(fp);
     }
 
-    return status;
+    return err;
 }
 
-int file_getlines(const char *file, uint8_t **buf, file_line **lines) {
+error_t file_getlines(const char *file, uint8_t **buf, file_line **lines) {
     file_line **pp = lines;
     size_t read = 0;
-    int status = 0;
+    error_t err = 0;
 
-    if (!file_read(file, buf, &read)) {
+    err = file_read(file, buf, &read);
+    if (err) {
         goto end;
     }
 
@@ -82,6 +88,7 @@ int file_getlines(const char *file, uint8_t **buf, file_line **lines) {
         len = i - j;
         *pp = file_line_new();
         if (*pp == NULL) {
+            err = EMALLOC;
             goto end;
         }
         (*pp)->line = &(*buf)[j];
@@ -92,8 +99,7 @@ int file_getlines(const char *file, uint8_t **buf, file_line **lines) {
 
     // end list
     *pp = NULL;
-    status = 1;
 
 end:
-    return status;
+    return err;
 }

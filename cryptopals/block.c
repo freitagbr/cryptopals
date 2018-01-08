@@ -6,14 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/hamming.h"
 #include "cryptopals/xor.h"
 
-int block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
+error_t block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
     uint8_t *block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
     uint8_t *block_b = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
+    error_t err = 0;
 
     if ((block_a == NULL) || (block_b == NULL)) {
+        err = EMALLOC;
         goto end;
     }
 
@@ -57,16 +60,17 @@ end:
         free((void *) block_b);
     }
 
-    return 1;
+    return err;
 }
 
-int block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *keysize, size_t max_keysize) {
+error_t block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *keysize, size_t max_keysize) {
     uint8_t *block = NULL;
     uint8_t *k = NULL;
     float min_dist = 0;
-    int status = 0;
+    error_t err = 0;
 
-    if (!block_get_keysize(buf, len, &min_dist, keysize, max_keysize)) {
+    err = block_get_keysize(buf, len, &min_dist, keysize, max_keysize);
+    if (err) {
         *keysize = 0;
         goto end;
     }
@@ -75,11 +79,13 @@ int block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *key
 
     block = (uint8_t *) calloc(blocklen + 1, sizeof (uint8_t));
     if (block == NULL) {
+        err = EMALLOC;
         goto end;
     }
 
     k = *key = (uint8_t *) calloc(*keysize + 1, sizeof (uint8_t));
     if (k == NULL) {
+        err = EMALLOC;
         goto end;
     }
 
@@ -93,12 +99,10 @@ int block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *key
         *k++ = xor_find_cipher(block, blocklen, &max_score);
     }
 
-    status = 1;
-
 end:
     if (block != NULL) {
         free((void *) block);
     }
 
-    return status;
+    return err;
 }

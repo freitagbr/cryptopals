@@ -7,6 +7,7 @@
 #include <openssl/evp.h>
 
 #include "cryptopals/base64.h"
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
 /**
@@ -25,44 +26,49 @@
  * Easiest way: use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
  */
 
-int challenge_07(const char *file, const uint8_t *key, uint8_t **plaintext, int *plaintextlen) {
+error_t challenge_07(const char *file, const uint8_t *key, uint8_t **plaintext, int *plaintextlen) {
     EVP_CIPHER_CTX *ctx = NULL;
     uint8_t *ciphertext = NULL;
     size_t ciphertextlen = 0;
     int len = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if (!base64_decode_file(file, &ciphertext, &ciphertextlen)) {
+    err = base64_decode_file(file, &ciphertext, &ciphertextlen);
+    if (err) {
         goto end;
     }
 
     ctx = EVP_CIPHER_CTX_new();
     if (ctx == NULL) {
+        err = EMALLOC;
         goto end;
     }
 
     if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL) != 1) {
+        err = EMALLOC;
         goto end;
     }
 
     uint8_t *p = *plaintext = (uint8_t *) calloc(ciphertextlen + 1, sizeof (uint8_t));
     if (p == NULL) {
+        err = EMALLOC;
         goto end;
     }
 
     if (EVP_DecryptUpdate(ctx, p, &len, ciphertext, ciphertextlen) != 1) {
+        err = EMALLOC;
         goto end;
     }
 
     *plaintextlen = len;
 
     if (EVP_DecryptFinal_ex(ctx, &p[len], &len) != 1) {
+        err = EMALLOC;
         goto end;
     }
 
     *plaintextlen += len;
     p[*plaintextlen] = '\0';
-    status = 0;
 
 end:
     if (ciphertext != NULL) {
@@ -72,22 +78,34 @@ end:
         EVP_CIPHER_CTX_free(ctx);
     }
 
-    return status;
+    return err;
 }
 
 int main() {
-    uint8_t *expected = NULL;
-    size_t read = 0;
-
-    assert(file_read("data/c07_test.txt", &expected, &read));
-
     const uint8_t key[16] = "YELLOW SUBMARINE";
+    uint8_t *expected = NULL;
     uint8_t *output = NULL;
+    size_t read = 0;
     int len = 0;
+    error_t err = 0;
 
-    assert(challenge_07("data/c07.txt", key, &output, &len) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = file_read("data/c07_test.txt", &expected, &read);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    err = challenge_07("data/c07.txt", key, &output, &len);
+    if (err) {
+        error(err);
+        goto end;
+    }
+
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) expected);
     free((void *) output);
+
+    return (int) err;
 }

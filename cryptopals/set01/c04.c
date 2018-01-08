@@ -1,10 +1,9 @@
-#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "cryptopals/error.h"
 #include "cryptopals/file.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
@@ -20,23 +19,25 @@
  * (Your code from #3 should help.)
  */
 
-int challenge_04(const char *file, uint8_t **dst) {
+error_t challenge_04(const char *file, uint8_t **dst) {
     uint8_t *buf = NULL;
     uint8_t *line = NULL;
     file_line *lines = NULL;
     file_line *curr = NULL;
     size_t linelen = 0;
     int global_max = 0;
-    int status = -1;
+    error_t err = 0;
 
-    if (!file_getlines(file, &buf, &lines)) {
+    err = file_getlines(file, &buf, &lines);
+    if (err) {
         goto end;
     }
 
     curr = lines;
 
     while (curr != NULL) {
-        if (!hex_decode(&line, &linelen, curr->line, curr->len)) {
+        err = hex_decode(&line, &linelen, curr->line, curr->len);
+        if (err) {
             goto end;
         }
 
@@ -45,15 +46,14 @@ int challenge_04(const char *file, uint8_t **dst) {
 
         if (local_max > global_max) {
             global_max = local_max;
-            if (!xor_single_byte(dst, line, linelen, key)) {
+            err = xor_single_byte(dst, line, linelen, key);
+            if (err) {
                 goto end;
             }
         }
 
         curr = curr->next;
     }
-
-    status = 0;
 
 end:
     if (buf != NULL) {
@@ -64,15 +64,24 @@ end:
     }
     file_line_delete(lines);
 
-    return status;
+    return err;
 }
 
 int main() {
     const uint8_t expected[] = "Now that the party is jumping\n";
     uint8_t *output = NULL;
+    error_t err = 0;
 
-    assert(challenge_04("data/c04.txt", &output) == 0);
-    assert(strcmp((const char *) output, (const char *) expected) == 0);
+    err = challenge_04("data/c04.txt", &output);
+    if (err) {
+        error(err);
+        goto end;
+    }
 
+    error_expect((const char *) expected, (const char *) output);
+
+end:
     free((void *) output);
+
+    return (int) err;
 }

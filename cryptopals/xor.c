@@ -4,25 +4,27 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int xor_fixed(uint8_t *a, size_t alen, uint8_t *b, size_t blen) {
+#include "cryptopals/error.h"
+
+error_t xor_fixed(uint8_t *a, size_t alen, uint8_t *b, size_t blen) {
     if (alen != blen) {
-        return 0;
+        return ESIZE;
     }
 
     for (size_t i = 0; i < alen; i++) {
         a[i] = a[i] ^ b[i];
     }
 
-    return 1;
+    return 0;
 }
 
-int xor_single_byte(uint8_t **dst, const uint8_t *src, size_t srclen, uint8_t key) {
+error_t xor_single_byte(uint8_t **dst, const uint8_t *src, size_t srclen, uint8_t key) {
     uint8_t *d = *dst;
 
     if (d == NULL) {
         d = *dst = (uint8_t *) calloc(srclen + 1, sizeof (uint8_t));
         if (d == NULL) {
-            return 0;
+            return EMALLOC;
         }
     }
 
@@ -30,16 +32,16 @@ int xor_single_byte(uint8_t **dst, const uint8_t *src, size_t srclen, uint8_t ke
         *d++ = src[i] ^ key;
     }
 
-    return 1;
+    return 0;
 }
 
-int xor_repeating(uint8_t **dst, const uint8_t *src, size_t srclen, const uint8_t *key, size_t keylen) {
+error_t xor_repeating(uint8_t **dst, const uint8_t *src, size_t srclen, const uint8_t *key, size_t keylen) {
     uint8_t *d = *dst;
 
     if (d == NULL) {
         d = *dst = (uint8_t *) calloc(srclen + 1, sizeof (uint8_t));
         if (d == NULL) {
-            return 0;
+            return EMALLOC;
         }
     }
 
@@ -47,7 +49,7 @@ int xor_repeating(uint8_t **dst, const uint8_t *src, size_t srclen, const uint8_
         *d++ = src[i] ^ key[k];
     }
 
-    return 1;
+    return 0;
 }
 
 uint8_t xor_find_cipher(const uint8_t *buf, const size_t len, int *max) {
