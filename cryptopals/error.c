@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *error_messages[11] = {
+static const char *error_messages[12] = {
     "Failed to allocate memory",
     "Destination buffer is shorter than source buffer",
     "Buffer lengths do not match",
@@ -15,11 +15,12 @@ static const char *error_messages[11] = {
     "Failed to read file",
     "Hex buffer contains invalid characters",
     "Buffer contains incomplete hex code point",
+    "OpenSSL error",
 };
 
 void error_print(error_t e, const char *file, int line) {
     size_t err = (size_t) e;
-    if (err && err <= EHEXLEN) {
+    if (err && err <= E_) {
         const char *message = error_messages[err - 1];
         fprintf(stderr, "Error in \"%s\" on line %d:\n\t%s\n", file, line, message);
     }

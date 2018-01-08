@@ -15,6 +15,8 @@ typedef enum {
     EFREAD,
     EHEXCHAR,
     EHEXLEN,
+    EOPENSSL,
+    E_,
 } error_t;
 
 #define error(e) error_print(e, __FILE__, __LINE__)

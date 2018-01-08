@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <openssl/err.h>
 #include <openssl/evp.h>
 
 #include "cryptopals/base64.h"
@@ -45,7 +46,8 @@ error_t challenge_07(const char *file, uint8_t **plaintext, int *plaintextlen, c
     }
 
     if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL) != 1) {
-        err = EMALLOC;
+        err = EOPENSSL;
+        fprintf(stderr, "%s\n", ERR_error_string(ERR_get_error(), NULL));
         goto end;
     }
 
@@ -56,14 +58,16 @@ error_t challenge_07(const char *file, uint8_t **plaintext, int *plaintextlen, c
     }
 
     if (EVP_DecryptUpdate(ctx, p, &len, ciphertext, ciphertextlen) != 1) {
-        err = EMALLOC;
+        err = EOPENSSL;
+        fprintf(stderr, "%s\n", ERR_error_string(ERR_get_error(), NULL));
         goto end;
     }
 
     *plaintextlen = len;
 
     if (EVP_DecryptFinal_ex(ctx, &p[len], &len) != 1) {
-        err = EMALLOC;
+        err = EOPENSSL;
+        fprintf(stderr, "%s\n", ERR_error_string(ERR_get_error(), NULL));
         goto end;
     }
 
