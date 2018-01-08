@@ -23,27 +23,27 @@
  * one with the best score.
  */
 
-error_t challenge_03(const uint8_t *hex, const size_t hexlen, uint8_t **dst) {
-    uint8_t *src = NULL;
+error_t challenge_03(uint8_t **dst, const uint8_t *src, const size_t srclen) {
+    uint8_t *dec = NULL;
     size_t len = 0;
     error_t err = 0;
 
-    err = hex_decode(&src, &len, hex, hexlen);
+    err = hex_decode(&dec, &len, src, srclen);
     if (err) {
         goto end;
     }
 
     int max_score = 0;
-    uint8_t key = xor_find_cipher(src, len, &max_score);
+    uint8_t key = xor_find_cipher(dec, len, &max_score);
 
-    err = xor_single_byte(dst, src, len, key);
+    err = xor_single_byte(dst, dec, len, key);
     if (err) {
         goto end;
     }
 
 end:
-    if (src != NULL) {
-        free((void *) src);
+    if (dec != NULL) {
+        free((void *) dec);
     }
 
     return err;
@@ -55,7 +55,7 @@ int main() {
     uint8_t *output = NULL;
     error_t err = 0;
 
-    err = challenge_03(input, 68, &output);
+    err = challenge_03(&output, input, 68);
     if (err) {
         error(err);
         goto end;

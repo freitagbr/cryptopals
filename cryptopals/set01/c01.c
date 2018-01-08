@@ -22,7 +22,7 @@
  * of the exercises.
  */
 
-error_t challenge_01(const uint8_t *src, const size_t srclen, uint8_t **dst) {
+error_t challenge_01(uint8_t **dst, const uint8_t *src, const size_t srclen) {
     size_t hexlen = 0;
     uint8_t *hex = NULL;
     error_t err = 0;
@@ -53,7 +53,7 @@ int main() {
     uint8_t *output = NULL;
     error_t err = 0;
 
-    err = challenge_01(input, 96, &output);
+    err = challenge_01(&output, input, 96);
     if (err) {
         error(err);
         goto end;

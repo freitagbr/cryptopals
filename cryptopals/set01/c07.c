@@ -26,7 +26,7 @@
  * Easiest way: use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
  */
 
-error_t challenge_07(const char *file, const uint8_t *key, uint8_t **plaintext, int *plaintextlen) {
+error_t challenge_07(const char *file, uint8_t **plaintext, int *plaintextlen, const uint8_t *key) {
     EVP_CIPHER_CTX *ctx = NULL;
     uint8_t *ciphertext = NULL;
     size_t ciphertextlen = 0;
@@ -95,7 +95,7 @@ int main() {
         goto end;
     }
 
-    err = challenge_07("data/c07.txt", key, &output, &len);
+    err = challenge_07("data/c07.txt", &output, &len, key);
     if (err) {
         error(err);
         goto end;

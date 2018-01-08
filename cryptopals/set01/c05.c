@@ -33,7 +33,7 @@
  * promise, we aren't wasting your time with this.
  */
 
-error_t challenge_05(const uint8_t *src, const size_t srclen, uint8_t **dst) {
+error_t challenge_05(uint8_t **dst, const uint8_t *src, const size_t srclen) {
     uint8_t *tmp = NULL;
     size_t dstlen = 0;
     error_t err = 0;
@@ -66,7 +66,7 @@ int main() {
     uint8_t *output = NULL;
     error_t err = 0;
 
-    err = challenge_05(input, 74, &output);
+    err = challenge_05(&output, input, 74);
     if (err) {
         error(err);
         goto end;

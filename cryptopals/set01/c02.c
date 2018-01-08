@@ -26,7 +26,7 @@
  * 746865206b696420646f6e277420706c6179
  */
 
-error_t challenge_02(const uint8_t *ahex, const size_t ahexlen, const uint8_t *bhex, const size_t bhexlen, uint8_t **dst) {
+error_t challenge_02(uint8_t **dst, const uint8_t *ahex, const size_t ahexlen, const uint8_t *bhex, const size_t bhexlen) {
     uint8_t *a = NULL;
     uint8_t *b = NULL;
     size_t alen = 0;
@@ -82,7 +82,7 @@ int main() {
     uint8_t *output = NULL;
     error_t err = 0;
 
-    err = challenge_02(input_a, 36, input_b, 36, &output);
+    err = challenge_02(&output, input_a, 36, input_b, 36);
     if (err) {
         error(err);
         goto end;
