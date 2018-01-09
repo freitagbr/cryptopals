@@ -24,7 +24,7 @@
 
 error_t challenge_01(buffer *dst, const buffer src) {
   buffer hex = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = hex_decode(&hex, src);
   if (err) {
@@ -50,7 +50,7 @@ int main() {
                  "06f69736f6e6f7573206d757368726f6f6d",
                  96);
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_01(&output, input);
   if (err) {

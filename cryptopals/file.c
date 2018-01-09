@@ -49,7 +49,7 @@ end:
   return err;
 }
 
-// based on the getdelim implementation from NetBSD
+/* based on the getdelim implementation from NetBSD */
 /*-
  * Copyright (c) 2011 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -79,12 +79,12 @@ end:
  * POSSIBILITY OF SUCH DAMAGE.
  */
 error_t file_getline(FILE *fp, buffer *buf, long *read) {
+  unsigned char *ptr = NULL;
+  unsigned char *endptr = NULL;
+
   if ((fp == NULL) || (buf == NULL) || (read == NULL)) {
     return ENULLPTR;
   }
-
-  unsigned char *ptr = NULL;
-  unsigned char *endptr = NULL;
 
   if (buf->ptr == NULL || buf->len == 0) {
     error_t err = buffer_alloc(buf, FILE_BUFLEN);

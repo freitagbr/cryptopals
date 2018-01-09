@@ -28,21 +28,24 @@ error_t challenge_08(const char *file, buffer *dst) {
   buffer buf = buffer_init();
   buffer line = buffer_init();
   buffer aes = buffer_init();
+  buffer tmp = buffer_init();
   float global_min_dist = FLT_MAX;
   long read = 0;
-  error_t err = 0;
+  error_t err;
 
   while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
-    buffer tmp = buffer_new(buf.ptr, read - 1);
+    float local_min_dist = 0.0;
+    size_t local_keysize = 0;
+    size_t local_max_keysize;
+
+    buffer_set(tmp, buf.ptr, read - 1);
 
     err = hex_decode(&line, tmp);
     if (err) {
       goto end;
     }
 
-    size_t local_max_keysize = line.len / 2;
-    float local_min_dist = 0.0;
-    size_t local_keysize = 0;
+    local_max_keysize = line.len / 2;
 
     err = block_get_keysize(line, &local_min_dist, &local_keysize,
                             local_max_keysize);
@@ -100,7 +103,7 @@ int main() {
       "69c744cd28397a93eab8d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744"
       "cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_08("data/c08.txt", &output);
   if (err) {

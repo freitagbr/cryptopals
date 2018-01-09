@@ -9,11 +9,13 @@
 
 error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
                   const unsigned char iv) {
+  error_t err;
+
   if (len < src.len) {
     return EDSTBUF;
   }
 
-  error_t err = buffer_alloc(dst, len);
+  err = buffer_alloc(dst, len);
   if (err) {
     return err;
   }

@@ -14,4 +14,4 @@ error_t file_read(const char *file, buffer *buf);
 
 error_t file_getline(FILE *fp, buffer *buf, long *read);
 
-#endif // CRYPTOPALS_FILE_H_
+#endif

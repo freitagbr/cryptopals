@@ -12,10 +12,14 @@ typedef struct buffer {
 } buffer;
 
 #define buffer_init()                                                          \
-  (buffer) { NULL, 0 }
+  { NULL, 0 }
 
 #define buffer_new(p, l)                                                       \
-  (buffer) { (unsigned char *)p, l }
+  { (unsigned char *)p, l }
+
+#define buffer_set(b, p, l)                                                    \
+  b.ptr = p;                                                                   \
+  b.len = l;
 
 #define buffer_delete(buf)                                                     \
   if (buf.ptr != NULL) {                                                       \
@@ -26,4 +30,4 @@ error_t buffer_alloc(buffer *buf, size_t len);
 
 error_t buffer_resize(buffer *buf, size_t len);
 
-#endif // CRYPTOPALS_BUFFER_H_
+#endif

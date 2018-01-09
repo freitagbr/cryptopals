@@ -4,20 +4,20 @@
 #include <string.h>
 
 static const char *error_messages[14] = {
-    "Failed to allocate memory",                        // EMALLOC
-    "Null pointer passed as argument",                  // ENULLPTR
-    "Destination buffer is shorter than source buffer", // EDSTBUF
-    "Buffer lengths do not match",                      // ESIZE
-    "Failed to decode from base64",                     // EBASE64D
-    "Failed to encode to base64",                       // EBASE64E
-    "Failed to read past end of file",                  // EFEOF
-    "Failed to open file",                              // EFOPEN
-    "Failed to determine position in file",             // EFTELL
-    "Failed to seek in file",                           // EFSEEK
-    "Failed to read file",                              // EFREAD
-    "Hex buffer contains invalid characters",           // EHEXCHAR
-    "Buffer contains incomplete hex code point",        // EHEXLEN
-    "OpenSSL error",                                    // EOPENSSL
+    "Failed to allocate memory",                        /* EMALLOC */
+    "Null pointer passed as argument",                  /* ENULLPTR */
+    "Destination buffer is shorter than source buffer", /* EDSTBUF */
+    "Buffer lengths do not match",                      /* ESIZE */
+    "Failed to decode from base64",                     /* EBASE64D */
+    "Failed to encode to base64",                       /* EBASE64E */
+    "Failed to read past end of file",                  /* EFEOF */
+    "Failed to open file",                              /* EFOPEN */
+    "Failed to determine position in file",             /* EFTELL */
+    "Failed to seek in file",                           /* EFSEEK */
+    "Failed to read file",                              /* EFREAD */
+    "Hex buffer contains invalid characters",           /* EHEXCHAR */
+    "Buffer contains incomplete hex code point",        /* EHEXLEN */
+    "OpenSSL error",                                    /* EOPENSSL */
 };
 
 void error_print(error_t e, const char *file, int line) {

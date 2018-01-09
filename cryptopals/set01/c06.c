@@ -67,7 +67,7 @@ error_t challenge_06(const char *file, buffer *dst) {
   buffer buf = buffer_init();
   buffer block = buffer_init();
   buffer key = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = base64_decode_file(file, &buf);
   if (err) {
@@ -95,7 +95,7 @@ end:
 int main() {
   buffer expected = buffer_init();
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = file_read("data/c06_test.txt", &expected);
   if (err) {

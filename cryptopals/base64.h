@@ -35,36 +35,10 @@ static const char base64_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-static inline void btoa(unsigned char *a, unsigned char *b) {
-  a[0] = (b[0] & 0xfc) >> 2;
-  a[1] = ((b[0] & 0x03) << 4) + ((b[1] & 0xf0) >> 4);
-  a[2] = ((b[1] & 0x0f) << 2) + ((b[2] & 0xc0) >> 6);
-  a[3] = (b[2] & 0x3f);
-}
-
-static inline void atob(unsigned char *b, unsigned char *a) {
-  b[0] = (a[0] << 2) + ((a[1] & 0x30) >> 4);
-  b[1] = ((a[1] & 0xf) << 4) + ((a[2] & 0x3c) >> 2);
-  b[2] = ((a[2] & 0x3) << 6) + a[3];
-}
-
-inline int base64_decoded_length(const buffer buf) {
-  int eqs = 0;
-  const unsigned char *end = &(buf.ptr[buf.len]);
-  while (*--end == '=') {
-    ++eqs;
-  }
-  return ((buf.len * 3) / 4) - eqs;
-}
-
-inline int base64_encoded_length(size_t len) {
-  return (len + 2 - ((len + 2) % 3)) / 3 * 4;
-}
-
 error_t base64_encode(buffer *dst, const buffer src);
 
 error_t base64_decode(buffer *dst, const buffer src);
 
 error_t base64_decode_file(const char *file, buffer *dst);
 
-#endif // CRYPTOPALS_BASE64_H_
+#endif

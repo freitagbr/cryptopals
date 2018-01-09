@@ -17,4 +17,4 @@ error_t xor_repeating(buffer *dst, const buffer src, const buffer key);
 
 unsigned char xor_find_cipher(const buffer buf, int *max);
 
-#endif // CRYPTOPALS_XOR_H_
+#endif

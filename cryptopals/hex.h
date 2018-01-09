@@ -28,21 +28,8 @@ static const char hex_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
-static inline char htob(const unsigned char c) { return hex_decode_table[c]; }
-
-static inline void btoh(unsigned char src, unsigned char *dst) {
-  dst[0] = hex_encode_table[(src & 0xF0) >> 4];
-  dst[1] = hex_encode_table[src & 0x0F];
-}
-
-static inline size_t hex_decoded_length(const size_t len) {
-  return (len + (len % 2)) / 2;
-}
-
-static inline size_t hex_encoded_length(const size_t len) { return len * 2; }
-
 error_t hex_decode(buffer *dst, const buffer src);
 
 error_t hex_encode(buffer *dst, const buffer src);
 
-#endif // CRYPTOPALS_HEX_H_
+#endif

@@ -26,12 +26,14 @@
  */
 
 error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
-  ERR_load_ERR_strings();
-  ERR_load_crypto_strings();
   EVP_CIPHER_CTX *ctx = NULL;
   buffer ciphertext = buffer_init();
+  unsigned char *p;
   int len = 0;
-  error_t err = 0;
+  error_t err;
+
+  ERR_load_ERR_strings();
+  ERR_load_crypto_strings();
 
   err = base64_decode_file(file, &ciphertext);
   if (err) {
@@ -56,7 +58,7 @@ error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
     goto end;
   }
 
-  unsigned char *p = plaintext->ptr;
+  p = plaintext->ptr;
 
   if (EVP_DecryptUpdate(ctx, p, &len, ciphertext.ptr, ciphertext.len) != 1) {
     err = EOPENSSL;
@@ -91,7 +93,7 @@ int main() {
   buffer expected = buffer_init();
   const buffer key = buffer_new("YELLOW SUBMARINE", 16);
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = file_read("data/c07_test.txt", &expected);
   if (err) {

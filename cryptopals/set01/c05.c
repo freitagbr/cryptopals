@@ -34,7 +34,7 @@
 error_t challenge_05(buffer *dst, const buffer src) {
   buffer tmp = buffer_init();
   buffer key = buffer_new("ICE", 3);
-  error_t err = 0;
+  error_t err;
 
   err = xor_repeating(&tmp, src, key);
   if (err) {
@@ -62,7 +62,7 @@ int main() {
                                   "I go crazy when I hear a cymbal",
                                   74);
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_05(&output, input);
   if (err) {

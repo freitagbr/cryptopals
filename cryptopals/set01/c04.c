@@ -23,20 +23,23 @@ error_t challenge_04(const char *file, buffer *dst) {
   FILE *fp = fopen(file, "rb");
   buffer buf = buffer_init();
   buffer line = buffer_init();
+  buffer tmp = buffer_init();
   long read = 0;
   int global_max = 0;
-  error_t err = 0;
+  error_t err;
 
   while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
-    buffer tmp = buffer_new(buf.ptr, read - 1);
+    int local_max = 0;
+    unsigned char key;
+
+    buffer_set(tmp, buf.ptr, read - 1);
 
     err = hex_decode(&line, tmp);
     if (err) {
       goto end;
     }
 
-    int local_max = 0;
-    unsigned char key = xor_find_cipher(line, &local_max);
+    key = xor_find_cipher(line, &local_max);
 
     if (local_max > global_max) {
       global_max = local_max;
@@ -60,7 +63,7 @@ end:
 int main() {
   const unsigned char expected[] = "Now that the party is jumping\n";
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_04("data/c04.txt", &output);
   if (err) {

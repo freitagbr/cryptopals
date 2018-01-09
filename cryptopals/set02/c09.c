@@ -36,7 +36,7 @@ int main() {
   const unsigned char expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
   const buffer input = buffer_new("YELLOW SUBMARINE", 16);
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_09(&output, input, 20);
   if (err) {

@@ -28,7 +28,7 @@
 error_t challenge_02(buffer *dst, const buffer hex_a, const buffer hex_b) {
   buffer a = buffer_init();
   buffer b = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   if (hex_a.len != hex_b.len) {
     return ESIZE;
@@ -66,7 +66,7 @@ int main() {
   const buffer input_a = buffer_new("1c0111001f010100061a024b53535009181c", 36);
   const buffer input_b = buffer_new("686974207468652062756c6c277320657965", 36);
   buffer output = buffer_init();
-  error_t err = 0;
+  error_t err;
 
   err = challenge_02(&output, input_a, input_b);
   if (err) {
