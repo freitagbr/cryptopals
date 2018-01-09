@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -37,7 +36,7 @@ error_t challenge_04(const char *file, buffer *dst) {
     }
 
     int local_max = 0;
-    uint8_t key = xor_find_cipher(line, &local_max);
+    unsigned char key = xor_find_cipher(line, &local_max);
 
     if (local_max > global_max) {
       global_max = local_max;
@@ -59,7 +58,7 @@ end:
 }
 
 int main() {
-  const uint8_t expected[] = "Now that the party is jumping\n";
+  const unsigned char expected[] = "Now that the party is jumping\n";
   buffer output = buffer_init();
   error_t err = 0;
 

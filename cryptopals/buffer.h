@@ -2,13 +2,12 @@
 #define CRYPTOPALS_BUFFER_H_
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "cryptopals/error.h"
 
 typedef struct buffer {
-  uint8_t *ptr;
+  unsigned char *ptr;
   size_t len;
 } buffer;
 
@@ -16,7 +15,7 @@ typedef struct buffer {
   (buffer) { NULL, 0 }
 
 #define buffer_new(p, l)                                                       \
-  (buffer) { (uint8_t *)p, l }
+  (buffer) { (unsigned char *)p, l }
 
 #define buffer_delete(buf)                                                     \
   if (buf.ptr != NULL) {                                                       \

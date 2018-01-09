@@ -2,9 +2,8 @@
 #define CRYPTOPALS_HAMMING_H_
 
 #include <stddef.h>
-#include <stdint.h>
 
-static inline int popcount(uint8_t n) {
+static inline int popcount(unsigned char n) {
   int count = 0;
   while (n) {
     n &= n - 1;
@@ -13,6 +12,7 @@ static inline int popcount(uint8_t n) {
   return count;
 }
 
-int hamming_distance(const uint8_t *a, const uint8_t *b, const size_t len);
+int hamming_distance(const unsigned char *a, const unsigned char *b,
+                     const size_t len);
 
 #endif // CRYPTOPALS_HAMMING_H_

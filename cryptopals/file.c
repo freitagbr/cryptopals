@@ -1,7 +1,6 @@
 #include "cryptopals/file.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -34,7 +33,7 @@ error_t file_read(const char *file, buffer *buf) {
       goto end;
     }
 
-    buf->len = fread(buf->ptr, sizeof(uint8_t), buf->len, fp);
+    buf->len = fread(buf->ptr, sizeof(unsigned char), buf->len, fp);
 
     if (ferror(fp) != 0) {
       err = EFREAD;
@@ -84,8 +83,8 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
     return ENULLPTR;
   }
 
-  uint8_t *ptr = NULL;
-  uint8_t *endptr = NULL;
+  unsigned char *ptr = NULL;
+  unsigned char *endptr = NULL;
 
   if (buf->ptr == NULL || buf->len == 0) {
     error_t err = buffer_alloc(buf, FILE_BUFLEN);
@@ -110,7 +109,7 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
       return EFREAD;
     }
 
-    *ptr++ = (uint8_t)c;
+    *ptr++ = (unsigned char)c;
 
     if (c == '\n') {
       *ptr = '\0';

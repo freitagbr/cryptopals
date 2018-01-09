@@ -2,7 +2,6 @@
 
 #include <float.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,7 +63,7 @@ end:
 
 error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
   buffer block = buffer_init();
-  uint8_t *kptr = NULL;
+  unsigned char *kptr = NULL;
   float min_dist = 0;
   size_t keysize = 0;
   error_t err = 0;

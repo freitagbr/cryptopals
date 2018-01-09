@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -57,7 +56,7 @@ error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
     goto end;
   }
 
-  uint8_t *p = plaintext->ptr;
+  unsigned char *p = plaintext->ptr;
 
   if (EVP_DecryptUpdate(ctx, p, &len, ciphertext.ptr, ciphertext.len) != 1) {
     err = EOPENSSL;

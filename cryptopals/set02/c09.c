@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "cryptopals/buffer.h"
@@ -34,7 +33,7 @@ error_t challenge_09(buffer *dst, const buffer src, const size_t len) {
 }
 
 int main() {
-  const uint8_t expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
+  const unsigned char expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
   const buffer input = buffer_new("YELLOW SUBMARINE", 16);
   buffer output = buffer_init();
   error_t err = 0;

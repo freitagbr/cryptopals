@@ -1,7 +1,6 @@
 #include "cryptopals/pad.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,7 +8,7 @@
 #include "cryptopals/error.h"
 
 error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
-                  const uint8_t iv) {
+                  const unsigned char iv) {
   if (len < src.len) {
     return EDSTBUF;
   }

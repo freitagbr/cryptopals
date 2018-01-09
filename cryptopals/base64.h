@@ -2,7 +2,6 @@
 #define CRYPTOPALS_BASE64_H_
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +10,7 @@
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
-static const uint8_t base64_encode_table[64] = {
+static const unsigned char base64_encode_table[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -36,14 +35,14 @@ static const char base64_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-static inline void btoa(uint8_t *a, uint8_t *b) {
+static inline void btoa(unsigned char *a, unsigned char *b) {
   a[0] = (b[0] & 0xfc) >> 2;
   a[1] = ((b[0] & 0x03) << 4) + ((b[1] & 0xf0) >> 4);
   a[2] = ((b[1] & 0x0f) << 2) + ((b[2] & 0xc0) >> 6);
   a[3] = (b[2] & 0x3f);
 }
 
-static inline void atob(uint8_t *b, uint8_t *a) {
+static inline void atob(unsigned char *b, unsigned char *a) {
   b[0] = (a[0] << 2) + ((a[1] & 0x30) >> 4);
   b[1] = ((a[1] & 0xf) << 4) + ((a[2] & 0x3c) >> 2);
   b[2] = ((a[2] & 0x3) << 6) + a[3];
@@ -51,7 +50,7 @@ static inline void atob(uint8_t *b, uint8_t *a) {
 
 inline int base64_decoded_length(const buffer buf) {
   int eqs = 0;
-  const uint8_t *end = &(buf.ptr[buf.len]);
+  const unsigned char *end = &(buf.ptr[buf.len]);
   while (*--end == '=') {
     ++eqs;
   }

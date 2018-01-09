@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -34,7 +33,7 @@ error_t challenge_03(buffer *dst, const buffer src) {
   }
 
   int max_score = 0;
-  uint8_t key = xor_find_cipher(hex, &max_score);
+  unsigned char key = xor_find_cipher(hex, &max_score);
 
   err = xor_single_byte(dst, hex, key);
   if (err) {
@@ -48,7 +47,7 @@ end:
 }
 
 int main() {
-  const uint8_t expected[] = "Cooking MC's like a pound of bacon";
+  const unsigned char expected[] = "Cooking MC's like a pound of bacon";
   const buffer input = buffer_new(
       "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
       68);

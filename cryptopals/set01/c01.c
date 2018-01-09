@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,7 +43,7 @@ end:
 }
 
 int main() {
-  const uint8_t expected[] =
+  const unsigned char expected[] =
       "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
   const buffer input =
       buffer_new("49276d206b696c6c696e6720796f757220627261696e206c696b652061207"

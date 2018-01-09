@@ -1,7 +1,6 @@
 #include "cryptopals/base64.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +10,7 @@
 #include "cryptopals/file.h"
 
 error_t base64_encode(buffer *dst, const buffer src) {
-  uint8_t *sptr = src.ptr;
+  unsigned char *sptr = src.ptr;
   size_t srclen = src.len;
   const size_t dstlen = base64_encoded_length(srclen);
 
@@ -20,10 +19,10 @@ error_t base64_encode(buffer *dst, const buffer src) {
     return err;
   }
 
-  uint8_t *dstptr = dst->ptr;
-  uint8_t *dptr = dstptr;
-  uint8_t b[3] = {0, 0, 0};
-  uint8_t a[4] = {0, 0, 0, 0};
+  unsigned char *dstptr = dst->ptr;
+  unsigned char *dptr = dstptr;
+  unsigned char b[3] = {0, 0, 0};
+  unsigned char a[4] = {0, 0, 0, 0};
   int i = 0;
 
   while (srclen--) {
@@ -64,7 +63,7 @@ error_t base64_encode(buffer *dst, const buffer src) {
 }
 
 error_t base64_decode(buffer *dst, const buffer src) {
-  uint8_t *sptr = src.ptr;
+  unsigned char *sptr = src.ptr;
   size_t srclen = src.len;
   const size_t dstlen = base64_decoded_length(src);
 
@@ -73,10 +72,10 @@ error_t base64_decode(buffer *dst, const buffer src) {
     return err;
   }
 
-  uint8_t *dstptr = dst->ptr;
-  uint8_t *dptr = dstptr;
-  uint8_t b[3] = {0, 0, 0};
-  uint8_t a[4] = {0, 0, 0, 0};
+  unsigned char *dstptr = dst->ptr;
+  unsigned char *dptr = dstptr;
+  unsigned char b[3] = {0, 0, 0};
+  unsigned char a[4] = {0, 0, 0, 0};
   int i = 0;
 
   while (srclen--) {

@@ -1,7 +1,6 @@
 #include "cryptopals/hex.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "cryptopals/buffer.h"
@@ -31,15 +30,15 @@ error_t hex_decode(buffer *dst, const buffer src) {
     }
   }
 
-  uint8_t *dptr = dst->ptr;
+  unsigned char *dptr = dst->ptr;
 
   for (size_t i = 0; i < srclen; i += 2) {
-    int8_t a = htob(src.ptr[i]);
-    int8_t b = htob(src.ptr[i + 1]);
+    char a = htob(src.ptr[i]);
+    char b = htob(src.ptr[i + 1]);
     if ((a == -1) || (b == -1)) {
       return EHEXCHAR;
     }
-    *dptr++ = (uint8_t)((a << 4) | b);
+    *dptr++ = (unsigned char)((a << 4) | b);
   }
 
   *dptr = '\0';
@@ -65,7 +64,7 @@ error_t hex_encode(buffer *dst, const buffer src) {
     return err;
   }
 
-  uint8_t *dptr = dst->ptr;
+  unsigned char *dptr = dst->ptr;
 
   for (size_t i = 0; i < srclen; i++) {
     btoh(src.ptr[i], dptr);
