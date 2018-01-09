@@ -25,24 +25,19 @@
  */
 
 error_t challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
+    FILE *fp = fopen(file, "rb");
     uint8_t *buf = NULL;
     uint8_t *line = NULL;
-    file_line *lines = NULL;
-    file_line *curr = NULL;
-    file_line *aes = NULL;
+    uint8_t *aes = NULL;
     float global_min_dist = FLT_MAX;
+    size_t buflen = 0;
     size_t linelen = 0;
+    size_t aeslen = 0;
+    long read = 0;
     error_t err = 0;
 
-    err = file_getlines(file, &buf, &lines);
-    if (err) {
-        goto end;
-    }
-
-    curr = lines;
-
-    while (curr != NULL) {
-        err = hex_decode(&line, &linelen, curr->line, curr->len);
+    while (((err = file_getline(fp, &buf, &buflen, &read)) == 0) && ((read - 1) > 0)) {
+        err = hex_decode(&line, &linelen, buf, read - 1);
         if (err) {
             goto end;
         }
@@ -58,24 +53,50 @@ error_t challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
 
         if (local_min_dist < global_min_dist) {
             global_min_dist = local_min_dist;
-            aes = curr;
+            if ((aes == NULL) && (aeslen == 0)) {
+                aeslen = read - 1;
+                aes = (uint8_t *) calloc(aeslen + 1, sizeof (uint8_t));
+                if (aes == NULL) {
+                    err = EMALLOC;
+                    goto end;
+                }
+            } else if ((size_t) read > aeslen) {
+                aeslen = read - 1;
+                aes = (uint8_t *) realloc(aes, sizeof (uint8_t) * (aeslen + 1));
+                if (aes == NULL) {
+                    err = EMALLOC;
+                    goto end;
+                }
+            }
+            if (aes != NULL) {
+                memcpy(aes, buf, read);
+            }
         }
-
-        curr = curr->next;
     }
 
-    *dstlen = aes->len;
-    *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
-    memcpy(*dst, aes->line, *dstlen);
+    if (err) {
+        goto end;
+    }
+
+    if (aes != NULL) {
+        *dstlen = aeslen;
+        *dst = (uint8_t *) calloc(*dstlen + 1, sizeof (uint8_t));
+        memcpy(*dst, aes, *dstlen);
+    }
 
 end:
+    if (fp != NULL) {
+        fclose(fp);
+    }
     if (buf != NULL) {
         free((void *) buf);
     }
     if (line != NULL) {
         free((void *) line);
     }
-    file_line_delete(lines);
+    if (aes != NULL) {
+        free((void *) aes);
+    }
 
     return err;
 }

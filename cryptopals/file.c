@@ -7,15 +7,6 @@
 
 #include "cryptopals/error.h"
 
-void file_line_delete(file_line *lines) {
-    file_line *next = NULL;
-    while (lines != NULL) {
-        next = lines->next;
-        free((void *) lines);
-        lines = next;
-    }
-}
-
 error_t file_read(const char *file, uint8_t **buf, size_t *read) {
     FILE *fp = fopen(file, "rb");
     error_t err = 0;
@@ -64,42 +55,90 @@ end:
     return err;
 }
 
-error_t file_getlines(const char *file, uint8_t **buf, file_line **lines) {
-    file_line **pp = lines;
-    size_t read = 0;
-    error_t err = 0;
-
-    err = file_read(file, buf, &read);
-    if (err) {
-        goto end;
+// based on the getdelim implementation from NetBSD
+/*-
+ * Copyright (c) 2011 The NetBSD Foundation, Inc.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to The NetBSD Foundation
+ * by Christos Zoulas.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+error_t file_getline(FILE *fp, uint8_t **buf, size_t *buflen, long *read) {
+    if ((fp == NULL) ||
+            (buf == NULL) ||
+            (buflen == NULL) ||
+            (read == NULL)) {
+        return ENULLPTR;
     }
 
-    size_t len = 0;
-    size_t i = 0;
-    size_t j = 0;
+    uint8_t *ptr = NULL;
+    uint8_t *endptr = NULL;
 
-    // use forward-chaining to create a linked list of
-    // structures that contain a pointer to the beginning
-    // of each line and the length of the line
-    while (i < read) {
-        while ((*buf)[i] != '\n') {
-            i++;
+    if (*buf == NULL || *buflen == 0) {
+        *buf = (uint8_t *) calloc(FILE_BUFLEN, sizeof (uint8_t));
+        if (*buf == NULL) {
+            *read = -1;
+            return EMALLOC;
         }
-        len = i - j;
-        *pp = file_line_new();
-        if (*pp == NULL) {
-            err = EMALLOC;
-            goto end;
-        }
-        (*pp)->line = &(*buf)[j];
-        (*pp)->len = len;
-        pp = &(*pp)->next;
-        j = ++i;
+        *buflen = FILE_BUFLEN;
     }
 
-    // end list
-    *pp = NULL;
+    ptr = *buf;
+    endptr = *buf + *buflen;
 
-end:
-    return err;
+    for (;;) {
+        int c = fgetc(fp);
+        if (c == EOF) {
+            if (feof(fp)) {
+                *ptr = '\0';
+                *read = (long) (ptr - *buf);
+                return 0;
+            }
+            *read = -1L;
+            return EFREAD;
+        }
+
+        *ptr++ = (uint8_t) c;
+
+        if (c == '\n') {
+            *ptr = '\0';
+            *read = (long) (ptr - *buf);
+            return 0;
+        }
+
+        if (ptr + 2 >= endptr) {
+            size_t nbuflen = *buflen * 2;
+            ptrdiff_t diff = (ptrdiff_t) (ptr - *buf);
+            uint8_t *nbuf = (uint8_t *) realloc(*buf, sizeof (uint8_t) * (nbuflen + 1));
+            if (nbuf == NULL) {
+                *read = (long) diff;
+                return EMALLOC;
+            }
+            *buf = nbuf;
+            *buflen = nbuflen;
+            endptr = nbuf + nbuflen;
+            ptr = nbuf + diff;
+        }
+    }
 }

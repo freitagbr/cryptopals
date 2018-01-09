@@ -20,23 +20,17 @@
  */
 
 error_t challenge_04(const char *file, uint8_t **dst) {
+    FILE *fp = fopen(file, "rb");
     uint8_t *buf = NULL;
     uint8_t *line = NULL;
-    file_line *lines = NULL;
-    file_line *curr = NULL;
+    size_t buflen = 0;
     size_t linelen = 0;
+    long read = 0;
     int global_max = 0;
     error_t err = 0;
 
-    err = file_getlines(file, &buf, &lines);
-    if (err) {
-        goto end;
-    }
-
-    curr = lines;
-
-    while (curr != NULL) {
-        err = hex_decode(&line, &linelen, curr->line, curr->len);
+    while (((err = file_getline(fp, &buf, &buflen, &read)) == 0) && ((read - 1) > 0)) {
+        err = hex_decode(&line, &linelen, buf, read - 1);
         if (err) {
             goto end;
         }
@@ -51,18 +45,18 @@ error_t challenge_04(const char *file, uint8_t **dst) {
                 goto end;
             }
         }
-
-        curr = curr->next;
     }
 
 end:
+    if (fp != NULL) {
+        fclose(fp);
+    }
     if (buf != NULL) {
         free((void *) buf);
     }
     if (line != NULL) {
         free((void *) line);
     }
-    file_line_delete(lines);
 
     return err;
 }
