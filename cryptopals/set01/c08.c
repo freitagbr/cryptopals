@@ -54,22 +54,24 @@ error_t challenge_08(const char *file, uint8_t **dst, size_t *dstlen) {
         if (local_min_dist < global_min_dist) {
             global_min_dist = local_min_dist;
             if ((aes == NULL) && (aeslen == 0)) {
-                aeslen = read - 1;
-                aes = (uint8_t *) calloc(aeslen + 1, sizeof (uint8_t));
+                aes = (uint8_t *) calloc(read, sizeof (uint8_t));
                 if (aes == NULL) {
                     err = EMALLOC;
                     goto end;
                 }
+                aeslen = read - 1;
             } else if ((size_t) read > aeslen) {
-                aeslen = read - 1;
-                aes = (uint8_t *) realloc(aes, sizeof (uint8_t) * (aeslen + 1));
-                if (aes == NULL) {
+                uint8_t *naes = NULL;
+                naes = (uint8_t *) realloc(aes, sizeof (uint8_t) * read);
+                if (naes == NULL) {
                     err = EMALLOC;
                     goto end;
                 }
+                aes = naes;
+                aeslen = read - 1;
             }
             if (aes != NULL) {
-                memcpy(aes, buf, read);
+                memcpy(aes, buf, aeslen);
             }
         }
     }

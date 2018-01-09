@@ -18,13 +18,17 @@ error_t hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size
     // reuse old memory if possible
     if (*dst != NULL) {
         if (*dstlen < declen) {
+            uint8_t *ndst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (declen + 1));
+            if (ndst == NULL) {
+                return EMALLOC;
+            }
+            *dst = ndst;
             *dstlen = declen;
-            *dst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (declen + 1));
         }
     }
     else {
-        *dstlen = declen;
         *dst = (uint8_t *) calloc(declen + 1, sizeof (uint8_t));
+        *dstlen = declen;
     }
 
     d = *dst;
@@ -55,13 +59,17 @@ error_t hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size
     // reuse old memory if possible
     if (*dst != NULL) {
         if (*dstlen < enclen) {
+            uint8_t *ndst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (enclen + 1));
+            if (ndst == NULL) {
+                return EMALLOC;
+            }
+            *dst = ndst;
             *dstlen = enclen;
-            *dst = (uint8_t *) realloc(*dst, sizeof (uint8_t) * (enclen + 1));
         }
     }
     else {
-        *dstlen = enclen;
         *dst = (uint8_t *) calloc(enclen + 1, sizeof (uint8_t));
+        *dstlen = enclen;
     }
 
     d = *dst;
