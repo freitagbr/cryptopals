@@ -21,58 +21,58 @@
  */
 
 error_t challenge_04(const char *file, buffer *dst) {
-    FILE *fp = fopen(file, "rb");
-    buffer buf = buffer_init();
-    buffer line = buffer_init();
-    long read = 0;
-    int global_max = 0;
-    error_t err = 0;
+  FILE *fp = fopen(file, "rb");
+  buffer buf = buffer_init();
+  buffer line = buffer_init();
+  long read = 0;
+  int global_max = 0;
+  error_t err = 0;
 
-    while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
-        buffer tmp = buffer_new(buf.ptr, read - 1);
+  while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
+    buffer tmp = buffer_new(buf.ptr, read - 1);
 
-        err = hex_decode(&line, tmp);
-        if (err) {
-            goto end;
-        }
-
-        int local_max = 0;
-        uint8_t key = xor_find_cipher(line, &local_max);
-
-        if (local_max > global_max) {
-            global_max = local_max;
-            err = xor_single_byte(dst, line, key);
-            if (err) {
-                goto end;
-            }
-        }
+    err = hex_decode(&line, tmp);
+    if (err) {
+      goto end;
     }
+
+    int local_max = 0;
+    uint8_t key = xor_find_cipher(line, &local_max);
+
+    if (local_max > global_max) {
+      global_max = local_max;
+      err = xor_single_byte(dst, line, key);
+      if (err) {
+        goto end;
+      }
+    }
+  }
 
 end:
-    if (fp != NULL) {
-        fclose(fp);
-    }
-    buffer_delete(buf);
-    buffer_delete(line);
+  if (fp != NULL) {
+    fclose(fp);
+  }
+  buffer_delete(buf);
+  buffer_delete(line);
 
-    return err;
+  return err;
 }
 
 int main() {
-    const uint8_t expected[] = "Now that the party is jumping\n";
-    buffer output = buffer_init();
-    error_t err = 0;
+  const uint8_t expected[] = "Now that the party is jumping\n";
+  buffer output = buffer_init();
+  error_t err = 0;
 
-    err = challenge_04("data/c04.txt", &output);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = challenge_04("data/c04.txt", &output);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    error_expect((const char *) expected, (const char *) output.ptr);
+  error_expect((const char *)expected, (const char *)output.ptr);
 
 end:
-    buffer_delete(output);
+  buffer_delete(output);
 
-    return (int) err;
+  return (int)err;
 }

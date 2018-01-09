@@ -27,58 +27,58 @@
  */
 
 error_t challenge_02(buffer *dst, const buffer hex_a, const buffer hex_b) {
-    buffer a = buffer_init();
-    buffer b = buffer_init();
-    error_t err = 0;
+  buffer a = buffer_init();
+  buffer b = buffer_init();
+  error_t err = 0;
 
-    if (hex_a.len != hex_b.len) {
-        return ESIZE;
-    }
+  if (hex_a.len != hex_b.len) {
+    return ESIZE;
+  }
 
-    err = hex_decode(&a, hex_a) || hex_decode(&b, hex_b);
-    if (err) {
-        goto end;
-    }
+  err = hex_decode(&a, hex_a) || hex_decode(&b, hex_b);
+  if (err) {
+    goto end;
+  }
 
-    if (a.len != b.len) {
-        err = ESIZE;
-        goto end;
-    }
+  if (a.len != b.len) {
+    err = ESIZE;
+    goto end;
+  }
 
-    err = xor_fixed(a, b);
-    if (err) {
-        goto end;
-    }
+  err = xor_fixed(a, b);
+  if (err) {
+    goto end;
+  }
 
-    err = hex_encode(dst, a);
-    if (err) {
-        goto end;
-    }
+  err = hex_encode(dst, a);
+  if (err) {
+    goto end;
+  }
 
 end:
-    buffer_delete(a);
-    buffer_delete(b);
+  buffer_delete(a);
+  buffer_delete(b);
 
-    return err;
+  return err;
 }
 
 int main() {
-    const uint8_t expected[] = "746865206b696420646f6e277420706c6179";
-    const buffer input_a = buffer_new("1c0111001f010100061a024b53535009181c", 36);
-    const buffer input_b = buffer_new("686974207468652062756c6c277320657965", 36);
-    buffer output = buffer_init();
-    error_t err = 0;
+  const uint8_t expected[] = "746865206b696420646f6e277420706c6179";
+  const buffer input_a = buffer_new("1c0111001f010100061a024b53535009181c", 36);
+  const buffer input_b = buffer_new("686974207468652062756c6c277320657965", 36);
+  buffer output = buffer_init();
+  error_t err = 0;
 
-    err = challenge_02(&output, input_a, input_b);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = challenge_02(&output, input_a, input_b);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    error_expect((const char *) expected, (const char *) output.ptr);
+  error_expect((const char *)expected, (const char *)output.ptr);
 
 end:
-    buffer_delete(output);
+  buffer_delete(output);
 
-    return (int) err;
+  return (int)err;
 }

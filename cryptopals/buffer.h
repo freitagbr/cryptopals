@@ -8,20 +8,20 @@
 #include "cryptopals/error.h"
 
 typedef struct buffer {
-    uint8_t *ptr;
-    size_t len;
+  uint8_t *ptr;
+  size_t len;
 } buffer;
 
-#define buffer_init() \
-    (buffer) {NULL, 0}
+#define buffer_init()                                                          \
+  (buffer) { NULL, 0 }
 
-#define buffer_new(p, l) \
-    (buffer) {(uint8_t *) p, l}
+#define buffer_new(p, l)                                                       \
+  (buffer) { (uint8_t *)p, l }
 
-#define buffer_delete(buf) \
-    if (buf.ptr != NULL) { \
-        free((void *) buf.ptr); \
-    }
+#define buffer_delete(buf)                                                     \
+  if (buf.ptr != NULL) {                                                       \
+    free((void *)buf.ptr);                                                     \
+  }
 
 error_t buffer_alloc(buffer *buf, size_t len);
 

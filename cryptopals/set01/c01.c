@@ -24,41 +24,45 @@
  */
 
 error_t challenge_01(buffer *dst, const buffer src) {
-    buffer hex = buffer_init();
-    error_t err = 0;
+  buffer hex = buffer_init();
+  error_t err = 0;
 
-    err = hex_decode(&hex, src);
-    if (err) {
-        goto end;
-    }
+  err = hex_decode(&hex, src);
+  if (err) {
+    goto end;
+  }
 
-    err = base64_encode(dst, hex);
-    if (err) {
-        goto end;
-    }
+  err = base64_encode(dst, hex);
+  if (err) {
+    goto end;
+  }
 
 end:
-    buffer_delete(hex);
+  buffer_delete(hex);
 
-    return err;
+  return err;
 }
 
 int main() {
-    const uint8_t expected[] = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
-    const buffer input = buffer_new("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d", 96);
-    buffer output = buffer_init();
-    error_t err = 0;
+  const uint8_t expected[] =
+      "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+  const buffer input =
+      buffer_new("49276d206b696c6c696e6720796f757220627261696e206c696b652061207"
+                 "06f69736f6e6f7573206d757368726f6f6d",
+                 96);
+  buffer output = buffer_init();
+  error_t err = 0;
 
-    err = challenge_01(&output, input);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = challenge_01(&output, input);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    error_expect((const char *) expected, (const char *) output.ptr);
+  error_expect((const char *)expected, (const char *)output.ptr);
 
 end:
-    buffer_delete(output);
+  buffer_delete(output);
 
-    return (int) err;
+  return (int)err;
 }

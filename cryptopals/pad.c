@@ -8,18 +8,19 @@
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-error_t pad_bytes(buffer *dst, const buffer src, const size_t len, const uint8_t iv) {
-    if (len < src.len) {
-        return EDSTBUF;
-    }
+error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
+                  const uint8_t iv) {
+  if (len < src.len) {
+    return EDSTBUF;
+  }
 
-    error_t err = buffer_alloc(dst, len);
-    if (err) {
-        return err;
-    }
+  error_t err = buffer_alloc(dst, len);
+  if (err) {
+    return err;
+  }
 
-    memset(dst->ptr, iv, dst->len);
-    memcpy(dst->ptr, src.ptr, src.len);
+  memset(dst->ptr, iv, dst->len);
+  memcpy(dst->ptr, src.ptr, src.len);
 
-    return 0;
+  return 0;
 }

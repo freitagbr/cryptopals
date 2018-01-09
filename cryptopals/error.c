@@ -21,15 +21,15 @@ static const char *error_messages[14] = {
 };
 
 void error_print(error_t e, const char *file, int line) {
-    size_t err = (size_t) e;
-    if (err && err <= __E__) {
-        const char *message = error_messages[err - 1];
-        fprintf(stderr, "Error in \"%s\" on line %d:\n\t%s\n", file, line, message);
-    }
+  size_t err = (size_t)e;
+  if (err && err <= __E__) {
+    const char *message = error_messages[err - 1];
+    fprintf(stderr, "Error in \"%s\" on line %d:\n\t%s\n", file, line, message);
+  }
 }
 
 void error_expect(const char *expected, const char *found) {
-    if (strcmp(expected, found) != 0) {
-        fprintf(stderr, "Expected:\n\t%s\nFound:\n\t%s\n", expected, found);
-    }
+  if (strcmp(expected, found) != 0) {
+    fprintf(stderr, "Expected:\n\t%s\nFound:\n\t%s\n", expected, found);
+  }
 }

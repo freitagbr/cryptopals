@@ -32,25 +32,25 @@
  */
 
 error_t challenge_09(buffer *dst, const buffer src, const size_t len) {
-    return pad_bytes(dst, src, len, IV);
+  return pad_bytes(dst, src, len, IV);
 }
 
 int main() {
-    const uint8_t expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
-    const buffer input = buffer_new("YELLOW SUBMARINE", 16);
-    buffer output = buffer_init();
-    error_t err = 0;
+  const uint8_t expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
+  const buffer input = buffer_new("YELLOW SUBMARINE", 16);
+  buffer output = buffer_init();
+  error_t err = 0;
 
-    err = challenge_09(&output, input, 20);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = challenge_09(&output, input, 20);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    error_expect((const char *) expected, (const char *) output.ptr);
+  error_expect((const char *)expected, (const char *)output.ptr);
 
 end:
-    buffer_delete(output);
+  buffer_delete(output);
 
-    return (int) err;
+  return (int)err;
 }

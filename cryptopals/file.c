@@ -9,45 +9,45 @@
 #include "cryptopals/error.h"
 
 error_t file_read(const char *file, buffer *buf) {
-    FILE *fp = fopen(file, "rb");
-    error_t err = 0;
+  FILE *fp = fopen(file, "rb");
+  error_t err = 0;
 
-    if (fp == NULL) {
-        err = EFOPEN;
-        goto end;
+  if (fp == NULL) {
+    err = EFOPEN;
+    goto end;
+  }
+
+  if (fseek(fp, 0, SEEK_END) == 0) {
+    long buflen = ftell(fp);
+    if (buflen == -1) {
+      err = EFTELL;
+      goto end;
     }
 
-    if (fseek(fp, 0, SEEK_END) == 0) {
-        long buflen = ftell(fp);
-        if (buflen == -1) {
-            err = EFTELL;
-            goto end;
-        }
-
-        err = buffer_alloc(buf, buflen);
-        if (err) {
-            goto end;
-        }
-
-        if (fseek(fp, 0, SEEK_SET) != 0) {
-            err = EFSEEK;
-            goto end;
-        }
-
-        buf->len = fread(buf->ptr, sizeof (uint8_t), buf->len, fp);
-
-        if (ferror(fp) != 0) {
-            err = EFREAD;
-            goto end;
-        }
+    err = buffer_alloc(buf, buflen);
+    if (err) {
+      goto end;
     }
+
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+      err = EFSEEK;
+      goto end;
+    }
+
+    buf->len = fread(buf->ptr, sizeof(uint8_t), buf->len, fp);
+
+    if (ferror(fp) != 0) {
+      err = EFREAD;
+      goto end;
+    }
+  }
 
 end:
-    if (fp != NULL) {
-        fclose(fp);
-    }
+  if (fp != NULL) {
+    fclose(fp);
+  }
 
-    return err;
+  return err;
 }
 
 // based on the getdelim implementation from NetBSD
@@ -80,54 +80,52 @@ end:
  * POSSIBILITY OF SUCH DAMAGE.
  */
 error_t file_getline(FILE *fp, buffer *buf, long *read) {
-    if ((fp == NULL) ||
-            (buf == NULL) ||
-            (read == NULL)) {
-        return ENULLPTR;
+  if ((fp == NULL) || (buf == NULL) || (read == NULL)) {
+    return ENULLPTR;
+  }
+
+  uint8_t *ptr = NULL;
+  uint8_t *endptr = NULL;
+
+  if (buf->ptr == NULL || buf->len == 0) {
+    error_t err = buffer_alloc(buf, FILE_BUFLEN);
+    if (err) {
+      *read = -1;
+      return err;
+    }
+  }
+
+  ptr = buf->ptr;
+  endptr = &(buf->ptr[buf->len]);
+
+  for (;;) {
+    int c = fgetc(fp);
+    if (c == EOF) {
+      if (feof(fp)) {
+        *ptr = '\0';
+        *read = (long)(ptr - buf->ptr);
+        return 0;
+      }
+      *read = -1L;
+      return EFREAD;
     }
 
-    uint8_t *ptr = NULL;
-    uint8_t *endptr = NULL;
+    *ptr++ = (uint8_t)c;
 
-    if (buf->ptr == NULL || buf->len == 0) {
-        error_t err = buffer_alloc(buf, FILE_BUFLEN);
-        if (err) {
-            *read = -1;
-            return err;
-        }
+    if (c == '\n') {
+      *ptr = '\0';
+      *read = (long)(ptr - buf->ptr);
+      return 0;
     }
 
-    ptr = buf->ptr;
-    endptr = &(buf->ptr[buf->len]);
-
-    for (;;) {
-        int c = fgetc(fp);
-        if (c == EOF) {
-            if (feof(fp)) {
-                *ptr = '\0';
-                *read = (long) (ptr - buf->ptr);
-                return 0;
-            }
-            *read = -1L;
-            return EFREAD;
-        }
-
-        *ptr++ = (uint8_t) c;
-
-        if (c == '\n') {
-            *ptr = '\0';
-            *read = (long) (ptr - buf->ptr);
-            return 0;
-        }
-
-        if (ptr + 2 >= endptr) {
-            error_t err = buffer_resize(buf, buf->len * 2);
-            if (err) {
-                *read = (long) (ptr - buf->ptr);
-                return err;
-            }
-            endptr = &(buf->ptr[buf->len]);
-            ptr = &(buf->ptr[ptr - buf->ptr]);
-        }
+    if (ptr + 2 >= endptr) {
+      error_t err = buffer_resize(buf, buf->len * 2);
+      if (err) {
+        *read = (long)(ptr - buf->ptr);
+        return err;
+      }
+      endptr = &(buf->ptr[buf->len]);
+      ptr = &(buf->ptr[ptr - buf->ptr]);
     }
+  }
 }

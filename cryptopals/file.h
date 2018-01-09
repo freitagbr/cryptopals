@@ -2,8 +2,8 @@
 #define CRYPTOPALS_FILE_H_
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "cryptopals/buffer.h"

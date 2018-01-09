@@ -67,56 +67,56 @@
  */
 
 error_t challenge_06(const char *file, buffer *dst) {
-    buffer buf = buffer_init();
-    buffer block = buffer_init();
-    buffer key = buffer_init();
-    error_t err = 0;
+  buffer buf = buffer_init();
+  buffer block = buffer_init();
+  buffer key = buffer_init();
+  error_t err = 0;
 
-    err = base64_decode_file(file, &buf);
-    if (err) {
-        goto end;
-    }
+  err = base64_decode_file(file, &buf);
+  if (err) {
+    goto end;
+  }
 
-    err = block_transpose_get_key(&key, buf, MAX_KEYSIZE);
-    if (err) {
-        goto end;
-    }
+  err = block_transpose_get_key(&key, buf, MAX_KEYSIZE);
+  if (err) {
+    goto end;
+  }
 
-    err = xor_repeating(dst, buf, key);
-    if (err) {
-        goto end;
-    }
+  err = xor_repeating(dst, buf, key);
+  if (err) {
+    goto end;
+  }
 
 end:
-    buffer_delete(key);
-    buffer_delete(block);
-    buffer_delete(buf);
+  buffer_delete(key);
+  buffer_delete(block);
+  buffer_delete(buf);
 
-    return err;
+  return err;
 }
 
 int main() {
-    buffer expected = buffer_init();
-    buffer output = buffer_init();
-    error_t err = 0;
+  buffer expected = buffer_init();
+  buffer output = buffer_init();
+  error_t err = 0;
 
-    err = file_read("data/c06_test.txt", &expected);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = file_read("data/c06_test.txt", &expected);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    err = challenge_06("data/c06.txt", &output);
-    if (err) {
-        error(err);
-        goto end;
-    }
+  err = challenge_06("data/c06.txt", &output);
+  if (err) {
+    error(err);
+    goto end;
+  }
 
-    error_expect((const char *) expected.ptr, (const char *) output.ptr);
+  error_expect((const char *)expected.ptr, (const char *)output.ptr);
 
 end:
-    buffer_delete(expected);
-    buffer_delete(output);
+  buffer_delete(expected);
+  buffer_delete(output);
 
-    return (int) err;
+  return (int)err;
 }
