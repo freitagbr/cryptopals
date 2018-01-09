@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-error_t pad_bytes(uint8_t **dst, const size_t dstlen, const uint8_t *src, const size_t srclen, const uint8_t iv);
+error_t pad_bytes(buffer *dst, const buffer src, const size_t len, const uint8_t iv);
 
 #endif // CRYPTOPALS_PAD_H_

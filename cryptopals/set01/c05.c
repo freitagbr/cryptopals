@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
@@ -33,49 +34,46 @@
  * promise, we aren't wasting your time with this.
  */
 
-error_t challenge_05(uint8_t **dst, const uint8_t *src, const size_t srclen) {
-    uint8_t *tmp = NULL;
-    size_t dstlen = 0;
+error_t challenge_05(buffer *dst, const buffer src) {
+    buffer tmp = buffer_init();
+    buffer key = buffer_new("ICE", 3);
     error_t err = 0;
 
-    err = xor_repeating(&tmp, src, srclen, (const uint8_t *) "ICE", 3);
+    err = xor_repeating(&tmp, src, key);
     if (err) {
         goto end;
     }
 
-    err = hex_encode(dst, &dstlen, tmp, srclen);
+    err = hex_encode(dst, tmp);
     if (err) {
         goto end;
     }
 
 end:
-    if (tmp != NULL) {
-        free((void *) tmp);
-    }
+    buffer_delete(tmp);
 
     return err;
 }
 
 int main() {
-    const uint8_t input[] =
-        "Burning 'em, if you ain't quick and nimble\n"
-        "I go crazy when I hear a cymbal";
     const uint8_t expected[] =
         "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
         "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
-    uint8_t *output = NULL;
+    const buffer input = buffer_new("Burning 'em, if you ain't quick and nimble\n"
+                                    "I go crazy when I hear a cymbal", 74);
+    buffer output = buffer_init();
     error_t err = 0;
 
-    err = challenge_05(&output, input, 74);
+    err = challenge_05(&output, input);
     if (err) {
         error(err);
         goto end;
     }
 
-    error_expect((const char *) expected, (const char *) output);
+    error_expect((const char *) expected, (const char *) output.ptr);
 
 end:
-    free((void *) output);
+    buffer_delete(output);
 
     return (int) err;
 }

@@ -6,17 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hamming.h"
 #include "cryptopals/xor.h"
 
-error_t block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *keysize, size_t max_keysize) {
-    uint8_t *block_a = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
-    uint8_t *block_b = (uint8_t *) calloc(max_keysize + 1, sizeof (uint8_t));
+error_t block_get_keysize(buffer buf, float *min_dist, size_t *keysize, size_t max_keysize) {
+    buffer block_a = buffer_init();
+    buffer block_b = buffer_init();
     error_t err = 0;
 
-    if ((block_a == NULL) || (block_b == NULL)) {
-        err = EMALLOC;
+    err = buffer_alloc(&block_a, max_keysize) || buffer_alloc(&block_b, max_keysize);
+    if (err) {
         goto end;
     }
 
@@ -29,7 +30,7 @@ error_t block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *key
         // but ignore the trailing block, which may be
         // smaller than the other blocks, preventing
         // out-of-bounds memory access
-        const size_t nblocks = (len / k) - 1;
+        const size_t nblocks = (buf.len / k) - 1;
         float dist = 0;
 
         // sum the hamming distances, normalized
@@ -37,9 +38,9 @@ error_t block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *key
         for (size_t b = 0; b < nblocks; b++) {
             const size_t offset_a = b * k;
             const size_t offset_b = offset_a + k;
-            memcpy(block_a, &buf[offset_a], k);
-            memcpy(block_b, &buf[offset_b], k);
-            float hd = (float) hamming_distance(block_a, block_b, k);
+            memcpy(block_a.ptr, &(buf.ptr[offset_a]), k);
+            memcpy(block_b.ptr, &(buf.ptr[offset_b]), k);
+            float hd = (float) hamming_distance(block_a.ptr, block_b.ptr, k);
             dist += (float) (hd / (float) k);
         }
 
@@ -53,56 +54,44 @@ error_t block_get_keysize(uint8_t *buf, size_t len, float *min_dist, size_t *key
     }
 
 end:
-    if (block_a != NULL) {
-        free((void *) block_a);
-    }
-    if (block_b != NULL) {
-        free((void *) block_b);
-    }
+    buffer_delete(block_a);
+    buffer_delete(block_b);
 
     return err;
 }
 
-error_t block_transpose_get_key(uint8_t *buf, size_t len, uint8_t **key, size_t *keysize, size_t max_keysize) {
-    uint8_t *block = NULL;
-    uint8_t *k = NULL;
+error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
+    buffer block = buffer_init();
+    uint8_t *kptr = NULL;
     float min_dist = 0;
+    size_t keysize = 0;
     error_t err = 0;
 
-    err = block_get_keysize(buf, len, &min_dist, keysize, max_keysize);
+    err = block_get_keysize(buf, &min_dist, &keysize, max_keysize);
     if (err) {
-        *keysize = 0;
         goto end;
     }
 
-    const size_t blocklen = len / *keysize;
-
-    block = (uint8_t *) calloc(blocklen + 1, sizeof (uint8_t));
-    if (block == NULL) {
-        err = EMALLOC;
+    const size_t blocklen = buf.len / keysize;
+    err = buffer_alloc(&block, blocklen) || buffer_alloc(key, keysize);
+    if (err) {
         goto end;
     }
 
-    k = *key = (uint8_t *) calloc(*keysize + 1, sizeof (uint8_t));
-    if (k == NULL) {
-        err = EMALLOC;
-        goto end;
-    }
+    kptr = key->ptr;
 
     // transpose blocks
-    for (size_t b = 0; b < *keysize; b++) {
-        for (size_t i = 0, j = b; (i < blocklen) && (j < len); i++, j += *keysize) {
-            block[i] = buf[j];
+    for (size_t b = 0; b < keysize; b++) {
+        for (size_t i = 0, j = b; (i < blocklen) && (j < buf.len); i++, j += keysize) {
+            block.ptr[i] = buf.ptr[j];
         }
 
         int max_score = 0;
-        *k++ = xor_find_cipher(block, blocklen, &max_score);
+        *kptr++ = xor_find_cipher(block, &max_score);
     }
 
 end:
-    if (block != NULL) {
-        free((void *) block);
-    }
+    buffer_delete(block);
 
     return err;
 }

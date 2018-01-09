@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/pad.h"
 
@@ -30,26 +31,26 @@
  * "YELLOW SUBMARINE\x04\x04\x04\x04"
  */
 
-error_t challenge_09(const uint8_t *src, const size_t srclen, uint8_t **dst, const size_t dstlen) {
-    return pad_bytes(dst, dstlen, src, srclen, IV);
+error_t challenge_09(buffer *dst, const buffer src, const size_t len) {
+    return pad_bytes(dst, src, len, IV);
 }
 
 int main() {
-    const uint8_t input[] = "YELLOW SUBMARINE";
     const uint8_t expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
-    uint8_t *output = NULL;
+    const buffer input = buffer_new("YELLOW SUBMARINE", 16);
+    buffer output = buffer_init();
     error_t err = 0;
 
-    err = challenge_09(input, 16, &output, 20);
+    err = challenge_09(&output, input, 20);
     if (err) {
         error(err);
         goto end;
     }
 
-    error_expect((const char *) expected, (const char *) output);
+    error_expect((const char *) expected, (const char *) output.ptr);
 
 end:
-    free((void *) output);
+    buffer_delete(output);
 
     return (int) err;
 }

@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
 static const uint8_t hex_encode_table[16] = {
@@ -48,8 +49,8 @@ static inline size_t hex_encoded_length(const size_t len) {
     return len * 2;
 }
 
-error_t hex_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen);
+error_t hex_decode(buffer *dst, const buffer src);
 
-error_t hex_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, const size_t srclen);
+error_t hex_encode(buffer *dst, const buffer src);
 
 #endif // CRYPTOPALS_HEX_H_

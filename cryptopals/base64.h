@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
@@ -53,23 +54,23 @@ static inline void atob(uint8_t *b, uint8_t *a) {
     b[2] = ((a[2] & 0x3) << 6) +   a[3];
 }
 
-inline int base64_decoded_length(const uint8_t *src, size_t srclen) {
+inline int base64_decoded_length(const buffer buf) {
     int eqs = 0;
-    const uint8_t *in_end = src + srclen;
-    while (*--in_end == '=') {
+    const uint8_t *end = &(buf.ptr[buf.len]);
+    while (*--end == '=') {
         ++eqs;
     }
-    return ((srclen * 6) / 8) - eqs;
+    return ((buf.len * 3) / 4) - eqs;
 }
 
 inline int base64_encoded_length(size_t len) {
     return (len + 2 - ((len + 2) % 3)) / 3 * 4;
 }
 
-error_t base64_encode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
+error_t base64_encode(buffer *dst, const buffer src);
 
-error_t base64_decode(uint8_t **dst, size_t *dstlen, const uint8_t *src, size_t srclen);
+error_t base64_decode(buffer *dst, const buffer src);
 
-error_t base64_decode_file(const char *file, uint8_t **dst, size_t *dstlen);
+error_t base64_decode_file(const char *file, buffer *dst);
 
 #endif // CRYPTOPALS_BASE64_H_

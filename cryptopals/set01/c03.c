@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
@@ -23,48 +24,45 @@
  * one with the best score.
  */
 
-error_t challenge_03(uint8_t **dst, const uint8_t *src, const size_t srclen) {
-    uint8_t *dec = NULL;
-    size_t len = 0;
+error_t challenge_03(buffer *dst, const buffer src) {
+    buffer hex = buffer_init();
     error_t err = 0;
 
-    err = hex_decode(&dec, &len, src, srclen);
+    err = hex_decode(&hex, src);
     if (err) {
         goto end;
     }
 
     int max_score = 0;
-    uint8_t key = xor_find_cipher(dec, len, &max_score);
+    uint8_t key = xor_find_cipher(hex, &max_score);
 
-    err = xor_single_byte(dst, dec, len, key);
+    err = xor_single_byte(dst, hex, key);
     if (err) {
         goto end;
     }
 
 end:
-    if (dec != NULL) {
-        free((void *) dec);
-    }
+    buffer_delete(hex);
 
     return err;
 }
 
 int main() {
-    const uint8_t input[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     const uint8_t expected[] = "Cooking MC's like a pound of bacon";
-    uint8_t *output = NULL;
+    const buffer input = buffer_new("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736", 68);
+    buffer output = buffer_init();
     error_t err = 0;
 
-    err = challenge_03(&output, input, 68);
+    err = challenge_03(&output, input);
     if (err) {
         error(err);
         goto end;
     }
 
-    error_expect((const char *) expected, (const char *) output);
+    error_expect((const char *) expected, (const char *) output.ptr);
 
 end:
-    free((void *) output);
+    buffer_delete(output);
 
     return (int) err;
 }

@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-error_t file_read(const char *file, uint8_t **buf, size_t *read) {
+error_t file_read(const char *file, buffer *buf) {
     FILE *fp = fopen(file, "rb");
     error_t err = 0;
 
@@ -16,8 +17,6 @@ error_t file_read(const char *file, uint8_t **buf, size_t *read) {
         goto end;
     }
 
-    *read = 0;
-
     if (fseek(fp, 0, SEEK_END) == 0) {
         long buflen = ftell(fp);
         if (buflen == -1) {
@@ -25,24 +24,20 @@ error_t file_read(const char *file, uint8_t **buf, size_t *read) {
             goto end;
         }
 
-        *buf = (uint8_t *) calloc(buflen + 1, sizeof (uint8_t));
-        if (*buf == NULL) {
-            err = EMALLOC;
+        err = buffer_alloc(buf, buflen);
+        if (err) {
             goto end;
         }
 
         if (fseek(fp, 0, SEEK_SET) != 0) {
             err = EFSEEK;
-            free((void *) *buf);
             goto end;
         }
 
-        *read = fread(*buf, sizeof (uint8_t), buflen, fp);
+        buf->len = fread(buf->ptr, sizeof (uint8_t), buf->len, fp);
 
         if (ferror(fp) != 0) {
             err = EFREAD;
-            free((void *) *buf);
-            *read = 0;
             goto end;
         }
     }
@@ -84,10 +79,9 @@ end:
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-error_t file_getline(FILE *fp, uint8_t **buf, size_t *buflen, long *read) {
+error_t file_getline(FILE *fp, buffer *buf, long *read) {
     if ((fp == NULL) ||
             (buf == NULL) ||
-            (buflen == NULL) ||
             (read == NULL)) {
         return ENULLPTR;
     }
@@ -95,24 +89,23 @@ error_t file_getline(FILE *fp, uint8_t **buf, size_t *buflen, long *read) {
     uint8_t *ptr = NULL;
     uint8_t *endptr = NULL;
 
-    if (*buf == NULL || *buflen == 0) {
-        *buf = (uint8_t *) calloc(FILE_BUFLEN, sizeof (uint8_t));
-        if (*buf == NULL) {
+    if (buf->ptr == NULL || buf->len == 0) {
+        error_t err = buffer_alloc(buf, FILE_BUFLEN);
+        if (err) {
             *read = -1;
-            return EMALLOC;
+            return err;
         }
-        *buflen = FILE_BUFLEN;
     }
 
-    ptr = *buf;
-    endptr = *buf + *buflen;
+    ptr = buf->ptr;
+    endptr = &(buf->ptr[buf->len]);
 
     for (;;) {
         int c = fgetc(fp);
         if (c == EOF) {
             if (feof(fp)) {
                 *ptr = '\0';
-                *read = (long) (ptr - *buf);
+                *read = (long) (ptr - buf->ptr);
                 return 0;
             }
             *read = -1L;
@@ -123,22 +116,18 @@ error_t file_getline(FILE *fp, uint8_t **buf, size_t *buflen, long *read) {
 
         if (c == '\n') {
             *ptr = '\0';
-            *read = (long) (ptr - *buf);
+            *read = (long) (ptr - buf->ptr);
             return 0;
         }
 
         if (ptr + 2 >= endptr) {
-            size_t nbuflen = *buflen * 2;
-            ptrdiff_t diff = (ptrdiff_t) (ptr - *buf);
-            uint8_t *nbuf = (uint8_t *) realloc(*buf, sizeof (uint8_t) * (nbuflen + 1));
-            if (nbuf == NULL) {
-                *read = (long) diff;
-                return EMALLOC;
+            error_t err = buffer_resize(buf, buf->len * 2);
+            if (err) {
+                *read = (long) (ptr - buf->ptr);
+                return err;
             }
-            *buf = nbuf;
-            *buflen = nbuflen;
-            endptr = nbuf + nbuflen;
-            ptr = nbuf + diff;
+            endptr = &(buf->ptr[buf->len]);
+            ptr = &(buf->ptr[ptr - buf->ptr]);
         }
     }
 }

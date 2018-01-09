@@ -66,50 +66,41 @@
  * important.
  */
 
-error_t challenge_06(const char *file, uint8_t **dst) {
-    uint8_t *buf = NULL;
-    uint8_t *block = NULL;
-    uint8_t *key = NULL;
-    size_t buflen = 0;
-    size_t keysize = 0;
+error_t challenge_06(const char *file, buffer *dst) {
+    buffer buf = buffer_init();
+    buffer block = buffer_init();
+    buffer key = buffer_init();
     error_t err = 0;
 
-    err = base64_decode_file(file, &buf, &buflen);
+    err = base64_decode_file(file, &buf);
     if (err) {
         goto end;
     }
 
-    err = block_transpose_get_key(buf, buflen, &key, &keysize, MAX_KEYSIZE);
+    err = block_transpose_get_key(&key, buf, MAX_KEYSIZE);
     if (err) {
         goto end;
     }
 
-    err = xor_repeating(dst, buf, buflen, (const uint8_t *) key, keysize);
+    err = xor_repeating(dst, buf, key);
     if (err) {
         goto end;
     }
 
 end:
-    if (key != NULL) {
-        free((void *) key);
-    }
-    if (block != NULL) {
-        free((void *) block);
-    }
-    if (buf != NULL) {
-        free((void *) buf);
-    }
+    buffer_delete(key);
+    buffer_delete(block);
+    buffer_delete(buf);
 
     return err;
 }
 
 int main() {
-    uint8_t *expected = NULL;
-    uint8_t *output = NULL;
-    size_t read = 0;
+    buffer expected = buffer_init();
+    buffer output = buffer_init();
     error_t err = 0;
 
-    err = file_read("data/c06_test.txt", &expected, &read);
+    err = file_read("data/c06_test.txt", &expected);
     if (err) {
         error(err);
         goto end;
@@ -121,11 +112,11 @@ int main() {
         goto end;
     }
 
-    error_expect((const char *) expected, (const char *) output);
+    error_expect((const char *) expected.ptr, (const char *) output.ptr);
 
 end:
-    free((void *) expected);
-    free((void *) output);
+    buffer_delete(expected);
+    buffer_delete(output);
 
     return (int) err;
 }
