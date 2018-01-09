@@ -2,6 +2,7 @@
 #define CRYPTOPALS_ERROR_H_
 
 #include <stdio.h>
+#include <string.h>
 
 typedef enum {
   EMALLOC = 1, // Failed to allocate memory
