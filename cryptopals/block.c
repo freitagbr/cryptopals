@@ -71,7 +71,7 @@ end:
 
 error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
   buffer block = buffer_init();
-  unsigned char *kptr = NULL;
+  unsigned char *kptr;
   float min_dist = 0;
   size_t keysize = 0;
   size_t blocklen;
@@ -98,7 +98,7 @@ error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
     for (i = 0, j = b; (i < blocklen) && (j < buf.len); i++, j += keysize) {
       block.ptr[i] = buf.ptr[j];
     }
-    *kptr++ = xor_find_cipher(block, &max_score);
+    *(kptr++) = xor_find_cipher(block, &max_score);
   }
 
 end:

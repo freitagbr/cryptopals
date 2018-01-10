@@ -25,7 +25,7 @@ static void atob(unsigned char *b, unsigned char *a) {
 int base64_decoded_length(const buffer buf) {
   const unsigned char *end = &(buf.ptr[buf.len]);
   int eqs = 0;
-  while (*--end == '=') {
+  while (*(--end) == '=') {
     ++eqs;
   }
   return ((buf.len * 3) / 4) - eqs;
@@ -54,15 +54,15 @@ error_t base64_encode(buffer *dst, const buffer src) {
   dptr = dstptr = dst->ptr;
 
   while (srclen--) {
-    b[i++] = *sptr++;
+    b[i++] = *(sptr++);
 
     if (i == 3) {
       btoa(a, b);
 
-      *dptr++ = base64_encode_table[a[0]];
-      *dptr++ = base64_encode_table[a[1]];
-      *dptr++ = base64_encode_table[a[2]];
-      *dptr++ = base64_encode_table[a[3]];
+      *(dptr++) = base64_encode_table[a[0]];
+      *(dptr++) = base64_encode_table[a[1]];
+      *(dptr++) = base64_encode_table[a[2]];
+      *(dptr++) = base64_encode_table[a[3]];
 
       i = 0;
     }
@@ -78,11 +78,11 @@ error_t base64_encode(buffer *dst, const buffer src) {
     btoa(a, b);
 
     for (j = 0; j < i + 1; j++) {
-      *dptr++ = base64_encode_table[a[j]];
+      *(dptr++) = base64_encode_table[a[j]];
     }
 
     while ((i++ < 3)) {
-      *dptr++ = '=';
+      *(dptr++) = '=';
     }
   }
 
@@ -126,9 +126,9 @@ error_t base64_decode(buffer *dst, const buffer src) {
 
       atob(b, a);
 
-      *dptr++ = b[0];
-      *dptr++ = b[1];
-      *dptr++ = b[2];
+      *(dptr++) = b[0];
+      *(dptr++) = b[1];
+      *(dptr++) = b[2];
 
       i = 0;
     }
@@ -149,7 +149,7 @@ error_t base64_decode(buffer *dst, const buffer src) {
     atob(b, a);
 
     for (j = 0; j < i - 1; j++) {
-      *dptr++ = b[j];
+      *(dptr++) = b[j];
     }
   }
 

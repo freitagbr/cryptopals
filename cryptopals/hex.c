@@ -54,7 +54,7 @@ error_t hex_decode(buffer *dst, const buffer src) {
     if ((a == -1) || (b == -1)) {
       return EHEXCHAR;
     }
-    *dptr++ = (unsigned char)((a << 4) | b);
+    *(dptr++) = (unsigned char)((a << 4) | b);
   }
 
   *dptr = '\0';

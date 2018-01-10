@@ -80,8 +80,8 @@ end:
  * POSSIBILITY OF SUCH DAMAGE.
  */
 error_t file_getline(FILE *fp, buffer *buf, long *read) {
-  unsigned char *ptr = NULL;
-  unsigned char *endptr = NULL;
+  unsigned char *ptr;
+  unsigned char *endptr;
 
   if ((fp == NULL) || (buf == NULL) || (read == NULL)) {
     return ENULLPTR;

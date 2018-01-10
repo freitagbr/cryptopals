@@ -27,8 +27,8 @@
  */
 
 error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
-  EVP_CIPHER_CTX *ctx = NULL;
   buffer ciphertext = buffer_init();
+  EVP_CIPHER_CTX *ctx = NULL;
   unsigned char *p;
   int len = 0;
   error_t err;
