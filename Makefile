@@ -23,14 +23,14 @@ SETS      = set01 set02
 
 all: sets
 
-test: sets
-	-for c in $(wildcard $(BIN_DIR)/*); do $$c; done
-
 debug: CFLAGS += -DDEBUG
 debug: sets
 
+test: sets
+	-for c in $(BIN_DIR)/*; do $$c; done
+
 valgrind: debug
-	-for c in $(wildcard $(BIN_DIR)/*); do $(VALGRIND) $$c; done
+	-for c in $(BIN_DIR)/*; do $(VALGRIND) $$c; done
 
 sets: $(SETS)
 
