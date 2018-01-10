@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"

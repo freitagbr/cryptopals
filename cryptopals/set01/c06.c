@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "cryptopals/base64.h"
 #include "cryptopals/block.h"

@@ -4,8 +4,6 @@
 #define CRYPTOPALS_BASE64_H_
 
 #include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "cryptopals/buffer.h"

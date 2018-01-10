@@ -1,7 +1,6 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <openssl/err.h>
 #include <openssl/evp.h>

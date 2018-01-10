@@ -3,7 +3,6 @@
 #include "cryptopals/hex.h"
 
 #include <stddef.h>
-#include <stdlib.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
