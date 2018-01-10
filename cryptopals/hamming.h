@@ -1,3 +1,5 @@
+/* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
+
 #ifndef CRYPTOPALS_HAMMING_H_
 #define CRYPTOPALS_HAMMING_H_
 

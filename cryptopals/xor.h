@@ -1,3 +1,5 @@
+/* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
+
 #ifndef CRYPTOPALS_XOR_H_
 #define CRYPTOPALS_XOR_H_
 

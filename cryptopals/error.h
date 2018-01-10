@@ -1,3 +1,5 @@
+/* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
+
 #ifndef CRYPTOPALS_ERROR_H_
 #define CRYPTOPALS_ERROR_H_
 

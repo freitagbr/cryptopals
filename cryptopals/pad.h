@@ -1,3 +1,5 @@
+/* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
+
 #ifndef CRYPTOPALS_PAD_H_
 #define CRYPTOPALS_PAD_H_
 

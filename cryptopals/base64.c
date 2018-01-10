@@ -1,3 +1,5 @@
+/* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
+
 #include "cryptopals/base64.h"
 
 #include <stddef.h>
