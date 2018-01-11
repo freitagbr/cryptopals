@@ -82,6 +82,7 @@ end:
 error_t file_getline(FILE *fp, buffer *buf, long *read) {
   unsigned char *ptr;
   unsigned char *endptr;
+  int c;
 
   if ((fp == NULL) || (buf == NULL) || (read == NULL)) {
     return ENULLPTR;
@@ -98,18 +99,7 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
   ptr = buf->ptr;
   endptr = &(buf->ptr[buf->len]);
 
-  for (;;) {
-    int c = fgetc(fp);
-    if (c == EOF) {
-      if (feof(fp)) {
-        *ptr = '\0';
-        *read = (long)(ptr - buf->ptr);
-        return 0;
-      }
-      *read = -1L;
-      return EFREAD;
-    }
-
+  while ((c = fgetc(fp)) != EOF) {
     *ptr++ = (unsigned char)c;
 
     if (c == '\n') {
@@ -128,4 +118,14 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
       ptr = &(buf->ptr[ptr - buf->ptr]);
     }
   }
+
+  if (feof(fp)) {
+    *ptr = '\0';
+    *read = (long)(ptr - buf->ptr);
+    return 0;
+  }
+
+  *read = -1L;
+
+  return EFREAD;
 }
