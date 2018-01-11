@@ -19,7 +19,7 @@ static const char *error_messages[14] = {
     "Failed to read file",                              /* EFREAD */
     "Hex buffer contains invalid characters",           /* EHEXCHAR */
     "Buffer contains incomplete hex code point",        /* EHEXLEN */
-    "OpenSSL error",                                    /* EOPENSSL */
+    "OpenSSL error"                                     /* EOPENSSL */
 };
 
 void error_print(error_t e, const char *file, int line) {

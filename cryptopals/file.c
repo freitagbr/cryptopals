@@ -90,7 +90,7 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
   if (buf->ptr == NULL || buf->len == 0) {
     error_t err = buffer_alloc(buf, FILE_BUFLEN);
     if (err) {
-      *read = -1;
+      *read = -1L;
       return err;
     }
   }
