@@ -4,28 +4,17 @@
 
 #include <float.h>
 #include <stddef.h>
-#include <string.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hamming.h"
 #include "cryptopals/xor.h"
 
-error_t block_get_keysize(buffer buf, float *min_dist, size_t *keysize,
-                          size_t max_keysize) {
-  buffer block_a = buffer_init();
-  buffer block_b = buffer_init();
+size_t block_keysize(buffer buf, float *min_dist, size_t max_keysize) {
+  size_t keysize = 0;
   size_t k;
-  error_t err = 0;
-
-  err = buffer_alloc(&block_a, max_keysize) ||
-        buffer_alloc(&block_b, max_keysize);
-  if (err) {
-    goto end;
-  }
 
   *min_dist = FLT_MAX;
-  *keysize = 0;
 
   /* check keysizes between 2 and max_keysize */
   for (k = 2; k <= max_keysize; k++) {
@@ -44,12 +33,9 @@ error_t block_get_keysize(buffer buf, float *min_dist, size_t *keysize,
      * by the keysize, between adjacent blocks
      */
     for (b = 0; b < nblocks; b++) {
-      const size_t offset_a = b * k;
-      const size_t offset_b = offset_a + k;
-      float hd;
-      memcpy(block_a.ptr, &(buf.ptr[offset_a]), k);
-      memcpy(block_b.ptr, &(buf.ptr[offset_b]), k);
-      hd = (float)hamming_distance(block_a.ptr, block_b.ptr, k);
+      const unsigned char *aptr = &(buf.ptr[b * k]);
+      const unsigned char *bptr = &(aptr[k]);
+      float hd = (float)hamming_distance(aptr, bptr, k);
       dist += (float)(hd / (float)k);
     }
 
@@ -58,32 +44,25 @@ error_t block_get_keysize(buffer buf, float *min_dist, size_t *keysize,
 
     if (dist < *min_dist) {
       *min_dist = dist;
-      *keysize = (size_t)k;
+      keysize = (size_t)k;
     }
   }
 
-end:
-  buffer_delete(block_a);
-  buffer_delete(block_b);
-
-  return err;
+  return keysize;
 }
 
 error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
   buffer block = buffer_init();
   unsigned char *kptr;
   float min_dist = 0;
-  size_t keysize = 0;
+  size_t keysize;
   size_t blocklen;
   size_t b;
-  error_t err = 0;
+  error_t err;
 
-  err = block_get_keysize(buf, &min_dist, &keysize, max_keysize);
-  if (err) {
-    goto end;
-  }
-
+  keysize = block_keysize(buf, &min_dist, max_keysize);
   blocklen = buf.len / keysize;
+
   err = buffer_alloc(&block, blocklen) || buffer_alloc(key, keysize);
   if (err) {
     goto end;

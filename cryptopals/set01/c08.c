@@ -36,7 +36,6 @@ error_t challenge_08(const char *file, buffer *dst) {
 
   while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
     float local_min_dist = 0.0;
-    size_t local_keysize = 0;
     size_t local_max_keysize;
 
     buffer_set(tmp, buf.ptr, read - 1);
@@ -47,12 +46,7 @@ error_t challenge_08(const char *file, buffer *dst) {
     }
 
     local_max_keysize = line.len / 2;
-
-    err = block_get_keysize(line, &local_min_dist, &local_keysize,
-                            local_max_keysize);
-    if (err) {
-      goto end;
-    }
+    block_keysize(line, &local_min_dist, local_max_keysize);
 
     if (local_min_dist < global_min_dist) {
       global_min_dist = local_min_dist;
