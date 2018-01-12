@@ -9,6 +9,7 @@
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
+#include "cryptopals/xor.h"
 
 /**
  * AES in ECB mode
@@ -26,11 +27,17 @@
  * Easiest way: use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
  */
 
-error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
+error_t challenge_10(const char *file, buffer *plaintext, const buffer key, const buffer iv) {
   buffer ciphertext = buffer_init();
+  buffer cblock = buffer_init();
+  buffer pblock = buffer_init();
+  unsigned char *cptr = iv.ptr;
   EVP_CIPHER_CTX *ctx = NULL;
-  unsigned char *p;
+  size_t blocklen = key.len;
+  size_t nblocks;
+  size_t i;
   int len = 0;
+  int remaining;
   error_t err;
 
   ERR_load_ERR_strings();
@@ -50,7 +57,7 @@ error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
   if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key.ptr, NULL) != 1) {
     err = EOPENSSL;
     fprintf(stderr, "EVP_DecryptInit_ex: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
+        ERR_error_string(ERR_get_error(), NULL));
     goto end;
   }
 
@@ -59,29 +66,47 @@ error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
     goto end;
   }
 
-  p = plaintext->ptr;
-
-  if (EVP_DecryptUpdate(ctx, p, &len, ciphertext.ptr, ciphertext.len) != 1) {
-    err = EOPENSSL;
-    fprintf(stderr, "EVP_DecryptUpdate: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
+  err = buffer_alloc(&cblock, iv.len);
+  if (err) {
     goto end;
   }
 
-  plaintext->len = len;
+  nblocks = ciphertext.len / blocklen;
 
-  if (EVP_DecryptFinal_ex(ctx, &(p[len]), &len) != 1) {
+  for (i = 0; i < nblocks; i++) {
+    const size_t offset = i * blocklen;
+    memcpy(cblock.ptr, cptr, cblock.len);
+    cptr = &(ciphertext.ptr[offset]);
+    buffer_set(pblock, &(plaintext->ptr[offset]), cblock.len);
+    if (EVP_DecryptUpdate(ctx, pblock.ptr, &len, cptr, cblock.len) != 1) {
+      err = EOPENSSL;
+      fprintf(stderr, "EVP_DecryptUpdate: %s\n",
+          ERR_error_string(ERR_get_error(), NULL));
+      goto end;
+    }
+    xor_fixed(pblock, cblock);
+    plaintext->len += len;
+  }
+
+  len = plaintext->len;
+  remaining = ciphertext.len - len;
+  buffer_set(pblock, &(plaintext->ptr[len]), remaining);
+  memcpy(cblock.ptr, cptr, remaining);
+
+  if (EVP_DecryptFinal_ex(ctx, pblock.ptr, &len) != 1) {
     err = EOPENSSL;
     fprintf(stderr, "EVP_DecryptFinal_ex: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
+        ERR_error_string(ERR_get_error(), NULL));
     goto end;
   }
 
+  xor_fixed(pblock, cblock);
   plaintext->len += len;
-  p[plaintext->len] = '\0';
+  plaintext->ptr[plaintext->len] = '\0';
 
 end:
   buffer_delete(ciphertext);
+  buffer_delete(cblock);
   if (ctx != NULL) {
     EVP_CIPHER_CTX_free(ctx);
   }
@@ -92,17 +117,20 @@ end:
 
 int main() {
   const buffer key = buffer_new("YELLOW SUBMARINE", 16);
+  const buffer iv = buffer_new("\x00\x00\x00\x00\x00\x00\x00\x00"
+                               "\x00\x00\x00\x00\x00\x00\x00\x00", 16);
   buffer expected = buffer_init();
   buffer output = buffer_init();
+
   error_t err;
 
-  err = file_read("data/c07_test.txt", &expected);
+  err = file_read("data/c10_test.txt", &expected);
   if (err) {
     error(err);
     goto end;
   }
 
-  err = challenge_07("data/c07.txt", &output, key);
+  err = challenge_10("data/c10.txt", &output, key, iv);
   if (err) {
     error(err);
     goto end;

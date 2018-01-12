@@ -21,7 +21,7 @@ typedef struct buffer {
 
 #define buffer_set(b, p, l)                                                    \
   b.ptr = p;                                                                   \
-  b.len = l;
+  b.len = l
 
 #define buffer_delete(buf)                                                     \
   if (buf.ptr != NULL) {                                                       \
