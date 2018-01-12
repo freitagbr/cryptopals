@@ -12,4 +12,4 @@
 error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
                   const unsigned char iv);
 
-#endif
+#endif /* CRYPTOPALS_PAD_H_ */

@@ -15,4 +15,4 @@ size_t block_keysize(buffer buf, float *min_dist, size_t max_keysize);
 
 error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize);
 
-#endif
+#endif /* CRYPTOPALS_BLOCK_H_ */

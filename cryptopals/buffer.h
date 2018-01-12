@@ -32,4 +32,4 @@ error_t buffer_alloc(buffer *buf, size_t len);
 
 error_t buffer_resize(buffer *buf, size_t len);
 
-#endif
+#endif /* CRYPTOPALS_BUFFER_H_ */

@@ -30,4 +30,4 @@ void error_print(error_t e, const char *file, int line);
 
 void error_expect(const char *expected, const char *found);
 
-#endif
+#endif /* CRYPTOPALS_ERROR_H_ */

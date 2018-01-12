@@ -8,4 +8,4 @@
 int hamming_distance(const unsigned char *a, const unsigned char *b,
                      const size_t len);
 
-#endif
+#endif /* CRYPTOPALS_HAMMING_H_ */

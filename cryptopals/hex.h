@@ -33,4 +33,4 @@ error_t hex_decode(buffer *dst, const buffer src);
 
 error_t hex_encode(buffer *dst, const buffer src);
 
-#endif
+#endif /* CRYPTOPALS_HEX_H_ */

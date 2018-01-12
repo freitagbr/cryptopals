@@ -41,4 +41,4 @@ error_t base64_decode(buffer *dst, const buffer src);
 
 error_t base64_decode_file(const char *file, buffer *dst);
 
-#endif
+#endif /* CRYPTOPALS_BASE64_H_ */
