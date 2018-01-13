@@ -3,12 +3,16 @@
 #include "cryptopals/aes.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <openssl/aes.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/xor.h"
+
+static int aes_rand_seeded = 0;
 
 error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
   AES_KEY aes_key;
@@ -95,6 +99,37 @@ error_t aes_pkcs7_strip(buffer *buf) {
   /* a full resize could be expensive, so fake it */
   buf->ptr[len] = '\0';
   buf->len = len;
+
+  return 0;
+}
+
+error_t aes_random_key(buffer *key) {
+  unsigned char *ptr;
+  unsigned char *end;
+  error_t err;
+
+  if (!aes_rand_seeded) {
+    /* seed rand with the time * a pointer */
+    int tmp = 0;
+    srand((unsigned int)time(NULL) * (unsigned int)&tmp);
+    aes_rand_seeded = 1;
+  }
+
+  err = buffer_alloc(key, AES_BLOCK_SIZE);
+  if (err) {
+    return err;
+  }
+
+  ptr = key->ptr;
+  end = &(ptr[AES_BLOCK_SIZE]);
+
+  while (ptr < end) {
+    int r = rand();
+    size_t i;
+    for (i = 0; (i < sizeof(int)) && (ptr < end); i++) {
+      *(ptr++) = (unsigned char)((r >> (i * 8)) & 0xff);
+    }
+  }
 
   return 0;
 }
