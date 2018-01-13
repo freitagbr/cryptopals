@@ -20,7 +20,8 @@ typedef enum {
   EFREAD,      /* Failed to read file */
   EHEXCHAR,    /* Hex buffer contains invalid characters */
   EHEXLEN,     /* Buffer contains incomplete hex code point */
-  EOPENSSL,    /* OpenSSL error */
+  EAESKEY,     /* AES Key could not be set */
+  EAESPKCS7,   /* Invalid PKCS7 padding */
   __E__
 } error_t;
 

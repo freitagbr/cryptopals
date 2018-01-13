@@ -2,9 +2,7 @@
 
 #include <stdio.h>
 
-#include <openssl/err.h>
-#include <openssl/evp.h>
-
+#include "cryptopals/aes.h"
 #include "cryptopals/base64.h"
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
@@ -28,64 +26,20 @@
 
 error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
   buffer ciphertext = buffer_init();
-  EVP_CIPHER_CTX *ctx = NULL;
-  unsigned char *p;
-  int len = 0;
   error_t err;
-
-  ERR_load_ERR_strings();
-  ERR_load_crypto_strings();
 
   err = base64_decode_file(file, &ciphertext);
   if (err) {
     goto end;
   }
 
-  ctx = EVP_CIPHER_CTX_new();
-  if (ctx == NULL) {
-    err = EMALLOC;
-    goto end;
-  }
-
-  if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key.ptr, NULL) != 1) {
-    err = EOPENSSL;
-    fprintf(stderr, "EVP_DecryptInit_ex: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
-    goto end;
-  }
-
-  err = buffer_alloc(plaintext, ciphertext.len);
+  err = aes_ecb_decrypt(plaintext, ciphertext, key);
   if (err) {
     goto end;
   }
 
-  p = plaintext->ptr;
-
-  if (EVP_DecryptUpdate(ctx, p, &len, ciphertext.ptr, ciphertext.len) != 1) {
-    err = EOPENSSL;
-    fprintf(stderr, "EVP_DecryptUpdate: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
-    goto end;
-  }
-
-  plaintext->len = len;
-
-  if (EVP_DecryptFinal_ex(ctx, &(p[len]), &len) != 1) {
-    err = EOPENSSL;
-    fprintf(stderr, "EVP_DecryptFinal_ex: %s\n",
-            ERR_error_string(ERR_get_error(), NULL));
-    goto end;
-  }
-
-  plaintext->len += len;
-  p[plaintext->len] = '\0';
-
 end:
   buffer_delete(ciphertext);
-  if (ctx != NULL) {
-    EVP_CIPHER_CTX_free(ctx);
-  }
-  ERR_free_strings();
 
   return err;
 }

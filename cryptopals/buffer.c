@@ -23,6 +23,7 @@ error_t buffer_resize(buffer *buf, size_t len) {
   if (ptr == NULL) {
     return EMALLOC;
   }
+  ptr[len] = '\0';
   buf->ptr = ptr;
   buf->len = len;
   return 0;
