@@ -1,7 +1,5 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
-#include <stdio.h>
-
 #include "cryptopals/aes.h"
 #include "cryptopals/base64.h"
 #include "cryptopals/buffer.h"

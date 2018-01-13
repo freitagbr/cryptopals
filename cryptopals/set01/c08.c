@@ -1,6 +1,7 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
 #include <float.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 

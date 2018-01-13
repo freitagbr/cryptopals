@@ -1,6 +1,5 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
-#include <stddef.h>
 #include <stdio.h>
 
 #include "cryptopals/buffer.h"
