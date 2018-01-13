@@ -2,10 +2,13 @@
 
 #include "cryptopals/aes.h"
 
+#include <stdio.h>
+
 #include <openssl/aes.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
+#include "cryptopals/xor.h"
 
 error_t aes_ecb_decrypt(buffer *dec, const buffer enc, const buffer key) {
   AES_KEY aes_key;
@@ -14,13 +17,13 @@ error_t aes_ecb_decrypt(buffer *dec, const buffer enc, const buffer key) {
   size_t len;
   error_t err;
 
+  if (0 != AES_set_decrypt_key(key.ptr, key.len * 8, &aes_key)) {
+    return EAESKEY;
+  }
+
   err = buffer_alloc(dec, enc.len);
   if (err) {
     return err;
-  }
-
-  if (0 != AES_set_decrypt_key(key.ptr, key.len * 8, &aes_key)) {
-    return EAESKEY;
   }
 
   eptr = enc.ptr;
@@ -31,6 +34,42 @@ error_t aes_ecb_decrypt(buffer *dec, const buffer enc, const buffer key) {
   }
 
   return aes_pkcs7_strip(dec);
+}
+
+error_t aes_cbc_decrypt(buffer *dec, const buffer enc, const buffer key,
+                        const buffer iv) {
+  buffer ivblock = buffer_init();
+  buffer decblock = buffer_init();
+  AES_KEY aes_key;
+  size_t len;
+  error_t err;
+
+  if (0 != AES_set_decrypt_key(key.ptr, key.len * 8, &aes_key)) {
+    return EAESKEY;
+  }
+
+  err = buffer_alloc(dec, enc.len) || buffer_alloc(&ivblock, iv.len);
+  if (err) {
+    goto end;
+  }
+
+  memcpy(ivblock.ptr, iv.ptr, ivblock.len);
+
+  for (len = 0; len < dec->len; len += AES_BLOCK_SIZE) {
+    unsigned char *eptr = &(enc.ptr[len]);
+    unsigned char *dptr = &(dec->ptr[len]);
+    buffer_set(decblock, dptr, AES_BLOCK_SIZE);
+    AES_ecb_encrypt(eptr, dptr, &aes_key, AES_BLOCK_SIZE);
+    xor_fixed(decblock, ivblock);
+    memcpy(ivblock.ptr, eptr, ivblock.len);
+  }
+
+  err = aes_pkcs7_strip(dec);
+
+end:
+  buffer_delete(ivblock);
+
+  return err;
 }
 
 error_t aes_pkcs7_strip(buffer *buf) {
