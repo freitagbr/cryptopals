@@ -109,13 +109,17 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
     }
 
     if (ptr + 2 >= endptr) {
-      error_t err = buffer_resize(buf, buf->len * 2);
+      size_t diff = ptr - buf->ptr;
+      error_t err;
+
+      err = buffer_resize(buf, buf->len * 2);
       if (err) {
-        *read = (long)(ptr - buf->ptr);
+        *read = (long)(diff);
         return err;
       }
+
       endptr = &(buf->ptr[buf->len]);
-      ptr = &(buf->ptr[ptr - buf->ptr]);
+      ptr = &(buf->ptr[diff]);
     }
   }
 
