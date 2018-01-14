@@ -100,7 +100,7 @@ error_t file_getline(FILE *fp, buffer *buf, long *read) {
   endptr = &(buf->ptr[buf->len]);
 
   while ((c = fgetc(fp)) != EOF) {
-    *ptr++ = (unsigned char)c;
+    *(ptr++) = (unsigned char)c;
 
     if (c == '\n') {
       *ptr = '\0';

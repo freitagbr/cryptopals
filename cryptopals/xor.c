@@ -35,7 +35,7 @@ error_t xor_single_byte(buffer *dst, const buffer src, unsigned char key) {
   dptr = dst->ptr;
 
   for (i = 0; i < src.len; i++) {
-    *dptr++ = src.ptr[i] ^ key;
+    *(dptr++) = src.ptr[i] ^ key;
   }
 
   return 0;
@@ -55,7 +55,7 @@ error_t xor_repeating(buffer *dst, const buffer src, const buffer key) {
   dptr = dst->ptr;
 
   for (i = 0, k = 0; i < src.len; i++, k = (k + 1) % key.len) {
-    *dptr++ = src.ptr[i] ^ key.ptr[k];
+    *(dptr++) = src.ptr[i] ^ key.ptr[k];
   }
 
   return 0;
