@@ -12,9 +12,11 @@
 #include "cryptopals/error.h"
 #include "cryptopals/xor.h"
 
-error_t aes_ecb_decrypt(buffer *dec, const buffer enc, const buffer key);
+error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key);
 
-error_t aes_cbc_decrypt(buffer *dec, const buffer enc, const buffer key,
+error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key);
+
+error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv);
 
 error_t aes_pkcs7_strip(buffer *buf);

@@ -44,6 +44,56 @@ error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
   return aes_pkcs7_strip(dst);
 }
 
+error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
+  AES_KEY aes_key;
+  unsigned char *sptr = src.ptr;
+  unsigned char *dptr;
+  unsigned char *endptr;
+  size_t dstlen;
+  int ret;
+  error_t err;
+
+  ret = AES_set_encrypt_key(key.ptr, key.len * 8, &aes_key);
+  if (ret < 0) {
+    return EAESKEY;
+  }
+
+  /* round dst length up to nearest multiple of AES_BLOCK_SIZE */
+  dstlen = src.len + (AES_BLOCK_SIZE - (src.len % AES_BLOCK_SIZE));
+
+  err = buffer_alloc(dst, dstlen);
+  if (err) {
+    return err;
+  }
+
+  dptr = dst->ptr;
+  endptr = &(src.ptr[src.len]);
+
+  while (sptr < endptr) {
+    AES_ecb_encrypt(sptr, dptr, &aes_key, AES_BLOCK_SIZE);
+    dptr += AES_BLOCK_SIZE;
+    sptr += AES_BLOCK_SIZE;
+  }
+
+  /**
+   * PKCS7 padding:
+   * determine how many bytes left there are to reach a multiple
+   * of AES_BLOCK_SIZE (padding), add the remaining bytes to dst,
+   * fill the remaining bytes with the value of the padding, and
+   * encrypt the last block of bytes
+   */
+  if (sptr > endptr) {
+    int padding = (int)(sptr - endptr);
+    dptr -= AES_BLOCK_SIZE;
+    sptr -= AES_BLOCK_SIZE;
+    memset(dptr, padding, AES_BLOCK_SIZE);
+    memcpy(dptr, sptr, endptr - sptr);
+    AES_ecb_encrypt(dptr, dptr, &aes_key, AES_BLOCK_SIZE);
+  }
+
+  return 0;
+}
+
 error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv) {
   buffer ivblock = buffer_init();
