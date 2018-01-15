@@ -19,6 +19,8 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key);
 error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv);
 
+error_t aes_pkcs7_pad(buffer *buf, size_t len);
+
 error_t aes_pkcs7_strip(buffer *buf);
 
 error_t aes_random_key(buffer *key);
