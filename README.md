@@ -1,6 +1,6 @@
 # cryptopals
 
-These are my solutions, written in C, to the [Cryptopals Crypto
+These are my solutions to the [Cryptopals Crypto
 Challenges](https://cryptopals.com).
 
 
