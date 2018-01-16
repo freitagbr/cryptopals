@@ -178,7 +178,7 @@ error_t aes_random_key(buffer *key) {
   if (!aes_rand_seeded) {
     /* seed rand with the time * a pointer */
     int tmp = 0;
-    srand((unsigned int)time(NULL) * (unsigned int)&tmp);
+    srand((unsigned int)((long)time(NULL) * (long)&tmp));
     aes_rand_seeded = 1;
   }
 
