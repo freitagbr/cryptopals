@@ -2,8 +2,8 @@
 
 #include "cryptopals/aes.h"
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <openssl/aes.h>
@@ -49,6 +49,7 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *endptr;
+  size_t padding;
   int ret;
   error_t err;
 
@@ -57,26 +58,22 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
     return EAESKEY;
   }
 
-  err = aes_pkcs7_pad(dst, src.len);
+  err = aes_pkcs7_pad(dst, src.len, &padding);
   if (err) {
     return err;
   }
 
   dptr = dst->ptr;
-  endptr = &(src.ptr[src.len]);
+  endptr = &(dst->ptr[dst->len - AES_BLOCK_SIZE]);
 
-  while (sptr < endptr) {
+  while (dptr < endptr) {
     AES_ecb_encrypt(sptr, dptr, &aes_key, AES_ENCRYPT);
     dptr += AES_BLOCK_SIZE;
     sptr += AES_BLOCK_SIZE;
   }
 
-  if (sptr > endptr) {
-    dptr -= AES_BLOCK_SIZE;
-    sptr -= AES_BLOCK_SIZE;
-    memcpy(dptr, sptr, endptr - sptr);
-    AES_ecb_encrypt(dptr, dptr, &aes_key, AES_ENCRYPT);
-  }
+  memcpy(dptr, sptr, AES_BLOCK_SIZE - padding);
+  AES_ecb_encrypt(dptr, dptr, &aes_key, AES_ENCRYPT);
 
   return 0;
 }
@@ -123,9 +120,8 @@ end:
   return err;
 }
 
-error_t aes_pkcs7_pad(buffer *buf, size_t len) {
+error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
   size_t buflen = len + (AES_BLOCK_SIZE - (len % AES_BLOCK_SIZE));
-  size_t padding = (int)buflen - (int)len;
   error_t err;
 
   err = buffer_alloc(buf, buflen);
@@ -133,12 +129,14 @@ error_t aes_pkcs7_pad(buffer *buf, size_t len) {
     return err;
   }
 
-  if (padding > AES_BLOCK_SIZE) {
+  *padding = buflen - len;
+
+  if (*padding > AES_BLOCK_SIZE) {
     return ESIZE;
   }
 
-  if (padding) {
-    memset(&(buf->ptr[buf->len - padding]), (int)padding, padding);
+  if (*padding) {
+    memset(&(buf->ptr[buf->len - *padding]), (int)*padding, *padding);
   }
 
   return 0;

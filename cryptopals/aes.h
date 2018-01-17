@@ -5,8 +5,9 @@
 
 #include <openssl/aes.h>
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
@@ -19,7 +20,7 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key);
 error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv);
 
-error_t aes_pkcs7_pad(buffer *buf, size_t len);
+error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding);
 
 error_t aes_pkcs7_strip(buffer *buf);
 
