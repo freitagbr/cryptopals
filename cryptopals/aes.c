@@ -36,7 +36,7 @@ error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
   endptr = &(dst->ptr[dst->len]);
 
   while (dptr < endptr) {
-    AES_ecb_encrypt(sptr, dptr, &aes_key, AES_BLOCK_SIZE);
+    AES_ecb_encrypt(sptr, dptr, &aes_key, AES_DECRYPT);
     dptr += AES_BLOCK_SIZE;
     sptr += AES_BLOCK_SIZE;
   }
@@ -66,7 +66,7 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
   endptr = &(src.ptr[src.len]);
 
   while (sptr < endptr) {
-    AES_ecb_encrypt(sptr, dptr, &aes_key, AES_BLOCK_SIZE);
+    AES_ecb_encrypt(sptr, dptr, &aes_key, AES_ENCRYPT);
     dptr += AES_BLOCK_SIZE;
     sptr += AES_BLOCK_SIZE;
   }
@@ -75,7 +75,7 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
     dptr -= AES_BLOCK_SIZE;
     sptr -= AES_BLOCK_SIZE;
     memcpy(dptr, sptr, endptr - sptr);
-    AES_ecb_encrypt(dptr, dptr, &aes_key, AES_BLOCK_SIZE);
+    AES_ecb_encrypt(dptr, dptr, &aes_key, AES_ENCRYPT);
   }
 
   return 0;
