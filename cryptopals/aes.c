@@ -120,6 +120,53 @@ end:
   return err;
 }
 
+error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
+                        const buffer iv) {
+  buffer ivblock = buffer_init();
+  buffer encblock = buffer_init();
+  AES_KEY aes_key;
+  unsigned char *sptr = src.ptr;
+  unsigned char *dptr;
+  unsigned char *endptr;
+  size_t padding;
+  int ret;
+  error_t err;
+
+  ret = AES_set_encrypt_key(key.ptr, key.len * 8, &aes_key);
+  if (ret < 0) {
+    return EAESKEY;
+  }
+
+  err = aes_pkcs7_pad(dst, src.len, &padding) || buffer_alloc(&ivblock, iv.len);
+  if (err) {
+    goto end;
+  }
+
+  memcpy(ivblock.ptr, iv.ptr, ivblock.len);
+  dptr = dst->ptr;
+  endptr = &(dst->ptr[dst->len - AES_BLOCK_SIZE]);
+
+  while (dptr < endptr) {
+    memcpy(dptr, sptr, AES_BLOCK_SIZE);
+    buffer_set(encblock, dptr, AES_BLOCK_SIZE);
+    xor_fixed(encblock, ivblock);
+    AES_encrypt(dptr, dptr, &aes_key);
+    memcpy(ivblock.ptr, dptr, AES_BLOCK_SIZE);
+    dptr += AES_BLOCK_SIZE;
+    sptr += AES_BLOCK_SIZE;
+  }
+
+  memcpy(dptr, sptr, AES_BLOCK_SIZE - padding);
+  buffer_set(encblock, dptr, AES_BLOCK_SIZE);
+  xor_fixed(encblock, ivblock);
+  AES_encrypt(dptr, dptr, &aes_key);
+
+end:
+  buffer_delete(ivblock);
+
+  return err;
+}
+
 error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
   size_t buflen = len + (AES_BLOCK_SIZE - (len % AES_BLOCK_SIZE));
   error_t err;
