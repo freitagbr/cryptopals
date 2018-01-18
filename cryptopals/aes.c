@@ -80,9 +80,8 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
 
 error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv) {
-  buffer ivblock = buffer_init();
-  buffer decblock = buffer_init();
   AES_KEY aes_key;
+  unsigned char *ivptr = iv.ptr;
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *endptr;
@@ -94,37 +93,29 @@ error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
     return EAESKEY;
   }
 
-  err = buffer_alloc(dst, src.len) || buffer_alloc(&ivblock, iv.len);
+  err = buffer_alloc(dst, src.len);
   if (err) {
-    goto end;
+    return err;
   }
 
-  memcpy(ivblock.ptr, iv.ptr, ivblock.len);
   dptr = dst->ptr;
   endptr = &(dst->ptr[dst->len]);
 
   while (dptr < endptr) {
     AES_decrypt(sptr, dptr, &aes_key);
-    buffer_set(decblock, dptr, AES_BLOCK_SIZE);
-    xor_fixed(decblock, ivblock);
-    memcpy(ivblock.ptr, sptr, ivblock.len);
+    xor_inplace(dptr, ivptr, AES_BLOCK_SIZE);
+    ivptr = sptr;
     dptr += AES_BLOCK_SIZE;
     sptr += AES_BLOCK_SIZE;
   }
 
-  err = aes_pkcs7_strip(dst);
-
-end:
-  buffer_delete(ivblock);
-
-  return err;
+  return aes_pkcs7_strip(dst);
 }
 
 error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
                         const buffer iv) {
-  buffer ivblock = buffer_init();
-  buffer encblock = buffer_init();
   AES_KEY aes_key;
+  unsigned char *ivptr = iv.ptr;
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *endptr;
@@ -137,34 +128,27 @@ error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
     return EAESKEY;
   }
 
-  err = aes_pkcs7_pad(dst, src.len, &padding) || buffer_alloc(&ivblock, iv.len);
+  err = aes_pkcs7_pad(dst, src.len, &padding);
   if (err) {
-    goto end;
+    return err;
   }
 
-  memcpy(ivblock.ptr, iv.ptr, ivblock.len);
   dptr = dst->ptr;
   endptr = &(dst->ptr[dst->len - AES_BLOCK_SIZE]);
 
   while (dptr < endptr) {
-    memcpy(dptr, sptr, AES_BLOCK_SIZE);
-    buffer_set(encblock, dptr, AES_BLOCK_SIZE);
-    xor_fixed(encblock, ivblock);
+    xor_bytes(dptr, sptr, ivptr, AES_BLOCK_SIZE);
     AES_encrypt(dptr, dptr, &aes_key);
-    memcpy(ivblock.ptr, dptr, AES_BLOCK_SIZE);
+    ivptr = dptr;
     dptr += AES_BLOCK_SIZE;
     sptr += AES_BLOCK_SIZE;
   }
 
   memcpy(dptr, sptr, AES_BLOCK_SIZE - padding);
-  buffer_set(encblock, dptr, AES_BLOCK_SIZE);
-  xor_fixed(encblock, ivblock);
+  xor_inplace(dptr, ivptr, AES_BLOCK_SIZE);
   AES_encrypt(dptr, dptr, &aes_key);
 
-end:
-  buffer_delete(ivblock);
-
-  return err;
+  return 0;
 }
 
 error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {

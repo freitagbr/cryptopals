@@ -10,6 +10,11 @@
 
 static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
 
+#define xor_inplace(a, b, l) \
+  xor_bytes(a, a, b, l)
+
+void xor_bytes(unsigned char *dst, const unsigned char *a, const unsigned char *b, const size_t len);
+
 error_t xor_fixed(buffer a, const buffer b);
 
 error_t xor_single_byte(buffer *dst, const buffer src, unsigned char key);

@@ -7,16 +7,20 @@
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-error_t xor_fixed(buffer a, const buffer b) {
+void xor_bytes(unsigned char *dst, const unsigned char *a, const unsigned char *b, const size_t len) {
   size_t i;
 
+  for (i = 0; i < len; i++) {
+    dst[i] = a[i] ^ b[i];
+  }
+}
+
+error_t xor_fixed(buffer a, const buffer b) {
   if (a.len != b.len) {
     return ESIZE;
   }
 
-  for (i = 0; i < a.len; i++) {
-    a.ptr[i] = a.ptr[i] ^ b.ptr[i];
-  }
+  xor_bytes(a.ptr, a.ptr, b.ptr, a.len);
 
   return 0;
 }
