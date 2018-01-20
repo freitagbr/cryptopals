@@ -14,6 +14,15 @@
 
 static int aes_rand_seeded = 0;
 
+static void aes_seed_rand() {
+  if (!aes_rand_seeded) {
+    /* seed rand with the time * a pointer */
+    int tmp = 0;
+    srand((unsigned int)((long)time(NULL) * (long)&tmp));
+    aes_rand_seeded = 1;
+  }
+}
+
 error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
   AES_KEY aes_key;
   unsigned char *sptr = src.ptr;
@@ -151,6 +160,52 @@ error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
   return 0;
 }
 
+error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
+  buffer key = buffer_init();
+  buffer buf = buffer_init();
+  size_t offset;
+  error_t err;
+
+  aes_seed_rand();
+
+  err = aes_random_key(&key);
+  if (err) {
+    goto end;
+  }
+
+  err = buffer_alloc(&buf, src.len + 20);
+  if (err) {
+    goto end;
+  }
+
+  offset = (rand() % 5) + 5; /* 5-10 bytes */
+  memcpy(&(buf.ptr[offset]), src.ptr, src.len);
+  buf.len = src.len + offset + (rand() % 5) + 5;
+
+  if (rand() & 1) {
+    /* encrypt using cbc */
+    buffer iv = buffer_init();
+
+    err = aes_random_key(&iv);
+    if (err) {
+      goto end;
+    }
+
+    *mode = AES_128_CBC;
+    err = aes_cbc_encrypt(dst, buf, key, iv);
+  } else {
+    /* encrypt using ecb */
+    *mode = AES_128_ECB;
+    err = aes_ecb_encrypt(dst, buf, key);
+  }
+
+end:
+  buffer_delete(key);
+  buffer_delete(buf);
+
+  return err;
+}
+
 error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
   size_t buflen = len + (AES_BLOCK_SIZE - (len % AES_BLOCK_SIZE));
   error_t err;
@@ -204,18 +259,12 @@ error_t aes_random_key(buffer *key) {
   unsigned char *end;
   error_t err;
 
-  if (!aes_rand_seeded) {
-    /* seed rand with the time * a pointer */
-    int tmp = 0;
-    srand((unsigned int)((long)time(NULL) * (long)&tmp));
-    aes_rand_seeded = 1;
-  }
-
   err = buffer_alloc(key, AES_BLOCK_SIZE);
   if (err) {
     return err;
   }
 
+  aes_seed_rand();
   ptr = key->ptr;
   end = &(ptr[AES_BLOCK_SIZE]);
 
