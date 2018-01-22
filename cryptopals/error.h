@@ -22,6 +22,7 @@ typedef enum {
   EHEXLEN,     /* Buffer contains incomplete hex code point */
   EAESKEY,     /* AES Key could not be set */
   EAESPKCS7,   /* Invalid PKCS7 padding */
+  ERAND,       /* Could not get random bytes */
   __E__
 } error_t;
 

@@ -2,11 +2,11 @@
 
 #include "cryptopals/aes.h"
 
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 #include <openssl/aes.h>
+#include <openssl/rand.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
@@ -14,13 +14,13 @@
 
 static int aes_rand_seeded = 0;
 
-static void aes_seed_rand() {
+static error_t aes_seed_rand() {
   if (!aes_rand_seeded) {
-    /* seed rand with the time * a pointer */
-    int tmp = 0;
-    srand((unsigned int)((long)time(NULL) * (long)&tmp));
-    aes_rand_seeded = 1;
+    if (RAND_load_file(AES_RAND_SOURCE, AES_RAND_SIZE) != AES_RAND_SIZE) {
+      return ERAND;
+    }
   }
+  return 0;
 }
 
 error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
@@ -168,7 +168,7 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
 
   aes_seed_rand();
 
-  err = aes_random_key(&key);
+  err = aes_random_bytes(&key);
   if (err) {
     goto end;
   }
@@ -178,15 +178,15 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
     goto end;
   }
 
-  offset = (rand() % 5) + 5; /* 5-10 bytes */
+  offset = (aes_rand() % 5) + 5; /* 5-10 bytes */
   memcpy(&(buf.ptr[offset]), src.ptr, src.len);
-  buf.len = src.len + offset + (rand() % 5) + 5;
+  buf.len = src.len + offset + (aes_rand() % 5) + 5;
 
-  if (rand() & 1) {
+  if (aes_rand() & 1) {
     /* encrypt using cbc */
     buffer iv = buffer_init();
 
-    err = aes_random_key(&iv);
+    err = aes_random_bytes(&iv);
     if (err) {
       goto end;
     }
@@ -254,26 +254,30 @@ error_t aes_pkcs7_strip(buffer *buf) {
   return 0;
 }
 
-error_t aes_random_key(buffer *key) {
-  unsigned char *ptr;
-  unsigned char *end;
+unsigned int aes_rand() {
+  unsigned char bytes[sizeof(unsigned int)];
+
+  aes_seed_rand();
+
+  if (RAND_bytes(bytes, sizeof(unsigned int)) != 1) {
+    return 0;
+  }
+
+  return ((unsigned int *)bytes)[0];
+}
+
+error_t aes_random_bytes(buffer *buf) {
   error_t err;
 
-  err = buffer_alloc(key, AES_BLOCK_SIZE);
+  err = buffer_alloc(buf, AES_BLOCK_SIZE);
   if (err) {
     return err;
   }
 
   aes_seed_rand();
-  ptr = key->ptr;
-  end = &(ptr[AES_BLOCK_SIZE]);
 
-  while (ptr < end) {
-    int r = rand();
-    size_t i;
-    for (i = 0; (i < sizeof(int)) && (ptr < end); i++) {
-      *(ptr++) = (unsigned char)((r >> (i * 8)) & 0xff);
-    }
+  if (RAND_bytes(buf->ptr, buf->len) != 1) {
+    return ERAND;
   }
 
   return 0;

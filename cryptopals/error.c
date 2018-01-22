@@ -20,7 +20,8 @@ static const char *error_messages[16] = {
     "Hex buffer contains invalid characters",           /* EHEXCHAR */
     "Buffer contains incomplete hex code point",        /* EHEXLEN */
     "AES Key could not be set",                         /* EAESKEY */
-    "Invalid PKCS7 padding"                             /* EAESPKCS7 */
+    "Invalid PKCS7 padding",                            /* EAESPKCS7 */
+    "Could not get random bytes"                        /* ERAND */
 };
 
 void error_print(error_t e, const char *file, int line) {
