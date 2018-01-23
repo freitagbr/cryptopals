@@ -166,7 +166,7 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
   unsigned int a;
   unsigned int b;
   unsigned int c;
-  size_t offset;
+  size_t padding;
   error_t err;
 
   err = buffer_alloc(&buf, src.len + 20) ||
@@ -179,9 +179,22 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
     goto end;
   }
 
-  offset = (a % 6) + 5; /* 5-10 bytes */
-  memcpy(&(buf.ptr[offset]), src.ptr, src.len);
-  buf.len = src.len + offset + (b % 6) + 5;
+  /* pad beginning of buffer with 5-10 bytes */
+  padding = (a % 6) + 5;
+  if (RAND_bytes(buf.ptr, padding) != 1) {
+    err = ERAND;
+    goto end;
+  }
+  memcpy(&(buf.ptr[padding]), src.ptr, src.len);
+  buf.len = src.len + padding;
+
+  /* pad end of buffer with 5-10 bytes */
+  padding = (b % 6) + 5;
+  if (RAND_bytes(&(buf.ptr[buf.len]), padding) != 1) {
+    err = ERAND;
+    goto end;
+  }
+  buf.len += padding;
 
   if (c & 1) {
     /* encrypt using cbc */
@@ -189,6 +202,7 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
     *mode = AES_128_CBC;
     err = aes_random_bytes(&iv) ||
           aes_cbc_encrypt(dst, buf, key, iv);
+    buffer_delete(iv);
   } else {
     /* encrypt using ecb */
     *mode = AES_128_ECB;
@@ -200,6 +214,13 @@ end:
   buffer_delete(buf);
 
   return err;
+}
+
+aes_mode_t aes_encrypt_detect(const buffer buf) {
+  const unsigned char *block_a = &(buf.ptr[AES_BLOCK_SIZE]);
+  const unsigned char *block_b = &(buf.ptr[AES_BLOCK_SIZE * 2]);
+  return memcmp(block_a, block_b, AES_BLOCK_SIZE) == 0 ? AES_128_ECB
+                                                       : AES_128_CBC;
 }
 
 error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
