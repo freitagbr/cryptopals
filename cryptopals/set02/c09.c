@@ -34,7 +34,7 @@ error_t challenge_09(buffer *dst, const buffer src, const size_t len) {
 }
 
 int main() {
-  const unsigned char expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
+  const char expected[] = "YELLOW SUBMARINE\x04\x04\x04\04";
   const buffer input = buffer_new("YELLOW SUBMARINE", 16);
   buffer output = buffer_init();
   error_t err;
@@ -45,7 +45,7 @@ int main() {
     goto end;
   }
 
-  error_expect((const char *)expected, (const char *)output.ptr);
+  error_expect(expected, (const char *)output.ptr);
 
 end:
   buffer_delete(output);

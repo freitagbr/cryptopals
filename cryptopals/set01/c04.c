@@ -61,7 +61,7 @@ end:
 }
 
 int main() {
-  const unsigned char expected[] = "Now that the party is jumping\n";
+  const char expected[] = "Now that the party is jumping\n";
   buffer output = buffer_init();
   error_t err;
 
@@ -71,7 +71,7 @@ int main() {
     goto end;
   }
 
-  error_expect((const char *)expected, (const char *)output.ptr);
+  error_expect(expected, (const char *)output.ptr);
 
 end:
   buffer_delete(output);

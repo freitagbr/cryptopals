@@ -33,7 +33,7 @@ error_t challenge_01(buffer *dst, const buffer src) {
 }
 
 int main() {
-  const unsigned char expected[] =
+  const char expected[] =
       "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
   const buffer input =
       buffer_new("49276d206b696c6c696e6720796f757220627261696e206c696b652061207"
@@ -48,7 +48,7 @@ int main() {
     goto end;
   }
 
-  error_expect((const char *)expected, (const char *)output.ptr);
+  error_expect(expected, (const char *)output.ptr);
 
 end:
   buffer_delete(output);

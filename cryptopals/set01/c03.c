@@ -42,7 +42,7 @@ end:
 }
 
 int main() {
-  const unsigned char expected[] = "Cooking MC's like a pound of bacon";
+  const char expected[] = "Cooking MC's like a pound of bacon";
   const buffer input = buffer_new(
       "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
       68);
@@ -55,7 +55,7 @@ int main() {
     goto end;
   }
 
-  error_expect((const char *)expected, (const char *)output.ptr);
+  error_expect(expected, (const char *)output.ptr);
 
 end:
   buffer_delete(output);

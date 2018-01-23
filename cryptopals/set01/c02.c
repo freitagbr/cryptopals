@@ -54,7 +54,7 @@ end:
 }
 
 int main() {
-  const unsigned char expected[] = "746865206b696420646f6e277420706c6179";
+  const char expected[] = "746865206b696420646f6e277420706c6179";
   const buffer input_a = buffer_new("1c0111001f010100061a024b53535009181c", 36);
   const buffer input_b = buffer_new("686974207468652062756c6c277320657965", 36);
   buffer output = buffer_init();
@@ -66,7 +66,7 @@ int main() {
     goto end;
   }
 
-  error_expect((const char *)expected, (const char *)output.ptr);
+  error_expect(expected, (const char *)output.ptr);
 
 end:
   buffer_delete(output);
