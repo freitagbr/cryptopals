@@ -28,6 +28,9 @@ typedef enum {
 
 #define error(e) error_print(e, __FILE__, __LINE__)
 
+#define error_log(e)                                                           \
+  fprintf(stderr, "Error in \"%s\" on line %d:\n\t%s\n", __FILE__, __LINE__, e);
+
 void error_print(error_t e, const char *file, int line);
 
 void error_expect(const char *expected, const char *found);

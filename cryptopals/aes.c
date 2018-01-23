@@ -246,26 +246,19 @@ error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
 }
 
 error_t aes_pkcs7_strip(buffer *buf) {
-  unsigned char *ptr = buf->ptr;
-  size_t padlen = buf->len;
-  size_t padding = (size_t)ptr[padlen - 1];
-  size_t len;
-  size_t i;
+  unsigned char *ptr = &(buf->ptr[buf->len - 1]);
+  size_t padding = (size_t)*ptr;
+  size_t len = buf->len - padding;
+  unsigned char *end = &(buf->ptr[len]);
 
-  if (ptr[padlen - padding] != padding) {
-    return EAESPKCS7;
-  }
-
-  len = padlen - padding;
-
-  for (i = len; i < padlen; i++) {
-    if (ptr[i] != padding) {
+  while (--ptr >= end) {
+    if (*ptr != padding) {
       return EAESPKCS7;
     }
   }
 
   /* a full resize could be expensive, so fake it */
-  buf->ptr[len] = '\0';
+  *end = '\0';
   buf->len = len;
 
   return 0;
