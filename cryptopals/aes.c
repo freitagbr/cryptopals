@@ -12,13 +12,13 @@
 #include "cryptopals/error.h"
 #include "cryptopals/xor.h"
 
-static int aes_rand_seeded = 0;
-
 static error_t aes_seed_rand() {
+  static int aes_rand_seeded = 0;
   if (!aes_rand_seeded) {
     if (RAND_load_file(AES_RAND_SOURCE, AES_RAND_SIZE) != AES_RAND_SIZE) {
       return ERAND;
     }
+    aes_rand_seeded = 1;
   }
   return 0;
 }
