@@ -32,7 +32,8 @@ error_t challenge_02(buffer *dst, const buffer hex_a, const buffer hex_b) {
     return ESIZE;
   }
 
-  err = hex_decode(&a, hex_a) || hex_decode(&b, hex_b);
+  err = hex_decode(&a, hex_a) ||
+        hex_decode(&b, hex_b);
   if (err) {
     goto end;
   }
@@ -42,15 +43,8 @@ error_t challenge_02(buffer *dst, const buffer hex_a, const buffer hex_b) {
     goto end;
   }
 
-  err = xor_fixed(a, b);
-  if (err) {
-    goto end;
-  }
-
-  err = hex_encode(dst, a);
-  if (err) {
-    goto end;
-  }
+  err = xor_fixed(a, b) ||
+        hex_encode(dst, a);
 
 end:
   buffer_delete(a);

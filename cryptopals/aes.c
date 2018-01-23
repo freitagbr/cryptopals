@@ -163,36 +163,32 @@ error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
 error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
   buffer key = buffer_init();
   buffer buf = buffer_init();
+  unsigned int a;
+  unsigned int b;
+  unsigned int c;
   size_t offset;
   error_t err;
 
-  aes_seed_rand();
-
-  err = aes_random_bytes(&key);
+  err = buffer_alloc(&buf, src.len + 20) ||
+        aes_seed_rand() ||
+        aes_random_bytes(&key) ||
+        aes_rand(&a) ||
+        aes_rand(&b) ||
+        aes_rand(&c);
   if (err) {
     goto end;
   }
 
-  err = buffer_alloc(&buf, src.len + 20);
-  if (err) {
-    goto end;
-  }
-
-  offset = (aes_rand() % 5) + 5; /* 5-10 bytes */
+  offset = (a % 6) + 5; /* 5-10 bytes */
   memcpy(&(buf.ptr[offset]), src.ptr, src.len);
-  buf.len = src.len + offset + (aes_rand() % 5) + 5;
+  buf.len = src.len + offset + (b % 6) + 5;
 
-  if (aes_rand() & 1) {
+  if (c & 1) {
     /* encrypt using cbc */
     buffer iv = buffer_init();
-
-    err = aes_random_bytes(&iv);
-    if (err) {
-      goto end;
-    }
-
     *mode = AES_128_CBC;
-    err = aes_cbc_encrypt(dst, buf, key, iv);
+    err = aes_random_bytes(&iv) ||
+          aes_cbc_encrypt(dst, buf, key, iv);
   } else {
     /* encrypt using ecb */
     *mode = AES_128_ECB;
@@ -254,27 +250,32 @@ error_t aes_pkcs7_strip(buffer *buf) {
   return 0;
 }
 
-unsigned int aes_rand() {
+error_t aes_rand(unsigned int *n) {
   unsigned char bytes[sizeof(unsigned int)];
+  error_t err;
 
-  aes_seed_rand();
-
-  if (RAND_bytes(bytes, sizeof(unsigned int)) != 1) {
-    return 0;
+  err = aes_seed_rand();
+  if (err) {
+    return err;
   }
 
-  return ((unsigned int *)bytes)[0];
+  if (RAND_bytes(bytes, sizeof(unsigned int)) != 1) {
+    return ERAND;
+  }
+
+  *n = ((unsigned int *)bytes)[0];
+
+  return 0;
 }
 
 error_t aes_random_bytes(buffer *buf) {
   error_t err;
 
-  err = buffer_alloc(buf, AES_BLOCK_SIZE);
+  err = buffer_alloc(buf, AES_BLOCK_SIZE) ||
+        aes_seed_rand();
   if (err) {
     return err;
   }
-
-  aes_seed_rand();
 
   if (RAND_bytes(buf->ptr, buf->len) != 1) {
     return ERAND;

@@ -28,17 +28,9 @@ error_t challenge_10(const char *file, buffer *plaintext, const buffer key,
   buffer ciphertext = buffer_init();
   error_t err;
 
-  err = base64_decode_file(file, &ciphertext);
-  if (err) {
-    goto end;
-  }
+  err = base64_decode_file(file, &ciphertext) ||
+        aes_cbc_decrypt(plaintext, ciphertext, key, iv);
 
-  err = aes_cbc_decrypt(plaintext, ciphertext, key, iv);
-  if (err) {
-    goto end;
-  }
-
-end:
   buffer_delete(ciphertext);
 
   return err;
@@ -51,13 +43,8 @@ int main() {
   buffer output = buffer_init();
   error_t err;
 
-  err = file_read("data/c10_test.txt", &expected);
-  if (err) {
-    error(err);
-    goto end;
-  }
-
-  err = challenge_10("data/c10.txt", &output, key, iv);
+  err = file_read("data/c10_test.txt", &expected) ||
+        challenge_10("data/c10.txt", &output, key, iv);
   if (err) {
     error(err);
     goto end;

@@ -34,17 +34,9 @@ error_t challenge_05(buffer *dst, const buffer src) {
   buffer key = buffer_new("ICE", 3);
   error_t err;
 
-  err = xor_repeating(&tmp, src, key);
-  if (err) {
-    goto end;
-  }
+  err = xor_repeating(&tmp, src, key) ||
+        hex_encode(dst, tmp);
 
-  err = hex_encode(dst, tmp);
-  if (err) {
-    goto end;
-  }
-
-end:
   buffer_delete(tmp);
 
   return err;

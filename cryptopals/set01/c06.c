@@ -67,22 +67,10 @@ error_t challenge_06(const char *file, buffer *dst) {
   buffer key = buffer_init();
   error_t err;
 
-  err = base64_decode_file(file, &buf);
-  if (err) {
-    goto end;
-  }
+  err = base64_decode_file(file, &buf) ||
+        block_transpose_get_key(&key, buf, MAX_KEYSIZE) ||
+        xor_repeating(dst, buf, key);
 
-  err = block_transpose_get_key(&key, buf, MAX_KEYSIZE);
-  if (err) {
-    goto end;
-  }
-
-  err = xor_repeating(dst, buf, key);
-  if (err) {
-    goto end;
-  }
-
-end:
   buffer_delete(key);
   buffer_delete(block);
   buffer_delete(buf);
@@ -95,13 +83,8 @@ int main() {
   buffer output = buffer_init();
   error_t err;
 
-  err = file_read("data/c06_test.txt", &expected);
-  if (err) {
-    error(err);
-    goto end;
-  }
-
-  err = challenge_06("data/c06.txt", &output);
+  err = file_read("data/c06_test.txt", &expected) ||
+        challenge_06("data/c06.txt", &output);
   if (err) {
     error(err);
     goto end;

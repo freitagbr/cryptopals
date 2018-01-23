@@ -33,11 +33,7 @@ error_t challenge_03(buffer *dst, const buffer src) {
   }
 
   key = xor_find_cipher(hex, &max_score);
-
   err = xor_single_byte(dst, hex, key);
-  if (err) {
-    goto end;
-  }
 
 end:
   buffer_delete(hex);

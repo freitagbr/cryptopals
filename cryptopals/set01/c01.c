@@ -24,17 +24,9 @@ error_t challenge_01(buffer *dst, const buffer src) {
   buffer hex = buffer_init();
   error_t err;
 
-  err = hex_decode(&hex, src);
-  if (err) {
-    goto end;
-  }
+  err = hex_decode(&hex, src) ||
+        base64_encode(dst, hex);
 
-  err = base64_encode(dst, hex);
-  if (err) {
-    goto end;
-  }
-
-end:
   buffer_delete(hex);
 
   return err;

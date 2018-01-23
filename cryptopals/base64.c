@@ -167,12 +167,8 @@ error_t base64_decode_file(const char *file, buffer *dst) {
   size_t j = 0;
   error_t err;
 
-  err = file_read(file, &tmp);
-  if (err) {
-    goto end;
-  }
-
-  err = buffer_alloc(&b64, tmp.len);
+  err = file_read(file, &tmp) ||
+        buffer_alloc(&b64, tmp.len);
   if (err) {
     goto end;
   }
@@ -191,9 +187,6 @@ error_t base64_decode_file(const char *file, buffer *dst) {
   }
 
   err = base64_decode(dst, b64);
-  if (err) {
-    goto end;
-  }
 
 end:
   buffer_delete(tmp);

@@ -37,7 +37,7 @@ error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding);
 
 error_t aes_pkcs7_strip(buffer *buf);
 
-unsigned int aes_rand();
+error_t aes_rand(unsigned int *n);
 
 error_t aes_random_bytes(buffer *buf);
 
