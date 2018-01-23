@@ -63,7 +63,6 @@
 
 error_t challenge_06(const char *file, buffer *dst) {
   buffer buf = buffer_init();
-  buffer block = buffer_init();
   buffer key = buffer_init();
   error_t err;
 
@@ -72,7 +71,6 @@ error_t challenge_06(const char *file, buffer *dst) {
         xor_repeating(dst, buf, key);
 
   buffer_delete(key);
-  buffer_delete(block);
   buffer_delete(buf);
 
   return err;
