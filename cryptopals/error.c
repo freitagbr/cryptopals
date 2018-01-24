@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *error_messages[17] = {
+static const char *error_messages[20] = {
     "Failed to allocate memory",                        /* EMALLOC */
     "Null pointer passed as argument",                  /* ENULLPTR */
     "Destination buffer is shorter than source buffer", /* EDSTBUF */
@@ -22,7 +22,10 @@ static const char *error_messages[17] = {
     "Incorrect AES mode",                               /* EAESMODE */
     "AES Key could not be set",                         /* EAESKEY */
     "Invalid PKCS7 padding",                            /* EAESPKCS7 */
-    "Could not get random bytes"                        /* ERAND */
+    "Could not get random bytes",                       /* ERAND */
+    "Could not resize map",                             /* EMAPRESIZE */
+    "Could not remove entry from map",                  /* EMAPREMOVE */
+    "Could not decrypt message"                         /* EDECRYPT */
 };
 
 void error_print(error_t e, const char *file, int line) {

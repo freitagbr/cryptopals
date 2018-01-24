@@ -9,14 +9,12 @@ BIN_DIR   = $(BUILD_DIR)/bin
 CC        = cc
 CFLAGS    = -std=c89 -Wall -Wextra -Werror -pedantic -O -I./
 LDFLAGS   = -O
-LDLIBS    = -lm
+LDLIBS    = -lm -lssl -lcrypto
 VALGRIND  = valgrind
 
 LIB       = $(LIB_DIR)/$(NAME).a
 LIB_SRCS  = $(wildcard $(SRC_DIR)/*.c)
 LIB_OBJS  = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(LIB_SRCS)))
-
-DEPS      = -lssl -lcrypto
 
 SETS      = set01 set02
 
@@ -58,7 +56,7 @@ SET01      = $(notdir $(basename $(SET01_SRCS)))
 
 set01: $(SET01)
 
-$(SET01): %: $(OBJ_DIR)/%.o $(LIB) $(DEPS)
+$(SET01): %: $(OBJ_DIR)/%.o $(LIB) $(LDLIBS)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
@@ -75,7 +73,7 @@ SET02      = $(notdir $(basename $(SET02_SRCS)))
 
 set02: $(SET02)
 
-$(SET02): %: $(OBJ_DIR)/%.o $(LIB) $(DEPS)
+$(SET02): %: $(OBJ_DIR)/%.o $(LIB) $(LDLIBS)
 	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^
 
@@ -84,7 +82,7 @@ $(SET02_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set02/%.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 
-.PHONY: all test debug valgrind sets $(SETS) clean $(DEPS)
+.PHONY: all test debug valgrind sets $(SETS) clean $(LDLIBS)
 
 clean:
 	rm -rf $(BUILD_DIR)

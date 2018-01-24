@@ -170,7 +170,6 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
   error_t err;
 
   err = buffer_alloc(&buf, src.len + 20) ||
-        aes_seed_rand() ||
         aes_random_bytes(&key) ||
         aes_rand(&a) ||
         aes_rand(&b) ||

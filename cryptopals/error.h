@@ -24,6 +24,9 @@ typedef enum {
   EAESKEY,     /* AES Key could not be set */
   EAESPKCS7,   /* Invalid PKCS7 padding */
   ERAND,       /* Could not get random bytes */
+  EMAPRESIZE,  /* Could not resize map */
+  EMAPREMOVE,  /* Could not remove entry from map */
+  EDECRYPT,    /* Could not decrypt message */
   __E__
 } error_t;
 

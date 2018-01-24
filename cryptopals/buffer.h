@@ -3,9 +3,9 @@
 #ifndef CRYPTOPALS_BUFFER_H_
 #define CRYPTOPALS_BUFFER_H_
 
-#include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cryptopals/error.h"
 
@@ -33,6 +33,12 @@ error_t buffer_alloc(buffer *buf, size_t len);
 
 error_t buffer_resize(buffer *buf, size_t len);
 
+error_t buffer_append(buffer *head, buffer tail);
+
 error_t buffer_concat(buffer *dst, const buffer a, const buffer b);
+
+error_t buffer_dup(buffer *dst, const buffer src);
+
+int buffer_cmp(const buffer lhs, const buffer rhs);
 
 #endif /* CRYPTOPALS_BUFFER_H_ */

@@ -2,26 +2,23 @@
 
 #include "cryptopals/buffer.h"
 
-#include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "cryptopals/error.h"
 
-static unsigned int nextpow2(unsigned int n) {
-  unsigned int k = 1;
-  if (n == UINT_MAX) {
-    return UINT_MAX;
+static size_t nextpow2(size_t n) {
+  size_t s = 1;
+  while (s < sizeof(size_t) * 4) {
+    n |= n >> s;
+    s <<= 1;
   }
-  while (k < n) {
-    k *= 2;
-  }
-  return k;
+  return ++n;
 }
 
 error_t buffer_alloc(buffer *buf, size_t len) {
-  unsigned int bytes;
+  size_t bytes;
   unsigned char *ptr;
   if (buf->ptr != NULL) {
     /* resize if buffer is already allocated */
@@ -38,11 +35,15 @@ error_t buffer_alloc(buffer *buf, size_t len) {
 }
 
 error_t buffer_resize(buffer *buf, size_t len) {
-  unsigned int bytes;
+  size_t bytes;
   unsigned char *ptr;
   if (buf->ptr == NULL) {
     /* allocate if buffer is not yet allocated */
     return buffer_alloc(buf, len);
+  }
+  if (buf->len == len) {
+    /* nothing to do */
+    return 0;
   }
   bytes = nextpow2(len);
   if (bytes > nextpow2(buf->len)) {
@@ -60,6 +61,20 @@ error_t buffer_resize(buffer *buf, size_t len) {
   return 0;
 }
 
+error_t buffer_append(buffer *head, buffer tail) {
+  const size_t len = head->len + tail.len;
+  error_t err;
+
+  err = buffer_resize(head, len);
+  if (err) {
+    return err;
+  }
+
+  memcpy(&(head->ptr[head->len]), tail.ptr, tail.len);
+
+  return 0;
+}
+
 error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
   const size_t len = a.len + b.len;
   error_t err;
@@ -73,4 +88,27 @@ error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
   memcpy(&(dst->ptr[a.len]), b.ptr, b.len);
 
   return 0;
+}
+
+error_t buffer_dup(buffer *dst, const buffer src) {
+  error_t err;
+
+  err = buffer_alloc(dst, src.len);
+  if (err) {
+    return err;
+  }
+
+  memcpy(dst->ptr, src.ptr, src.len);
+
+  return 0;
+}
+
+int buffer_cmp(const buffer lhs, const buffer rhs) {
+  if (lhs.len < rhs.len) {
+    return -1;
+  }
+  if (rhs.len > lhs.len) {
+    return 1;
+  }
+  return memcmp(lhs.ptr, rhs.ptr, lhs.len);
 }
