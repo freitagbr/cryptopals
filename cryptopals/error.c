@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *error_messages[16] = {
+static const char *error_messages[17] = {
     "Failed to allocate memory",                        /* EMALLOC */
     "Null pointer passed as argument",                  /* ENULLPTR */
     "Destination buffer is shorter than source buffer", /* EDSTBUF */
@@ -19,6 +19,7 @@ static const char *error_messages[16] = {
     "Failed to read file",                              /* EFREAD */
     "Hex buffer contains invalid characters",           /* EHEXCHAR */
     "Buffer contains incomplete hex code point",        /* EHEXLEN */
+    "Incorrect AES mode",                               /* EAESMODE */
     "AES Key could not be set",                         /* EAESKEY */
     "Invalid PKCS7 padding",                            /* EAESPKCS7 */
     "Could not get random bytes"                        /* ERAND */

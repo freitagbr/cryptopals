@@ -75,7 +75,7 @@ int main() {
       expected = cbc;
       break;
     default:
-      return 1;
+      return EAESMODE;
     }
     switch (guess) {
     case AES_128_ECB:
@@ -85,10 +85,10 @@ int main() {
       result = cbc;
       break;
     default:
-      return 1;
+      return EAESMODE;
     }
     fprintf(stderr, "Expected %s, got %s\n", expected, result);
-    return 1;
+    return EAESMODE;
   }
 
   return 0;
