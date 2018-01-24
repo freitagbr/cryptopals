@@ -2,13 +2,33 @@
 
 #include "cryptopals/buffer.h"
 
+#include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cryptopals/error.h"
 
+static unsigned int nextpow2(unsigned int n) {
+  unsigned int k = 1;
+  if (n == UINT_MAX) {
+    return UINT_MAX;
+  }
+  while (k < n) {
+    k *= 2;
+  }
+  return k;
+}
+
 error_t buffer_alloc(buffer *buf, size_t len) {
-  unsigned char *ptr = (unsigned char *)calloc(len + 1, sizeof(unsigned char));
+  unsigned int bytes;
+  unsigned char *ptr;
+  if (buf->ptr != NULL) {
+    /* resize if buffer is already allocated */
+    return buffer_resize(buf, len);
+  }
+  bytes = nextpow2(len);
+  ptr = (unsigned char *)calloc(bytes, sizeof(unsigned char));
   if (ptr == NULL) {
     return EMALLOC;
   }
@@ -18,13 +38,39 @@ error_t buffer_alloc(buffer *buf, size_t len) {
 }
 
 error_t buffer_resize(buffer *buf, size_t len) {
-  unsigned char *ptr =
-      (unsigned char *)realloc(buf->ptr, sizeof(unsigned char) * (len + 1));
-  if (ptr == NULL) {
-    return EMALLOC;
+  unsigned int bytes;
+  unsigned char *ptr;
+  if (buf->ptr == NULL) {
+    /* allocate if buffer is not yet allocated */
+    return buffer_alloc(buf, len);
+  }
+  bytes = nextpow2(len);
+  if (bytes > nextpow2(buf->len)) {
+    /* only realloc if more space is needed than is available */
+    ptr = (unsigned char *)realloc(buf->ptr, sizeof(unsigned char) * bytes);
+    if (ptr == NULL) {
+      return EMALLOC;
+    }
+  } else {
+    ptr = buf->ptr;
   }
   ptr[len] = '\0';
   buf->ptr = ptr;
   buf->len = len;
+  return 0;
+}
+
+error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
+  const size_t len = a.len + b.len;
+  error_t err;
+
+  err = buffer_alloc(dst, len);
+  if (err) {
+    return err;
+  }
+
+  memcpy(dst->ptr, a.ptr, a.len);
+  memcpy(&(dst->ptr[a.len]), b.ptr, b.len);
+
   return 0;
 }
