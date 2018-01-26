@@ -3,8 +3,6 @@
 #ifndef CRYPTOPALS_HEX_H_
 #define CRYPTOPALS_HEX_H_
 
-#include <stddef.h>
-
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 

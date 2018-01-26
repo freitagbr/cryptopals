@@ -3,7 +3,6 @@
 #include "cryptopals/aes.h"
 
 #include <string.h>
-#include <time.h>
 
 #include <openssl/aes.h>
 #include <openssl/rand.h>
@@ -264,7 +263,6 @@ error_t aes_pkcs7_strip(buffer *buf) {
 }
 
 error_t aes_rand(unsigned int *n) {
-  unsigned char bytes[sizeof(unsigned int)];
   error_t err;
 
   err = aes_seed_rand();
@@ -272,11 +270,9 @@ error_t aes_rand(unsigned int *n) {
     return err;
   }
 
-  if (RAND_bytes(bytes, sizeof(unsigned int)) != 1) {
+  if (RAND_bytes((unsigned char *)n, sizeof(unsigned int)) != 1) {
     return ERAND;
   }
-
-  *n = ((unsigned int *)bytes)[0];
 
   return 0;
 }

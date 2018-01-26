@@ -3,13 +3,10 @@
 #ifndef CRYPTOPALS_BLOCK_H_
 #define CRYPTOPALS_BLOCK_H_
 
-#include <float.h>
 #include <stddef.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
-#include "cryptopals/hamming.h"
-#include "cryptopals/xor.h"
 
 size_t block_keysize(buffer buf, float *min_dist, size_t max_keysize);
 

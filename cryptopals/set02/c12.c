@@ -1,13 +1,13 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
 #include <limits.h>
+#include <string.h>
 
 #include "cryptopals/aes.h"
 #include "cryptopals/base64.h"
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
-#include "cryptopals/map.h"
 
 static buffer b64 =
     buffer_new("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg"
@@ -88,18 +88,15 @@ static error_t encrypt_oracle(buffer *dst, const buffer src) {
  */
 
 error_t challenge_12(buffer *plain) {
-  map lastbytes = map_init();
   buffer scratch = buffer_init();
   buffer cipher = buffer_init();
   buffer enc = buffer_init();
   buffer dec = buffer_init();
-  buffer lastbyte = buffer_new(NULL, 1);
-  buffer hashkey;
-  buffer *byte;
   unsigned char *plainptr;
   size_t decoded = 0;
   size_t cipherlen;
   size_t keylen;
+  int byte;
   aes_mode_t mode;
   error_t err;
 
@@ -136,7 +133,6 @@ error_t challenge_12(buffer *plain) {
     }
   }
   keylen = cipher.len - cipherlen;
-  hashkey.len = keylen;
 
   /* detect the encryption method being used */
   err = buffer_resize(&scratch, keylen * 3);
@@ -170,11 +166,6 @@ error_t challenge_12(buffer *plain) {
 
   memset(dec.ptr, 'a', dec.len);
 
-  err = map_new(&lastbytes);
-  if (err) {
-    goto end;
-  }
-
   while (scratch.len <= cipherlen) {
     size_t i;
 
@@ -182,6 +173,8 @@ error_t challenge_12(buffer *plain) {
     if (err) {
       goto end;
     }
+
+    byte = -1;
 
     /**
      * construct a dictionary relating the last byte in the buffer to the byte
@@ -193,17 +186,13 @@ error_t challenge_12(buffer *plain) {
       if (err) {
         goto end;
       }
-      hashkey.ptr = cipher.ptr;
-      lastbyte.ptr = (unsigned char *)&i;
-      err = map_set(&lastbytes, hashkey, lastbyte);
-      if (err) {
-        goto end;
+      if (memcmp(cipher.ptr, enc.ptr, scratch.len) == 0) {
+        byte = (int)i;
+        break;
       }
     }
 
-    hashkey.ptr = enc.ptr;
-    byte = map_get(&lastbytes, hashkey);
-    if (byte == NULL) {
+    if (byte == -1) {
       /**
        * this is probably the end of the message, so fix the length of the
        * decoded plaintext, but fail if there's more than a keylength left to
@@ -216,7 +205,7 @@ error_t challenge_12(buffer *plain) {
       goto end;
     }
 
-    *plainptr++ = scratch.ptr[scratch.len - 1] = byte->ptr[0];
+    *plainptr++ = scratch.ptr[scratch.len - 1] = (unsigned char)byte;
     decoded++;
 
     if (decoded % keylen == 0) {
@@ -228,8 +217,7 @@ error_t challenge_12(buffer *plain) {
        */
       unsigned char *from;
       unsigned char *to;
-      err = buffer_resize(&scratch, scratch.len + keylen) ||
-            buffer_resize(&dec, dec.len + keylen);
+      err = buffer_resize(&scratch, scratch.len + keylen);
       if (err) {
         goto end;
       }
@@ -242,7 +230,6 @@ error_t challenge_12(buffer *plain) {
         *(to--) = 'a';
       }
       dec.len = keylen - 1;
-      hashkey.len += keylen;
     } else {
       /**
        * shift the bytes to the left to make room for the next byte, and
@@ -256,12 +243,9 @@ error_t challenge_12(buffer *plain) {
       }
       dec.len--;
     }
-
-    map_clear(&lastbytes);
   }
 
 end:
-  map_delete(lastbytes);
   buffer_delete(scratch);
   buffer_delete(cipher);
   buffer_delete(enc);

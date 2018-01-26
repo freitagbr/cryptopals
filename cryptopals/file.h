@@ -3,7 +3,6 @@
 #ifndef CRYPTOPALS_FILE_H_
 #define CRYPTOPALS_FILE_H_
 
-#include <stddef.h>
 #include <stdio.h>
 
 #include "cryptopals/buffer.h"

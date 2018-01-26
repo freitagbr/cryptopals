@@ -4,11 +4,9 @@
 #define CRYPTOPALS_BASE64_H_
 
 #include <stddef.h>
-#include <string.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
-#include "cryptopals/file.h"
 
 static const unsigned char base64_encode_table[64] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',

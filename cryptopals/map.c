@@ -3,6 +3,7 @@
 #include "cryptopals/map.h"
 
 #include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 #include "cryptopals/buffer.h"
@@ -74,19 +75,15 @@ static void map_bucket_delete(map_bucket *b) {
 }
 
 /* FNV-1a hash */
-static unsigned long map_hash(const buffer buf, unsigned long buckets) {
-  long hash = MAP_OFFSET_BASIS_32;
+static size_t map_hash(const buffer buf, unsigned long buckets) {
+  unsigned int hash = MAP_FNV1_BASE_32;
   unsigned char *ptr = buf.ptr;
   unsigned char *end = &(buf.ptr[buf.len]);
   while (ptr < end) {
     hash ^= *(ptr++);
-    hash += (hash << 1) +
-            (hash << 4) +
-            (hash << 7) +
-            (hash << 8) +
-            (hash << 24);
+    hash *= MAP_FNV1_PRIME_32;
   }
-  return (unsigned long)hash % buckets;
+  return (size_t)hash % buckets;
 }
 
 error_t map_new_length(map *m, const size_t len) {
@@ -124,8 +121,8 @@ static error_t map_resize(map *m, const size_t new_base) {
 
   while (ptr < end) {
     if (*ptr != NULL && *ptr != &MAP_BUCKET_DELETED) {
-      unsigned long hash = map_hash((*ptr)->key, new_len);
-      unsigned long step = 0;
+      size_t hash = map_hash((*ptr)->key, new_len);
+      size_t step = 0;
       map_bucket *curr = new_buckets[hash];
       while (curr != NULL && curr != &MAP_BUCKET_DELETED) {
         hash = (hash + (++step)) % new_len;
@@ -183,8 +180,8 @@ void map_delete(map m) {
 error_t map_set(map *m, const buffer key, const buffer val) {
   map_bucket *curr;
   map_bucket *b;
-  unsigned long hash;
-  unsigned long step = 0;
+  size_t hash;
+  size_t step = 0;
   error_t err;
 
   if (map_load(m) > MAP_UPPER_LOAD_LIMIT) {
@@ -221,8 +218,8 @@ error_t map_set(map *m, const buffer key, const buffer val) {
 }
 
 buffer *map_get(map *m, const buffer key) {
-  unsigned long hash = map_hash(key, m->len);
-  unsigned long step = 0;
+  size_t hash = map_hash(key, m->len);
+  size_t step = 0;
   map_bucket *b = m->buckets[hash];
 
   while (b != NULL) {
@@ -239,8 +236,8 @@ buffer *map_get(map *m, const buffer key) {
 }
 
 error_t map_remove(map *m, const buffer key) {
-  unsigned long hash = map_hash(key, m->len);
-  unsigned long step = 0;
+  size_t hash = map_hash(key, m->len);
+  size_t step = 0;
   map_bucket *b = m->buckets[hash];
 
   if (map_load(m) < MAP_LOWER_LOAD_LIMIT) {

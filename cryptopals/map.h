@@ -3,18 +3,16 @@
 #ifndef CRYPTOPALS_MAP_H_
 #define CRYPTOPALS_MAP_H_
 
-#include <math.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-#define MAP_DEFAULT_LENGTH 523
+#define MAP_DEFAULT_LENGTH 53
 #define MAP_UPPER_LOAD_LIMIT 70
 #define MAP_LOWER_LOAD_LIMIT 10
-#define MAP_OFFSET_BASIS_32 2166136261
-#define MAP_PRIME_A 151
-#define MAP_PRIME_B 167
+#define MAP_FNV1_PRIME_32 0x01000193
+#define MAP_FNV1_BASE_32 2166136261U
 
 typedef struct map_bucket {
   buffer key;
