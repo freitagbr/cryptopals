@@ -28,6 +28,10 @@ static const char hex_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
+void btoh(unsigned char *dst, unsigned char src);
+
+char htob(const unsigned char c);
+
 error_t hex_decode(buffer *dst, const buffer src);
 
 error_t hex_encode(buffer *dst, const buffer src);

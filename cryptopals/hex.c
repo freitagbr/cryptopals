@@ -7,18 +7,18 @@
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 
-static char htob(const unsigned char c) { return hex_decode_table[c]; }
-
-static void btoh(unsigned char src, unsigned char *dst) {
-  dst[0] = hex_encode_table[(src & 0xF0) >> 4];
-  dst[1] = hex_encode_table[src & 0x0F];
-}
-
 static size_t hex_decoded_length(const size_t len) {
   return (len + (len % 2)) / 2;
 }
 
 static size_t hex_encoded_length(const size_t len) { return len * 2; }
+
+void btoh(unsigned char *dst, unsigned char src) {
+  dst[0] = hex_encode_table[(src & 0xF0) >> 4];
+  dst[1] = hex_encode_table[src & 0x0F];
+}
+
+char htob(const unsigned char c) { return hex_decode_table[c]; }
 
 error_t hex_decode(buffer *dst, const buffer src) {
   unsigned char *dptr;
@@ -63,10 +63,10 @@ error_t hex_decode(buffer *dst, const buffer src) {
 }
 
 error_t hex_encode(buffer *dst, const buffer src) {
+  unsigned char *sptr = src.ptr;
   unsigned char *dptr;
-  const size_t srclen = src.len;
-  size_t enclen = hex_encoded_length(srclen);
-  size_t i;
+  unsigned char *end = &(src.ptr[src.len]);
+  const size_t enclen = hex_encoded_length(src.len);
   error_t err = 0;
 
   /* reuse old memory if possible */
@@ -84,8 +84,8 @@ error_t hex_encode(buffer *dst, const buffer src) {
 
   dptr = dst->ptr;
 
-  for (i = 0; i < srclen; i++) {
-    btoh(src.ptr[i], dptr);
+  while (sptr < end) {
+    btoh(dptr, *(sptr++));
     dptr += 2;
   }
 

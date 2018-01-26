@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *error_messages[20] = {
+static const char *error_messages[21] = {
     "Failed to allocate memory",                        /* EMALLOC */
     "Null pointer passed as argument",                  /* ENULLPTR */
     "Destination buffer is shorter than source buffer", /* EDSTBUF */
@@ -25,7 +25,8 @@ static const char *error_messages[20] = {
     "Could not get random bytes",                       /* ERAND */
     "Could not resize map",                             /* EMAPRESIZE */
     "Could not remove entry from map",                  /* EMAPREMOVE */
-    "Could not decrypt message"                         /* EDECRYPT */
+    "Could not decrypt message",                        /* EDECRYPT */
+    "Could not unescape URL component"                  /* EURLUNESCAPE */
 };
 
 void error_print(error_t e, const char *file, int line) {

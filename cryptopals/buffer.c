@@ -62,7 +62,8 @@ error_t buffer_resize(buffer *buf, size_t len) {
 }
 
 error_t buffer_append(buffer *head, buffer tail) {
-  const size_t len = head->len + tail.len;
+  const size_t headlen = head->len;
+  const size_t len = headlen + tail.len;
   error_t err;
 
   err = buffer_resize(head, len);
@@ -70,7 +71,7 @@ error_t buffer_append(buffer *head, buffer tail) {
     return err;
   }
 
-  memcpy(&(head->ptr[head->len]), tail.ptr, tail.len);
+  memcpy(&(head->ptr[headlen]), tail.ptr, tail.len);
 
   return 0;
 }
