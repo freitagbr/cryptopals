@@ -47,7 +47,7 @@ error_t url_qs_unescape(buffer *dst, const buffer src) {
   }
 
   if (percents == 0 && !plus) {
-    return buffer_dup(dst, src);
+    return buffer_copy(dst, src);
   }
 
   err = buffer_alloc(dst, src.len);
@@ -99,7 +99,7 @@ error_t url_qs_escape(buffer *dst, const buffer src) {
   }
 
   if (spaces == 0 && hexes == 0) {
-    return buffer_dup(dst, src);
+    return buffer_copy(dst, src);
   }
 
   err = buffer_alloc(dst, src.len + (hexes * 2));

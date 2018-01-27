@@ -63,7 +63,8 @@ error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize) {
   keysize = block_keysize(buf, &min_dist, max_keysize);
   blocklen = buf.len / keysize;
 
-  err = buffer_alloc(&block, blocklen) || buffer_alloc(key, keysize);
+  err = buffer_alloc(&block, blocklen) ||
+        buffer_alloc(key, keysize);
   if (err) {
     goto end;
   }

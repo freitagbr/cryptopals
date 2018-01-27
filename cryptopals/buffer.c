@@ -91,7 +91,7 @@ error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
   return 0;
 }
 
-error_t buffer_dup(buffer *dst, const buffer src) {
+error_t buffer_copy(buffer *dst, const buffer src) {
   error_t err;
 
   err = buffer_alloc(dst, src.len);

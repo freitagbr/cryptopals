@@ -36,7 +36,7 @@ error_t buffer_append(buffer *head, buffer tail);
 
 error_t buffer_concat(buffer *dst, const buffer a, const buffer b);
 
-error_t buffer_dup(buffer *dst, const buffer src);
+error_t buffer_copy(buffer *dst, const buffer src);
 
 int buffer_cmp(const buffer lhs, const buffer rhs);
 

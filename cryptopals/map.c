@@ -56,7 +56,8 @@ static error_t map_bucket_new(map_bucket **mb, const buffer key,
   if (b == NULL) {
     return EMALLOC;
   }
-  err = buffer_dup(&(b->key), key) || buffer_dup(&(b->val), val);
+  err = buffer_copy(&(b->key), key) ||
+        buffer_copy(&(b->val), val);
   if (err) {
     buffer_delete(&(b->key));
     buffer_delete(&(b->val));
