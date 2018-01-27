@@ -60,17 +60,17 @@ error_t url_qs_unescape(buffer *dst, const buffer src) {
 
   while (sptr < end) {
     switch (*sptr) {
-      case '%':
-        *(dptr++) = (unsigned char)((htob(sptr[1]) << 4) | htob(sptr[2]));
-        sptr += 3;
-        break;
-      case '+':
-        *(dptr++) = ' ';
-        sptr++;
-        break;
-      default:
-        *(dptr++) = *(sptr++);
-        break;
+    case '%':
+      *(dptr++) = (unsigned char)((htob(sptr[1]) << 4) | htob(sptr[2]));
+      sptr += 3;
+      break;
+    case '+':
+      *(dptr++) = ' ';
+      sptr++;
+      break;
+    default:
+      *(dptr++) = *(sptr++);
+      break;
     }
   }
 
@@ -198,13 +198,13 @@ error_t url_qs_decode(map *m, const buffer qs) {
   }
 
   while (keyptr < end) {
-    while (valend < end && *valend != URL_QS_SEP) {
+    while (valend < end && *valend != '&') {
       valend++;
     }
     if (keyptr == valend) {
       continue;
     }
-    while (keyend < valend && *keyend != URL_QS_EQ) {
+    while (keyend < valend && *keyend != '=') {
       keyend++;
     }
     valptr = keyend;
