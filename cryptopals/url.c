@@ -202,7 +202,7 @@ error_t url_qs_decode(map *m, const buffer qs) {
       valend++;
     }
     if (keyptr == valend) {
-      continue;
+      break;
     }
     while (keyend < valend && *keyend != '=') {
       keyend++;
