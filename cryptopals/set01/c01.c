@@ -1,7 +1,7 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
 #include "cryptopals/base64.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 
@@ -20,14 +20,14 @@
  * of the exercises.
  */
 
-error_t challenge_01(buffer *dst, const buffer src) {
-  buffer hex = buffer_init();
+error_t challenge_01(string *dst, const string src) {
+  string hex = string_init();
   error_t err;
 
   err = hex_decode(&hex, src) ||
         base64_encode(dst, hex);
 
-  buffer_delete(hex);
+  string_delete(hex);
 
   return err;
 }
@@ -35,11 +35,11 @@ error_t challenge_01(buffer *dst, const buffer src) {
 int main() {
   const char expected[] =
       "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
-  const buffer input =
-      buffer_new("49276d206b696c6c696e6720796f757220627261696e206c696b652061207"
+  const string input =
+      string_new("49276d206b696c6c696e6720796f757220627261696e206c696b652061207"
                  "06f69736f6e6f7573206d757368726f6f6d",
                  96);
-  buffer output = buffer_init();
+  string output = string_init();
   error_t err;
 
   err = challenge_01(&output, input);
@@ -51,7 +51,7 @@ int main() {
   error_expect(expected, (const char *)output.ptr);
 
 end:
-  buffer_delete(output);
+  string_delete(output);
 
   return (int)err;
 }

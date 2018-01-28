@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 #include "cryptopals/hex.h"
@@ -19,20 +19,20 @@
  * (Your code from #3 should help.)
  */
 
-error_t challenge_04(const char *file, buffer *dst) {
+error_t challenge_04(const char *file, string *dst) {
   FILE *fp = fopen(file, "rb");
-  buffer buf = buffer_init();
-  buffer line = buffer_init();
-  buffer tmp = buffer_init();
+  string str = string_init();
+  string line = string_init();
+  string tmp = string_init();
   long read = 0;
   int global_max = 0;
   error_t err;
 
-  while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
+  while (((err = file_getline(fp, &str, &read)) == 0) && ((read - 1) > 0)) {
     int local_max = 0;
     unsigned char key;
 
-    buffer_set(tmp, buf.ptr, read - 1);
+    string_set(tmp, str.ptr, read - 1);
 
     err = hex_decode(&line, tmp);
     if (err) {
@@ -54,15 +54,15 @@ end:
   if (fp != NULL) {
     fclose(fp);
   }
-  buffer_delete(buf);
-  buffer_delete(line);
+  string_delete(str);
+  string_delete(line);
 
   return err;
 }
 
 int main() {
   const char expected[] = "Now that the party is jumping\n";
-  buffer output = buffer_init();
+  string output = string_init();
   error_t err;
 
   err = challenge_04("data/c04.txt", &output);
@@ -74,7 +74,7 @@ int main() {
   error_expect(expected, (const char *)output.ptr);
 
 end:
-  buffer_delete(output);
+  string_delete(output);
 
   return (int)err;
 }

@@ -1,6 +1,6 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/xor.h"
@@ -21,8 +21,8 @@
  * one with the best score.
  */
 
-error_t challenge_03(buffer *dst, const buffer src) {
-  buffer hex = buffer_init();
+error_t challenge_03(string *dst, const string src) {
+  string hex = string_init();
   unsigned char key;
   int max_score = 0;
   error_t err;
@@ -36,17 +36,17 @@ error_t challenge_03(buffer *dst, const buffer src) {
   err = xor_single_byte(dst, hex, key);
 
 end:
-  buffer_delete(hex);
+  string_delete(hex);
 
   return err;
 }
 
 int main() {
   const char expected[] = "Cooking MC's like a pound of bacon";
-  const buffer input = buffer_new(
+  const string input = string_new(
       "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
       68);
-  buffer output = buffer_init();
+  string output = string_init();
   error_t err;
 
   err = challenge_03(&output, input);
@@ -58,7 +58,7 @@ int main() {
   error_expect(expected, (const char *)output.ptr);
 
 end:
-  buffer_delete(output);
+  string_delete(output);
 
   return (int)err;
 }

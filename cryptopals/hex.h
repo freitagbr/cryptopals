@@ -3,7 +3,7 @@
 #ifndef CRYPTOPALS_HEX_H_
 #define CRYPTOPALS_HEX_H_
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 static const unsigned char hex_encode_table[16] = {
@@ -32,8 +32,8 @@ void btoh(unsigned char *dst, unsigned char src);
 
 char htob(const unsigned char c);
 
-error_t hex_decode(buffer *dst, const buffer src);
+error_t hex_decode(string *dst, const string src);
 
-error_t hex_encode(buffer *dst, const buffer src);
+error_t hex_encode(string *dst, const string src);
 
 #endif /* CRYPTOPALS_HEX_H_ */

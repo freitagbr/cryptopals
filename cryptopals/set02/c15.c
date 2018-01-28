@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "cryptopals/aes.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 /**
@@ -33,21 +33,21 @@
  * Crypto nerds know where we're going with this. Bear with us.
  */
 
-error_t challenge_15(buffer *buf) {
-  return aes_pkcs7_strip(buf);
+error_t challenge_15(string *str) {
+  return aes_pkcs7_strip(str);
 }
 
 int main() {
   const char expected[] = "ICE ICE BABY";
-  buffer a = buffer_init();
-  buffer b = buffer_init();
-  buffer c = buffer_init();
+  string a = string_init();
+  string b = string_init();
+  string c = string_init();
   error_t err;
 
   /* avoid writing to read-only memory */
-  err = buffer_alloc(&a, 16) ||
-        buffer_alloc(&b, 16) ||
-        buffer_alloc(&c, 16);
+  err = string_alloc(&a, 16) ||
+        string_alloc(&b, 16) ||
+        string_alloc(&c, 16);
   if (err) {
     error(err);
     goto end;
@@ -65,20 +65,20 @@ int main() {
   error_expect(expected, (const char *)a.ptr);
 
   if (challenge_15(&b) != EAESPKCS7) {
-    error_log("Expected invalid padding in buffer");
+    error_log("Expected invalid padding in string");
     err = 1;
     goto end;
   }
 
   if (challenge_15(&c) != EAESPKCS7) {
-    error_log("Expected invalid padding in buffer");
+    error_log("Expected invalid padding in string");
     err = 1;
   }
 
 end:
-  buffer_delete(a);
-  buffer_delete(b);
-  buffer_delete(c);
+  string_delete(a);
+  string_delete(b);
+  string_delete(c);
 
   return (int)err;
 }

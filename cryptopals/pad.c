@@ -5,10 +5,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
-error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
+error_t pad_bytes(string *dst, const string src, const size_t len,
                   const unsigned char iv) {
   error_t err;
 
@@ -16,7 +16,7 @@ error_t pad_bytes(buffer *dst, const buffer src, const size_t len,
     return EDSTBUF;
   }
 
-  err = buffer_alloc(dst, len);
+  err = string_alloc(dst, len);
   if (err) {
     return err;
   }

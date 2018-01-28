@@ -3,7 +3,7 @@
 #ifndef CRYPTOPALS_AES_H_
 #define CRYPTOPALS_AES_H_
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 #define AES_RAND_SOURCE "/dev/urandom"
@@ -14,26 +14,26 @@ typedef enum {
   AES_128_CBC      /* aes-128-cbc */
 } aes_mode_t;
 
-error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key);
+error_t aes_ecb_decrypt(string *dst, const string src, const string key);
 
-error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key);
+error_t aes_ecb_encrypt(string *dst, const string src, const string key);
 
-error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
-                        const buffer iv);
+error_t aes_cbc_decrypt(string *dst, const string src, const string key,
+                        const string iv);
 
-error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
-                        const buffer iv);
+error_t aes_cbc_encrypt(string *dst, const string src, const string key,
+                        const string iv);
 
-error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode);
+error_t aes_encrypt_oracle(string *dst, const string src, aes_mode_t *mode);
 
-aes_mode_t aes_encrypt_detect(const buffer buf);
+aes_mode_t aes_encrypt_detect(const string str);
 
-error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding);
+error_t aes_pkcs7_pad(string *str, size_t len, size_t *padding);
 
-error_t aes_pkcs7_strip(buffer *buf);
+error_t aes_pkcs7_strip(string *str);
 
 error_t aes_rand(unsigned int *n);
 
-error_t aes_random_bytes(buffer *buf);
+error_t aes_random_bytes(string *str);
 
 #endif /* CRYPTOPALS_AES_H_ */

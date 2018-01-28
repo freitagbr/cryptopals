@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 static map_bucket MAP_BUCKET_DELETED = {{NULL, 0}, {NULL, 0}};
@@ -45,8 +45,8 @@ static unsigned long next_prime(unsigned long n) {
   return n;
 }
 
-static error_t map_bucket_new(map_bucket **mb, const buffer key,
-                              const buffer val) {
+static error_t map_bucket_new(map_bucket **mb, const string key,
+                              const string val) {
   map_bucket *b;
   error_t err;
   if (mb == NULL) {
@@ -56,11 +56,11 @@ static error_t map_bucket_new(map_bucket **mb, const buffer key,
   if (b == NULL) {
     return EMALLOC;
   }
-  err = buffer_copy(&(b->key), key) ||
-        buffer_copy(&(b->val), val);
+  err = string_copy(&(b->key), key) ||
+        string_copy(&(b->val), val);
   if (err) {
-    buffer_delete(&(b->key));
-    buffer_delete(&(b->val));
+    string_delete(&(b->key));
+    string_delete(&(b->val));
     free((void *)b);
     return err;
   }
@@ -69,17 +69,17 @@ static error_t map_bucket_new(map_bucket **mb, const buffer key,
 
 static void map_bucket_delete(map_bucket *b) {
   if (b != NULL && b != &MAP_BUCKET_DELETED) {
-    buffer_delete(b->key);
-    buffer_delete(b->val);
+    string_delete(b->key);
+    string_delete(b->val);
     free((void *)b);
   }
 }
 
 /* FNV-1a hash */
-size_t map_hash(const buffer buf, unsigned long buckets) {
+size_t map_hash(const string str, unsigned long buckets) {
   unsigned int hash = MAP_FNV1_BASE_32;
-  unsigned char *ptr = buf.ptr;
-  unsigned char *end = &(buf.ptr[buf.len]);
+  unsigned char *ptr = str.ptr;
+  unsigned char *end = &(str.ptr[str.len]);
   while (ptr < end) {
     hash ^= *(ptr++);
     hash *= MAP_FNV1_PRIME_32;
@@ -178,7 +178,7 @@ void map_delete(map m) {
   }
 }
 
-error_t map_set(map *m, const buffer key, const buffer val) {
+error_t map_set(map *m, const string key, const string val) {
   map_bucket *curr;
   map_bucket *b;
   size_t hash;
@@ -202,7 +202,7 @@ error_t map_set(map *m, const buffer key, const buffer val) {
 
   while (curr != NULL) {
     if (curr != &MAP_BUCKET_DELETED) {
-      if (buffer_cmp(curr->key, key) == 0) {
+      if (string_cmp(curr->key, key) == 0) {
         map_bucket_delete(curr);
         m->buckets[hash] = b;
         return 0;
@@ -218,14 +218,14 @@ error_t map_set(map *m, const buffer key, const buffer val) {
   return 0;
 }
 
-buffer *map_get(map *m, const buffer key) {
+string *map_get(map *m, const string key) {
   size_t hash = map_hash(key, m->len);
   size_t step = 0;
   map_bucket *b = m->buckets[hash];
 
   while (b != NULL) {
     if (b != &MAP_BUCKET_DELETED) {
-      if (buffer_cmp(b->key, key) == 0) {
+      if (string_cmp(b->key, key) == 0) {
         return &b->val;
       }
     }
@@ -236,7 +236,7 @@ buffer *map_get(map *m, const buffer key) {
   return NULL;
 }
 
-error_t map_remove(map *m, const buffer key) {
+error_t map_remove(map *m, const string key) {
   size_t hash = map_hash(key, m->len);
   size_t step = 0;
   map_bucket *b = m->buckets[hash];
@@ -249,7 +249,7 @@ error_t map_remove(map *m, const buffer key) {
   }
 
   while (b != NULL) {
-    if (b != &MAP_BUCKET_DELETED && buffer_cmp(b->key, key) == 0) {
+    if (b != &MAP_BUCKET_DELETED && string_cmp(b->key, key) == 0) {
       map_bucket_delete(b);
       m->buckets[hash] = &MAP_BUCKET_DELETED;
       m->count--;

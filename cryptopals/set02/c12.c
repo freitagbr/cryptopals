@@ -5,19 +5,19 @@
 
 #include "cryptopals/aes.h"
 #include "cryptopals/base64.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
-static buffer b64 =
-    buffer_new("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg"
+static string b64 =
+    string_new("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg"
                "aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq"
                "dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg"
                "YnkK",
                185);
-static buffer key = buffer_init();
-static buffer txt = buffer_init();
-static buffer tmp = buffer_init();
+static string key = string_init();
+static string txt = string_init();
+static string tmp = string_init();
 
 static error_t init() {
   error_t err;
@@ -39,15 +39,15 @@ static error_t init() {
   return 0;
 }
 
-static error_t encrypt_oracle(buffer *dst, const buffer src) {
-  return buffer_concat(&tmp, src, txt) ||
+static error_t encrypt_oracle(string *dst, const string src) {
+  return string_concat(&tmp, src, txt) ||
          aes_ecb_encrypt(dst, tmp, key);
 }
 
 /**
  * Byte-at-a-time ECB decryption (Simple)
  *
- * Copy your oracle function to a new function that encrypts buffers under ECB
+ * Copy your oracle function to a new function that encrypts strings under ECB
  * mode using a consistent but unknown key (for instance, assign a single
  * random key, once, to a global variable).
  *
@@ -87,11 +87,11 @@ static error_t encrypt_oracle(buffer *dst, const buffer src) {
  * 6. Repeat for the next byte.
  */
 
-error_t challenge_12(buffer *plain) {
-  buffer scratch = buffer_init();
-  buffer cipher = buffer_init();
-  buffer enc = buffer_init();
-  buffer dec = buffer_init();
+error_t challenge_12(string *plain) {
+  string scratch = string_init();
+  string cipher = string_init();
+  string enc = string_init();
+  string dec = string_init();
   unsigned char *plainptr;
   size_t decoded = 0;
   size_t cipherlen;
@@ -100,7 +100,7 @@ error_t challenge_12(buffer *plain) {
   aes_mode_t mode;
   error_t err;
 
-  err = buffer_alloc(&scratch, 1);
+  err = string_alloc(&scratch, 1);
   if (err) {
     goto end;
   }
@@ -114,7 +114,7 @@ error_t challenge_12(buffer *plain) {
 
   cipherlen = cipher.len;
 
-  err = buffer_alloc(plain, cipherlen);
+  err = string_alloc(plain, cipherlen);
   if (err) {
     goto end;
   }
@@ -122,7 +122,7 @@ error_t challenge_12(buffer *plain) {
 
   /* increase scratch size until ciphertext bumps, providing the key length */
   while (cipherlen == cipher.len) {
-    err = buffer_resize(&scratch, scratch.len + 1);
+    err = string_resize(&scratch, scratch.len + 1);
     if (err) {
       goto end;
     }
@@ -135,7 +135,7 @@ error_t challenge_12(buffer *plain) {
   keylen = cipher.len - cipherlen;
 
   /* detect the encryption method being used */
-  err = buffer_resize(&scratch, keylen * 3);
+  err = string_resize(&scratch, keylen * 3);
   if (err) {
     goto end;
   }
@@ -153,13 +153,13 @@ error_t challenge_12(buffer *plain) {
     goto end;
   }
 
-  err = buffer_resize(&scratch, keylen);
+  err = string_resize(&scratch, keylen);
   if (err) {
     goto end;
   }
 
-  /* use a 1-byte short buffer to help guess the bytes */
-  err = buffer_alloc(&dec, keylen - 1);
+  /* use a 1-byte short string to help guess the bytes */
+  err = string_alloc(&dec, keylen - 1);
   if (err) {
     goto end;
   }
@@ -177,8 +177,8 @@ error_t challenge_12(buffer *plain) {
     byte = -1;
 
     /**
-     * construct a dictionary relating the last byte in the buffer to the byte
-     * that it is encrypted to
+     * mimic encrypting the one byte short string, switching out the last
+     * byte until it matches the encrypted string
      */
     for (i = 0; i < UCHAR_MAX + 1; i++) {
       scratch.ptr[scratch.len - 1] = (unsigned char)i;
@@ -217,7 +217,7 @@ error_t challenge_12(buffer *plain) {
        */
       unsigned char *from;
       unsigned char *to;
-      err = buffer_resize(&scratch, scratch.len + keylen);
+      err = string_resize(&scratch, scratch.len + keylen);
       if (err) {
         goto end;
       }
@@ -246,17 +246,17 @@ error_t challenge_12(buffer *plain) {
   }
 
 end:
-  buffer_delete(scratch);
-  buffer_delete(cipher);
-  buffer_delete(enc);
-  buffer_delete(dec);
+  string_delete(scratch);
+  string_delete(cipher);
+  string_delete(enc);
+  string_delete(dec);
 
   return err;
 }
 
 int main() {
-  buffer expected = buffer_init();
-  buffer output = buffer_init();
+  string expected = string_init();
+  string output = string_init();
   error_t err;
 
   err = init() ||
@@ -270,11 +270,11 @@ int main() {
   error_expect((const char *)expected.ptr, (const char *)output.ptr);
 
 end:
-  buffer_delete(expected);
-  buffer_delete(output);
-  buffer_delete(key);
-  buffer_delete(txt);
-  buffer_delete(tmp);
+  string_delete(expected);
+  string_delete(output);
+  string_delete(key);
+  string_delete(txt);
+  string_delete(tmp);
 
   return err;
 }

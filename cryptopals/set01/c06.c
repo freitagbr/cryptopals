@@ -61,24 +61,24 @@
  * important.
  */
 
-error_t challenge_06(const char *file, buffer *dst) {
-  buffer buf = buffer_init();
-  buffer key = buffer_init();
+error_t challenge_06(const char *file, string *dst) {
+  string str = string_init();
+  string key = string_init();
   error_t err;
 
-  err = base64_decode_file(file, &buf) ||
-        block_transpose_get_key(&key, buf, MAX_KEYSIZE) ||
-        xor_repeating(dst, buf, key);
+  err = base64_decode_file(file, &str) ||
+        block_transpose_get_key(&key, str, MAX_KEYSIZE) ||
+        xor_repeating(dst, str, key);
 
-  buffer_delete(key);
-  buffer_delete(buf);
+  string_delete(key);
+  string_delete(str);
 
   return err;
 }
 
 int main() {
-  buffer expected = buffer_init();
-  buffer output = buffer_init();
+  string expected = string_init();
+  string output = string_init();
   error_t err;
 
   err = file_read("data/c06_test.txt", &expected) ||
@@ -91,8 +91,8 @@ int main() {
   error_expect((const char *)expected.ptr, (const char *)output.ptr);
 
 end:
-  buffer_delete(expected);
-  buffer_delete(output);
+  string_delete(expected);
+  string_delete(output);
 
   return (int)err;
 }

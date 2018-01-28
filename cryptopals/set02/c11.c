@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "cryptopals/aes.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 /**
@@ -34,8 +34,8 @@
  */
 
 error_t challenge_11(aes_mode_t *mode, aes_mode_t *guess) {
-  buffer src = buffer_new("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 43);
-  buffer enc = buffer_init();
+  string src = string_new("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 43);
+  string enc = string_init();
   error_t err;
 
   err = aes_encrypt_oracle(&enc, src, mode);
@@ -46,7 +46,7 @@ error_t challenge_11(aes_mode_t *mode, aes_mode_t *guess) {
   *guess = aes_encrypt_detect(enc);
 
 end:
-  buffer_delete(enc);
+  string_delete(enc);
 
   return 0;
 }

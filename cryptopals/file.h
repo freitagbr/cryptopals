@@ -5,13 +5,13 @@
 
 #include <stdio.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 #define FILE_BUFLEN 512
 
-error_t file_read(const char *file, buffer *buf);
+error_t file_read(const char *file, string *str);
 
-error_t file_getline(FILE *fp, buffer *buf, long *read);
+error_t file_getline(FILE *fp, string *str, long *read);
 
 #endif /* CRYPTOPALS_FILE_H_ */

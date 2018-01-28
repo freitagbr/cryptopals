@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 void xor_bytes(unsigned char *dst, const unsigned char *a,
@@ -16,7 +16,7 @@ void xor_bytes(unsigned char *dst, const unsigned char *a,
   }
 }
 
-error_t xor_fixed(buffer a, const buffer b) {
+error_t xor_fixed(string a, const string b) {
   if (a.len != b.len) {
     return ESIZE;
   }
@@ -26,12 +26,12 @@ error_t xor_fixed(buffer a, const buffer b) {
   return 0;
 }
 
-error_t xor_single_byte(buffer *dst, const buffer src, unsigned char key) {
+error_t xor_single_byte(string *dst, const string src, unsigned char key) {
   unsigned char *dptr;
   size_t i;
 
   if (dst->ptr == NULL) {
-    error_t err = buffer_alloc(dst, src.len);
+    error_t err = string_alloc(dst, src.len);
     if (err) {
       return err;
     }
@@ -46,12 +46,12 @@ error_t xor_single_byte(buffer *dst, const buffer src, unsigned char key) {
   return 0;
 }
 
-error_t xor_repeating(buffer *dst, const buffer src, const buffer key) {
+error_t xor_repeating(string *dst, const string src, const string key) {
   unsigned char *dptr;
   size_t i, k;
 
   if (dst->ptr == NULL) {
-    error_t err = buffer_alloc(dst, src.len);
+    error_t err = string_alloc(dst, src.len);
     if (err) {
       return err;
     }
@@ -66,7 +66,7 @@ error_t xor_repeating(buffer *dst, const buffer src, const buffer key) {
   return 0;
 }
 
-unsigned char xor_find_cipher(const buffer buf, int *max) {
+unsigned char xor_find_cipher(const string str, int *max) {
   int max_score = 0;
   unsigned char key = 0;
   int k;
@@ -77,8 +77,8 @@ unsigned char xor_find_cipher(const buffer buf, int *max) {
     for (i = 0; i < 13; i++) {
       unsigned char c = xor_english_cipher_chars[i];
       size_t l;
-      for (l = 0; l < buf.len; l++) {
-        if ((buf.ptr[l] ^ (unsigned char)k) == c) {
+      for (l = 0; l < str.len; l++) {
+        if ((str.ptr[l] ^ (unsigned char)k) == c) {
           s++;
         }
       }

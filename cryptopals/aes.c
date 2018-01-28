@@ -7,7 +7,7 @@
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/xor.h"
 
@@ -22,7 +22,7 @@ static error_t aes_seed_rand() {
   return 0;
 }
 
-error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
+error_t aes_ecb_decrypt(string *dst, const string src, const string key) {
   AES_KEY aes_key;
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
@@ -35,7 +35,7 @@ error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
     return EAESKEY;
   }
 
-  err = buffer_alloc(dst, src.len);
+  err = string_alloc(dst, src.len);
   if (err) {
     return err;
   }
@@ -52,7 +52,7 @@ error_t aes_ecb_decrypt(buffer *dst, const buffer src, const buffer key) {
   return aes_pkcs7_strip(dst);
 }
 
-error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
+error_t aes_ecb_encrypt(string *dst, const string src, const string key) {
   AES_KEY aes_key;
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
@@ -86,8 +86,8 @@ error_t aes_ecb_encrypt(buffer *dst, const buffer src, const buffer key) {
   return 0;
 }
 
-error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
-                        const buffer iv) {
+error_t aes_cbc_decrypt(string *dst, const string src, const string key,
+                        const string iv) {
   AES_KEY aes_key;
   unsigned char *ivptr = iv.ptr;
   unsigned char *sptr = src.ptr;
@@ -101,7 +101,7 @@ error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
     return EAESKEY;
   }
 
-  err = buffer_alloc(dst, src.len);
+  err = string_alloc(dst, src.len);
   if (err) {
     return err;
   }
@@ -120,8 +120,8 @@ error_t aes_cbc_decrypt(buffer *dst, const buffer src, const buffer key,
   return aes_pkcs7_strip(dst);
 }
 
-error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
-                        const buffer iv) {
+error_t aes_cbc_encrypt(string *dst, const string src, const string key,
+                        const string iv) {
   AES_KEY aes_key;
   unsigned char *ivptr = iv.ptr;
   unsigned char *sptr = src.ptr;
@@ -159,16 +159,16 @@ error_t aes_cbc_encrypt(buffer *dst, const buffer src, const buffer key,
   return 0;
 }
 
-error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
-  buffer key = buffer_init();
-  buffer buf = buffer_init();
-  unsigned int a;
-  unsigned int b;
-  unsigned int c;
+error_t aes_encrypt_oracle(string *dst, const string src, aes_mode_t *mode) {
+  string key = string_init();
+  string str = string_init();
+  unsigned int a = 0;
+  unsigned int b = 0;
+  unsigned int c = 0;
   size_t padding;
   error_t err;
 
-  err = buffer_alloc(&buf, src.len + 20) ||
+  err = string_alloc(&str, src.len + 20) ||
         aes_random_bytes(&key) ||
         aes_rand(&a) ||
         aes_rand(&b) ||
@@ -177,77 +177,77 @@ error_t aes_encrypt_oracle(buffer *dst, const buffer src, aes_mode_t *mode) {
     goto end;
   }
 
-  /* pad beginning of buffer with 5-10 bytes */
+  /* pad beginning of string with 5-10 bytes */
   padding = (a % 6) + 5;
-  if (RAND_bytes(buf.ptr, padding) != 1) {
+  if (RAND_bytes(str.ptr, padding) != 1) {
     err = ERAND;
     goto end;
   }
-  memcpy(&(buf.ptr[padding]), src.ptr, src.len);
-  buf.len = src.len + padding;
+  memcpy(&(str.ptr[padding]), src.ptr, src.len);
+  str.len = src.len + padding;
 
-  /* pad end of buffer with 5-10 bytes */
+  /* pad end of string with 5-10 bytes */
   padding = (b % 6) + 5;
-  if (RAND_bytes(&(buf.ptr[buf.len]), padding) != 1) {
+  if (RAND_bytes(&(str.ptr[str.len]), padding) != 1) {
     err = ERAND;
     goto end;
   }
-  buf.len += padding;
+  str.len += padding;
 
   if (c & 1) {
     /* encrypt using cbc */
-    buffer iv = buffer_init();
+    string iv = string_init();
     *mode = AES_128_CBC;
     err = aes_random_bytes(&iv) ||
-          aes_cbc_encrypt(dst, buf, key, iv);
-    buffer_delete(iv);
+          aes_cbc_encrypt(dst, str, key, iv);
+    string_delete(iv);
   } else {
     /* encrypt using ecb */
     *mode = AES_128_ECB;
-    err = aes_ecb_encrypt(dst, buf, key);
+    err = aes_ecb_encrypt(dst, str, key);
   }
 
 end:
-  buffer_delete(key);
-  buffer_delete(buf);
+  string_delete(key);
+  string_delete(str);
 
   return err;
 }
 
-aes_mode_t aes_encrypt_detect(const buffer buf) {
-  const unsigned char *block_a = &(buf.ptr[AES_BLOCK_SIZE]);
-  const unsigned char *block_b = &(buf.ptr[AES_BLOCK_SIZE * 2]);
+aes_mode_t aes_encrypt_detect(const string str) {
+  const unsigned char *block_a = &(str.ptr[AES_BLOCK_SIZE]);
+  const unsigned char *block_b = &(str.ptr[AES_BLOCK_SIZE * 2]);
   return memcmp(block_a, block_b, AES_BLOCK_SIZE) == 0 ? AES_128_ECB
                                                        : AES_128_CBC;
 }
 
-error_t aes_pkcs7_pad(buffer *buf, size_t len, size_t *padding) {
-  size_t buflen = len + (AES_BLOCK_SIZE - (len % AES_BLOCK_SIZE));
+error_t aes_pkcs7_pad(string *str, size_t len, size_t *padding) {
+  size_t slen = len + (AES_BLOCK_SIZE - (len % AES_BLOCK_SIZE));
   error_t err;
 
-  err = buffer_alloc(buf, buflen);
+  err = string_alloc(str, slen);
   if (err) {
     return err;
   }
 
-  *padding = buflen - len;
+  *padding = slen - len;
 
   if (*padding > AES_BLOCK_SIZE) {
     return ESIZE;
   }
 
   if (*padding) {
-    memset(&(buf->ptr[buf->len - *padding]), (int)*padding, *padding);
+    memset(&(str->ptr[str->len - *padding]), (int)*padding, *padding);
   }
 
   return 0;
 }
 
-error_t aes_pkcs7_strip(buffer *buf) {
-  unsigned char *ptr = &(buf->ptr[buf->len - 1]);
+error_t aes_pkcs7_strip(string *str) {
+  unsigned char *ptr = &(str->ptr[str->len - 1]);
   size_t padding = (size_t)*ptr;
-  size_t len = buf->len - padding;
-  unsigned char *end = &(buf->ptr[len]);
+  size_t len = str->len - padding;
+  unsigned char *end = &(str->ptr[len]);
 
   while (--ptr >= end) {
     if (*ptr != padding) {
@@ -257,7 +257,7 @@ error_t aes_pkcs7_strip(buffer *buf) {
 
   /* a full resize could be expensive, so fake it */
   *end = '\0';
-  buf->len = len;
+  str->len = len;
 
   return 0;
 }
@@ -277,16 +277,16 @@ error_t aes_rand(unsigned int *n) {
   return 0;
 }
 
-error_t aes_random_bytes(buffer *buf) {
+error_t aes_random_bytes(string *str) {
   error_t err;
 
-  err = buffer_alloc(buf, AES_BLOCK_SIZE) ||
+  err = string_alloc(str, AES_BLOCK_SIZE) ||
         aes_seed_rand();
   if (err) {
     return err;
   }
 
-  if (RAND_bytes(buf->ptr, buf->len) != 1) {
+  if (RAND_bytes(str->ptr, str->len) != 1) {
     return ERAND;
   }
 

@@ -5,11 +5,11 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
-size_t block_keysize(buffer buf, float *min_dist, size_t max_keysize);
+size_t block_keysize(string str, float *min_dist, size_t max_keysize);
 
-error_t block_transpose_get_key(buffer *key, buffer buf, size_t max_keysize);
+error_t block_transpose_get_key(string *key, string str, size_t max_keysize);
 
 #endif /* CRYPTOPALS_BLOCK_H_ */

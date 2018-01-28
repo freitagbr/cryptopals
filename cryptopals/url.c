@@ -4,13 +4,13 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/map.h"
 
-static const buffer QS_SEP = buffer_new("&", 1);
-static const buffer QS_EQ = buffer_new("=", 1);
+static const string QS_SEP = string_new("&", 1);
+static const string QS_EQ = string_new("=", 1);
 
 static int should_escape(unsigned char c) {
   if (('A' <= c && c <= 'Z') ||
@@ -23,7 +23,7 @@ static int should_escape(unsigned char c) {
   return 1;
 }
 
-error_t url_qs_unescape(buffer *dst, const buffer src) {
+error_t url_qs_unescape(string *dst, const string src) {
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *end = &(src.ptr[src.len]);
@@ -49,10 +49,10 @@ error_t url_qs_unescape(buffer *dst, const buffer src) {
   }
 
   if (percents == 0 && !plus) {
-    return buffer_copy(dst, src);
+    return string_copy(dst, src);
   }
 
-  err = buffer_alloc(dst, src.len);
+  err = string_alloc(dst, src.len);
   if (err) {
     return err;
   }
@@ -81,7 +81,7 @@ error_t url_qs_unescape(buffer *dst, const buffer src) {
   return 0;
 }
 
-error_t url_qs_escape(buffer *dst, const buffer src) {
+error_t url_qs_escape(string *dst, const string src) {
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *end = &(src.ptr[src.len]);
@@ -101,10 +101,10 @@ error_t url_qs_escape(buffer *dst, const buffer src) {
   }
 
   if (spaces == 0 && hexes == 0) {
-    return buffer_copy(dst, src);
+    return string_copy(dst, src);
   }
 
-  err = buffer_alloc(dst, src.len + (hexes * 2));
+  err = string_alloc(dst, src.len + (hexes * 2));
   if (err) {
     return err;
   }
@@ -130,11 +130,11 @@ error_t url_qs_escape(buffer *dst, const buffer src) {
   return 0;
 }
 
-error_t url_qs_encode(buffer *dst, map *m) {
+error_t url_qs_encode(string *dst, map *m) {
   map_bucket **mptr = m->buckets;
   map_bucket **end = &(m->buckets[m->len]);
-  buffer keyesc = buffer_init();
-  buffer valesc = buffer_init();
+  string keyesc = string_init();
+  string valesc = string_init();
   size_t encoded = 0;
   error_t err = 0;
 
@@ -145,21 +145,21 @@ error_t url_qs_encode(buffer *dst, map *m) {
 
       err = url_qs_escape(&keyesc, entry->key) ||
             url_qs_escape(&valesc, entry->val) ||
-            buffer_append(dst, keyesc);
+            string_append(dst, keyesc);
       if (err) {
         goto end;
       }
 
       if (valesc.len > 0) {
-        err = buffer_append(dst, QS_EQ) ||
-              buffer_append(dst, valesc);
+        err = string_append(dst, QS_EQ) ||
+              string_append(dst, valesc);
         if (err) {
           goto end;
         }
       }
 
       if (encoded < m->count) {
-        err = buffer_append(dst, QS_SEP);
+        err = string_append(dst, QS_SEP);
         if (err) {
           goto end;
         }
@@ -168,22 +168,22 @@ error_t url_qs_encode(buffer *dst, map *m) {
   }
 
 end:
-  buffer_delete(keyesc);
-  buffer_delete(valesc);
+  string_delete(keyesc);
+  string_delete(valesc);
 
   return err;
 }
 
-error_t url_qs_decode(map *m, const buffer qs) {
+error_t url_qs_decode(map *m, const string qs) {
   unsigned char *keyptr = qs.ptr;
   unsigned char *keyend = qs.ptr;
   unsigned char *valptr = qs.ptr;
   unsigned char *valend = qs.ptr;
   unsigned char *end = &(qs.ptr[qs.len]);
-  buffer key = buffer_init();
-  buffer val = buffer_init();
-  buffer keyraw = buffer_init();
-  buffer valraw = buffer_init();
+  string key = string_init();
+  string val = string_init();
+  string keyraw = string_init();
+  string valraw = string_init();
   error_t err = 0;
 
   if (qs.len == 0) {
@@ -227,8 +227,8 @@ error_t url_qs_decode(map *m, const buffer qs) {
   }
 
 end:
-  buffer_delete(keyraw);
-  buffer_delete(valraw);
+  string_delete(keyraw);
+  string_delete(valraw);
 
   return err;
 }

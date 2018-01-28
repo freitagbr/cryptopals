@@ -1,6 +1,6 @@
 /* Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com> */
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -17,56 +17,56 @@ static size_t nextpow2(size_t n) {
   return ++n;
 }
 
-error_t buffer_alloc(buffer *buf, size_t len) {
+error_t string_alloc(string *str, size_t len) {
   size_t bytes;
   unsigned char *ptr;
-  if (buf->ptr != NULL) {
-    /* resize if buffer is already allocated */
-    return buffer_resize(buf, len);
+  if (str->ptr != NULL) {
+    /* resize if string is already allocated */
+    return string_resize(str, len);
   }
   bytes = nextpow2(len);
   ptr = (unsigned char *)calloc(bytes, sizeof(unsigned char));
   if (ptr == NULL) {
     return EMALLOC;
   }
-  buf->ptr = ptr;
-  buf->len = len;
+  str->ptr = ptr;
+  str->len = len;
   return 0;
 }
 
-error_t buffer_resize(buffer *buf, size_t len) {
+error_t string_resize(string *str, size_t len) {
   size_t bytes;
   unsigned char *ptr;
-  if (buf->ptr == NULL) {
-    /* allocate if buffer is not yet allocated */
-    return buffer_alloc(buf, len);
+  if (str->ptr == NULL) {
+    /* allocate if string is not yet allocated */
+    return string_alloc(str, len);
   }
-  if (buf->len == len) {
+  if (str->len == len) {
     /* nothing to do */
     return 0;
   }
   bytes = nextpow2(len);
-  if (bytes > nextpow2(buf->len)) {
+  if (bytes > nextpow2(str->len)) {
     /* only realloc if more space is needed than is available */
-    ptr = (unsigned char *)realloc(buf->ptr, sizeof(unsigned char) * bytes);
+    ptr = (unsigned char *)realloc(str->ptr, sizeof(unsigned char) * bytes);
     if (ptr == NULL) {
       return EMALLOC;
     }
   } else {
-    ptr = buf->ptr;
+    ptr = str->ptr;
   }
   ptr[len] = '\0';
-  buf->ptr = ptr;
-  buf->len = len;
+  str->ptr = ptr;
+  str->len = len;
   return 0;
 }
 
-error_t buffer_append(buffer *head, buffer tail) {
+error_t string_append(string *head, string tail) {
   const size_t headlen = head->len;
   const size_t len = headlen + tail.len;
   error_t err;
 
-  err = buffer_resize(head, len);
+  err = string_resize(head, len);
   if (err) {
     return err;
   }
@@ -76,11 +76,11 @@ error_t buffer_append(buffer *head, buffer tail) {
   return 0;
 }
 
-error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
+error_t string_concat(string *dst, const string a, const string b) {
   const size_t len = a.len + b.len;
   error_t err;
 
-  err = buffer_alloc(dst, len);
+  err = string_alloc(dst, len);
   if (err) {
     return err;
   }
@@ -91,10 +91,10 @@ error_t buffer_concat(buffer *dst, const buffer a, const buffer b) {
   return 0;
 }
 
-error_t buffer_copy(buffer *dst, const buffer src) {
+error_t string_copy(string *dst, const string src) {
   error_t err;
 
-  err = buffer_alloc(dst, src.len);
+  err = string_alloc(dst, src.len);
   if (err) {
     return err;
   }
@@ -104,7 +104,7 @@ error_t buffer_copy(buffer *dst, const buffer src) {
   return 0;
 }
 
-int buffer_cmp(const buffer lhs, const buffer rhs) {
+int string_cmp(const string lhs, const string rhs) {
   if (lhs.len < rhs.len) {
     return -1;
   }

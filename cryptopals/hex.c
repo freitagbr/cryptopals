@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 static size_t hex_decoded_length(const size_t len) {
@@ -20,7 +20,7 @@ void btoh(unsigned char *dst, unsigned char src) {
 
 char htob(const unsigned char c) { return hex_decode_table[c]; }
 
-error_t hex_decode(buffer *dst, const buffer src) {
+error_t hex_decode(string *dst, const string src) {
   unsigned char *dptr;
   const size_t srclen = src.len;
   size_t declen;
@@ -36,10 +36,10 @@ error_t hex_decode(buffer *dst, const buffer src) {
   /* reuse old memory if possible */
   if (dst->ptr != NULL) {
     if (dst->len < declen) {
-      err = buffer_resize(dst, declen);
+      err = string_resize(dst, declen);
     }
   } else {
-    err = buffer_alloc(dst, declen);
+    err = string_alloc(dst, declen);
   }
 
   if (err) {
@@ -62,7 +62,7 @@ error_t hex_decode(buffer *dst, const buffer src) {
   return 0;
 }
 
-error_t hex_encode(buffer *dst, const buffer src) {
+error_t hex_encode(string *dst, const string src) {
   unsigned char *sptr = src.ptr;
   unsigned char *dptr;
   unsigned char *end = &(src.ptr[src.len]);
@@ -72,10 +72,10 @@ error_t hex_encode(buffer *dst, const buffer src) {
   /* reuse old memory if possible */
   if (dst->ptr != NULL) {
     if (dst->len < enclen) {
-      err = buffer_resize(dst, enclen);
+      err = string_resize(dst, enclen);
     }
   } else {
-    err = buffer_alloc(dst, enclen);
+    err = string_alloc(dst, enclen);
   }
 
   if (err) {

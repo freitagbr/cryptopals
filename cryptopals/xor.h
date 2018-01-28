@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
@@ -15,12 +15,12 @@ static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
 void xor_bytes(unsigned char *dst, const unsigned char *a,
                const unsigned char *b, const size_t len);
 
-error_t xor_fixed(buffer a, const buffer b);
+error_t xor_fixed(string a, const string b);
 
-error_t xor_single_byte(buffer *dst, const buffer src, unsigned char key);
+error_t xor_single_byte(string *dst, const string src, unsigned char key);
 
-error_t xor_repeating(buffer *dst, const buffer src, const buffer key);
+error_t xor_repeating(string *dst, const string src, const string key);
 
-unsigned char xor_find_cipher(const buffer buf, int *max);
+unsigned char xor_find_cipher(const string str, int *max);
 
 #endif /* CRYPTOPALS_XOR_H_ */

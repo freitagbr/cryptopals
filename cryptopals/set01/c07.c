@@ -2,7 +2,7 @@
 
 #include "cryptopals/aes.h"
 #include "cryptopals/base64.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 
@@ -22,22 +22,22 @@
  * Easiest way: use OpenSSL::Cipher and give it AES-128-ECB as the cipher.
  */
 
-error_t challenge_07(const char *file, buffer *plaintext, const buffer key) {
-  buffer ciphertext = buffer_init();
+error_t challenge_07(const char *file, string *plaintext, const string key) {
+  string ciphertext = string_init();
   error_t err;
 
   err = base64_decode_file(file, &ciphertext) ||
         aes_ecb_decrypt(plaintext, ciphertext, key);
 
-  buffer_delete(ciphertext);
+  string_delete(ciphertext);
 
   return err;
 }
 
 int main() {
-  const buffer key = buffer_new("YELLOW SUBMARINE", 16);
-  buffer expected = buffer_init();
-  buffer output = buffer_init();
+  const string key = string_new("YELLOW SUBMARINE", 16);
+  string expected = string_init();
+  string output = string_init();
   error_t err;
 
   err = file_read("data/c07_test.txt", &expected) ||
@@ -50,8 +50,8 @@ int main() {
   error_expect((const char *)expected.ptr, (const char *)output.ptr);
 
 end:
-  buffer_delete(expected);
-  buffer_delete(output);
+  string_delete(expected);
+  string_delete(output);
 
   return (int)err;
 }

@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "cryptopals/block.h"
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
 #include "cryptopals/hex.h"
@@ -25,21 +25,21 @@
  * 16 byte ciphertext.
  */
 
-error_t challenge_08(const char *file, buffer *dst) {
+error_t challenge_08(const char *file, string *dst) {
   FILE *fp = fopen(file, "rb");
-  buffer buf = buffer_init();
-  buffer line = buffer_init();
-  buffer aes = buffer_init();
-  buffer tmp = buffer_init();
+  string str = string_init();
+  string line = string_init();
+  string aes = string_init();
+  string tmp = string_init();
   float global_min_dist = FLT_MAX;
   long read = 0;
   error_t err;
 
-  while (((err = file_getline(fp, &buf, &read)) == 0) && ((read - 1) > 0)) {
+  while (((err = file_getline(fp, &str, &read)) == 0) && ((read - 1) > 0)) {
     float local_min_dist = 0.0;
     size_t local_max_keysize;
 
-    buffer_set(tmp, buf.ptr, read - 1);
+    string_set(tmp, str.ptr, read - 1);
 
     err = hex_decode(&line, tmp);
     if (err) {
@@ -52,18 +52,18 @@ error_t challenge_08(const char *file, buffer *dst) {
     if (local_min_dist < global_min_dist) {
       global_min_dist = local_min_dist;
       if ((aes.ptr == NULL) && (aes.len == 0)) {
-        err = buffer_alloc(&aes, read - 1);
+        err = string_alloc(&aes, read - 1);
         if (err) {
           goto end;
         }
       } else if ((size_t)read > aes.len) {
-        err = buffer_resize(&aes, read - 1);
+        err = string_resize(&aes, read - 1);
         if (err) {
           goto end;
         }
       }
       if (aes.ptr != NULL) {
-        memcpy(aes.ptr, buf.ptr, aes.len);
+        memcpy(aes.ptr, str.ptr, aes.len);
       }
     }
   }
@@ -73,7 +73,7 @@ error_t challenge_08(const char *file, buffer *dst) {
   }
 
   if (aes.ptr != NULL) {
-    err = buffer_alloc(dst, aes.len);
+    err = string_alloc(dst, aes.len);
     if (err) {
       goto end;
     }
@@ -84,9 +84,9 @@ end:
   if (fp != NULL) {
     fclose(fp);
   }
-  buffer_delete(buf);
-  buffer_delete(line);
-  buffer_delete(aes);
+  string_delete(str);
+  string_delete(line);
+  string_delete(aes);
 
   return err;
 }
@@ -98,7 +98,7 @@ int main() {
       "fd5d2d69c744cd2839475c9dfdbc1d46597949d9c7e82bf5a08649af70dc06f4fd5d2d"
       "69c744cd28397a93eab8d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744"
       "cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
-  buffer output = buffer_init();
+  string output = string_init();
   error_t err;
 
   err = challenge_08("data/c08.txt", &output);
@@ -115,7 +115,7 @@ int main() {
   error_expect(expected, (const char *)output.ptr);
 
 end:
-  buffer_delete(output);
+  string_delete(output);
 
   return (int)err;
 }

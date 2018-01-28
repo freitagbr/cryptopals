@@ -5,10 +5,10 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
-error_t file_read(const char *file, buffer *buf) {
+error_t file_read(const char *file, string *str) {
   FILE *fp = fopen(file, "rb");
   error_t err = 0;
 
@@ -18,13 +18,13 @@ error_t file_read(const char *file, buffer *buf) {
   }
 
   if (fseek(fp, 0, SEEK_END) == 0) {
-    long buflen = ftell(fp);
-    if (buflen == -1) {
+    long len = ftell(fp);
+    if (len == -1) {
       err = EFTELL;
       goto end;
     }
 
-    err = buffer_alloc(buf, buflen);
+    err = string_alloc(str, len);
     if (err) {
       goto end;
     }
@@ -34,7 +34,7 @@ error_t file_read(const char *file, buffer *buf) {
       goto end;
     }
 
-    buf->len = fread(buf->ptr, sizeof(unsigned char), buf->len, fp);
+    str->len = fread(str->ptr, sizeof(unsigned char), str->len, fp);
 
     if (ferror(fp) != 0) {
       err = EFREAD;
@@ -79,53 +79,53 @@ end:
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-error_t file_getline(FILE *fp, buffer *buf, long *read) {
+error_t file_getline(FILE *fp, string *str, long *read) {
   unsigned char *ptr;
   unsigned char *endptr;
   int c;
 
-  if ((fp == NULL) || (buf == NULL) || (read == NULL)) {
+  if ((fp == NULL) || (str == NULL) || (read == NULL)) {
     return ENULLPTR;
   }
 
-  if (buf->ptr == NULL || buf->len == 0) {
-    error_t err = buffer_alloc(buf, FILE_BUFLEN);
+  if (str->ptr == NULL || str->len == 0) {
+    error_t err = string_alloc(str, FILE_BUFLEN);
     if (err) {
       *read = -1L;
       return err;
     }
   }
 
-  ptr = buf->ptr;
-  endptr = &(buf->ptr[buf->len]);
+  ptr = str->ptr;
+  endptr = &(str->ptr[str->len]);
 
   while ((c = fgetc(fp)) != EOF) {
     *(ptr++) = (unsigned char)c;
 
     if (c == '\n') {
       *ptr = '\0';
-      *read = (long)(ptr - buf->ptr);
+      *read = (long)(ptr - str->ptr);
       return 0;
     }
 
     if (ptr + 2 >= endptr) {
-      size_t diff = ptr - buf->ptr;
+      size_t diff = ptr - str->ptr;
       error_t err;
 
-      err = buffer_resize(buf, buf->len * 2);
+      err = string_resize(str, str->len * 2);
       if (err) {
         *read = (long)(diff);
         return err;
       }
 
-      endptr = &(buf->ptr[buf->len]);
-      ptr = &(buf->ptr[diff]);
+      endptr = &(str->ptr[str->len]);
+      ptr = &(str->ptr[diff]);
     }
   }
 
   if (feof(fp)) {
     *ptr = '\0';
-    *read = (long)(ptr - buf->ptr);
+    *read = (long)(ptr - str->ptr);
     return 0;
   }
 

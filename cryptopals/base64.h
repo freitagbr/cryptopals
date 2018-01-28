@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 static const unsigned char base64_encode_table[64] = {
@@ -33,10 +33,10 @@ static const char base64_decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-error_t base64_encode(buffer *dst, const buffer src);
+error_t base64_encode(string *dst, const string src);
 
-error_t base64_decode(buffer *dst, const buffer src);
+error_t base64_decode(string *dst, const string src);
 
-error_t base64_decode_file(const char *file, buffer *dst);
+error_t base64_decode_file(const char *file, string *dst);
 
 #endif /* CRYPTOPALS_BASE64_H_ */

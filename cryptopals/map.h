@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-#include "cryptopals/buffer.h"
+#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 
 #define MAP_DEFAULT_LENGTH 53
@@ -15,8 +15,8 @@
 #define MAP_FNV1_BASE_32 2166136261U
 
 typedef struct map_bucket {
-  buffer key;
-  buffer val;
+  string key;
+  string val;
 } map_bucket;
 
 typedef struct map {
@@ -31,7 +31,7 @@ typedef struct map {
 
 #define map_load(m) ((m->count * 100) / m->len)
 
-size_t map_hash(const buffer buf, unsigned long buckets);
+size_t map_hash(const string str, unsigned long buckets);
 
 error_t map_new_length(map *m, const size_t len);
 
@@ -41,10 +41,10 @@ void map_clear(map *m);
 
 void map_delete(map m);
 
-error_t map_set(map *m, const buffer key, const buffer val);
+error_t map_set(map *m, const string key, const string val);
 
-buffer *map_get(map *m, const buffer key);
+string *map_get(map *m, const string key);
 
-error_t map_remove(map *m, const buffer key);
+error_t map_remove(map *m, const string key);
 
 #endif /* CRYPTOPALS_MAP_H_ */
