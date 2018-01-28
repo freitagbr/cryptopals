@@ -2,6 +2,8 @@
 
 #include "cryptopals/url.h"
 
+#include <stddef.h>
+
 #include "cryptopals/buffer.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
@@ -142,12 +144,8 @@ error_t url_qs_encode(buffer *dst, map *m) {
       encoded++;
 
       err = url_qs_escape(&keyesc, entry->key) ||
-            url_qs_escape(&valesc, entry->val);
-      if (err) {
-        goto end;
-      }
-
-      err = buffer_append(dst, keyesc);
+            url_qs_escape(&valesc, entry->val) ||
+            buffer_append(dst, keyesc);
       if (err) {
         goto end;
       }
@@ -218,12 +216,8 @@ error_t url_qs_decode(map *m, const buffer qs) {
     val.len = valend - valptr;
 
     err = url_qs_unescape(&keyraw, key) ||
-          url_qs_unescape(&valraw, val);
-    if (err) {
-      goto end;
-    }
-
-    err = map_set(m, keyraw, valraw);
+          url_qs_unescape(&valraw, val) ||
+          map_set(m, keyraw, valraw);
     if (err) {
       goto end;
     }

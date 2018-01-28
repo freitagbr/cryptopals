@@ -31,6 +31,8 @@ typedef struct map {
 
 #define map_load(m) ((m->count * 100) / m->len)
 
+size_t map_hash(const buffer buf, unsigned long buckets);
+
 error_t map_new_length(map *m, const size_t len);
 
 error_t map_new(map *m);

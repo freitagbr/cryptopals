@@ -76,7 +76,7 @@ static void map_bucket_delete(map_bucket *b) {
 }
 
 /* FNV-1a hash */
-static size_t map_hash(const buffer buf, unsigned long buckets) {
+size_t map_hash(const buffer buf, unsigned long buckets) {
   unsigned int hash = MAP_FNV1_BASE_32;
   unsigned char *ptr = buf.ptr;
   unsigned char *end = &(buf.ptr[buf.len]);
