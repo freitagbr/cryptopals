@@ -166,7 +166,6 @@ void map_clear(map *m) {
   }
 }
 
-
 void map_delete(map m) {
   if (m.buckets != NULL) {
     map_bucket **ptr = m.buckets;

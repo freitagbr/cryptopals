@@ -19,9 +19,9 @@ typedef struct string {
 #define string_new(p, l)                                                       \
   { (unsigned char *)p, l }
 
-#define string_set(b, p, l)                                                    \
-  b.ptr = p;                                                                   \
-  b.len = l
+#define string_set(s, p, l)                                                    \
+  s.ptr = p;                                                                   \
+  s.len = l
 
 #define string_delete(str)                                                     \
   if (str.ptr != NULL) {                                                       \
