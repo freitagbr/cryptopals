@@ -1,88 +1,70 @@
-.POSIX:
-NAME      = cryptopals
-SRC_DIR   = cryptopals
-BUILD_DIR = build
-OBJ_DIR   = $(BUILD_DIR)/obj
-LIB_DIR   = $(BUILD_DIR)/lib
-BIN_DIR   = $(BUILD_DIR)/bin
+# Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-CC        = cc
-CFLAGS    = -std=c89 -Wall -Wextra -Werror -pedantic -O -I./
-LDFLAGS   = -O
-LDLIBS    = -lm -lssl -lcrypto
-VALGRIND  = valgrind
+NAME     := cryptopals
+SRCDIR   := cryptopals
+BUILDDIR := build
+BINDIR   := $(BUILDDIR)/bin
+LIBDIR   := $(BUILDDIR)/lib
+OBJDIR   := $(BUILDDIR)/obj
+INCLUDES := -I./
 
-LIB       := $(LIB_DIR)/$(NAME).a
-LIB_SRCS  := $(wildcard $(SRC_DIR)/*.c)
-LIB_OBJS  := $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(LIB_SRCS)))
+CSTD     := -std=c89
+WARNINGS := -Wall -Wextra -Werror -pedantic
+OPTIMIZE := -O
 
-SETS      = set01 set02
+CFLAGS   := $(CSTD) $(WARNINGS) $(OPTIMIZE) $(INCLUDES)
+LDLIBS   := -lm -lssl -lcrypto
+VALGRIND := valgrind
+
+LIBSRCS  := $(wildcard $(SRCDIR)/*.c)
+LIBOBJS  := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(LIBSRCS))
+LIB      := $(LIBDIR)/lib$(NAME).a
+
+BINSRCS  := $(wildcard $(SRCDIR)/set*/*.c)
+BINOBJS  := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(BINSRCS))
+BINS     := $(patsubst $(OBJDIR)/%.o,$(BINDIR)/%,$(BINOBJS))
 
 
-.PHONY: all debug test valgrind sets $(SETS) clean
+# top-level targets
+
+.PHONY: all debug test valgrind sets clean
 
 all: sets
 
+debug: clean
 debug: CFLAGS += -DDEBUG
 debug: sets
 
 test: sets
-	-for c in $(BIN_DIR)/*; do $$c; done
+	-for c in $(BINS); do $$c; done
 
 valgrind: debug
-	-for c in $(BIN_DIR)/*; do $(VALGRIND) $$c; done
+	-for c in $(BINS); do $(VALGRIND) $$c; done
 
-sets: $(SETS)
-
-
-# library
-
-$(LIB): $(LIB_OBJS)
-	@[ -d $(LIB_DIR) ] || mkdir -p $(LIB_DIR)
-	$(LD) -r -o $(OBJ_DIR)/$(NAME).o $(LIB_OBJS)
-	$(AR) rvs $@ $(OBJ_DIR)/$(NAME).o
+sets: $(BINS)
 
 
 # objects
 
-$(LIB_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 
-# set 01
+# library
 
-SET01_SRCS := $(wildcard $(SRC_DIR)/set01/*.c)
-SET01_OBJS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(SET01_SRCS)))
-SET01      := $(notdir $(basename $(SET01_SRCS)))
-
-set01: $(SET01)
-
-$(SET01): %: $(OBJ_DIR)/%.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ $(LDLIBS)
-
-$(SET01_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set01/%.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $^
+$(LIB): $(LIBOBJS)
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	$(LD) -r -o $(OBJDIR)/$(NAME).o $^
+	$(AR) rs $@ $(OBJDIR)/$(NAME).o
 
 
-# set 02
+# binaries
 
-SET02_SRCS := $(wildcard $(SRC_DIR)/set02/*.c)
-SET02_OBJS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(SET02_SRCS)))
-SET02      := $(notdir $(basename $(SET02_SRCS)))
-
-set02: $(SET02)
-
-$(SET02): %: $(OBJ_DIR)/%.o $(LIB)
-	@[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ $(LDLIBS)
-
-$(SET02_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/set02/%.c
-	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -o $@ -c $^
+$(BINS): $(BINDIR)/%: $(OBJDIR)/%.o $(LIB)
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 
 clean:
-	rm -rf $(BUILD_DIR)
+	$(RM) -r $(BUILDDIR)
