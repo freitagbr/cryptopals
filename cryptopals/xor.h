@@ -5,8 +5,8 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 static const unsigned char xor_english_cipher_chars[13] = "etaoin shrdlu";
 

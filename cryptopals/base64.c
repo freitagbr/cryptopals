@@ -5,9 +5,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/file.h"
+#include "cryptopals/string.h"
 
 int base64_decoded_length(const string str) {
   const unsigned char *end = &(str.ptr[str.len]);

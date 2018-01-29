@@ -4,10 +4,10 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hex.h"
 #include "cryptopals/map.h"
+#include "cryptopals/string.h"
 
 static const string QS_SEP = string_new("&", 1);
 static const string QS_EQ = string_new("=", 1);

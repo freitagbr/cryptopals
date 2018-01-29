@@ -5,8 +5,8 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 #define MAP_DEFAULT_LENGTH 53
 #define MAP_UPPER_LOAD_LIMIT 70

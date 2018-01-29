@@ -5,8 +5,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 error_t file_read(const char *file, string *str) {
   FILE *fp = fopen(file, "rb");

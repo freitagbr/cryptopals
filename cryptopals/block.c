@@ -5,9 +5,9 @@
 #include <float.h>
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
 #include "cryptopals/hamming.h"
+#include "cryptopals/string.h"
 #include "cryptopals/xor.h"
 
 size_t block_keysize(string str, float *min_dist, size_t max_keysize) {

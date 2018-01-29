@@ -5,8 +5,8 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 error_t pad_bytes(string *dst, const string src, const size_t len,
                   const unsigned char iv);

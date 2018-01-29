@@ -7,8 +7,8 @@
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 #include "cryptopals/xor.h"
 
 static error_t aes_seed_rand() {

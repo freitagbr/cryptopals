@@ -4,8 +4,8 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 void xor_bytes(unsigned char *dst, const unsigned char *a,
                const unsigned char *b, const size_t len) {

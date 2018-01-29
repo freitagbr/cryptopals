@@ -3,8 +3,8 @@
 #ifndef CRYPTOPALS_HEX_H_
 #define CRYPTOPALS_HEX_H_
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 static const unsigned char hex_encode_table[16] = {
     '0', '1', '2', '3', '4', '5', '6', '7',

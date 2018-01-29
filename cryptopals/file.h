@@ -5,8 +5,8 @@
 
 #include <stdio.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 #define FILE_BUFLEN 512
 

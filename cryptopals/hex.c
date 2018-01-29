@@ -4,8 +4,8 @@
 
 #include <stddef.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 static size_t hex_decoded_length(const size_t len) {
   return (len + (len % 2)) / 2;

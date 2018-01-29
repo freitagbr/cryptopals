@@ -210,10 +210,10 @@ error_t challenge_12(string *plain) {
 
     if (decoded % keylen == 0) {
       /**
-       * a keylength has been decoded, so scratch needs to be resized up by one
-       * keylength, the bits need to be shifted to the right to match the
-       * dec, the dec length needs to be reset to one less than the
-       * keylength, and the hashing length needs to be increased by a keylength
+       * a keylength has been decoded, so scratch needs to be resized up by
+       * one keylength, the bits need to be shifted to the right to match what
+       * will be encrypted, and the decoding length needs to be reset to one
+       * less than the keylength
        */
       unsigned char *from;
       unsigned char *to;

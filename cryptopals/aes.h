@@ -3,8 +3,8 @@
 #ifndef CRYPTOPALS_AES_H_
 #define CRYPTOPALS_AES_H_
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 #define AES_RAND_SOURCE "/dev/urandom"
 #define AES_RAND_SIZE 32

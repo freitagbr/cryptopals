@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "cryptopals/string.h"
 #include "cryptopals/error.h"
+#include "cryptopals/string.h"
 
 static map_bucket MAP_BUCKET_DELETED = {{NULL, 0}, {NULL, 0}};
 
