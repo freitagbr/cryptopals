@@ -93,10 +93,10 @@ error_t challenge_12(string *plain) {
   string enc = string_init();
   string dec = string_init();
   unsigned char *plainptr;
+  unsigned char *plainend;
   size_t decoded = 0;
   size_t cipherlen;
   size_t keylen;
-  int byte;
   aes_mode_t mode;
   error_t err;
 
@@ -104,21 +104,13 @@ error_t challenge_12(string *plain) {
   if (err) {
     goto end;
   }
-
   scratch.ptr[0] = 'a';
 
   err = encrypt_oracle(&cipher, scratch);
   if (err) {
     goto end;
   }
-
   cipherlen = cipher.len;
-
-  err = string_alloc(plain, cipherlen);
-  if (err) {
-    goto end;
-  }
-  plainptr = plain->ptr;
 
   /* increase scratch size until ciphertext bumps, providing the key length */
   while (cipherlen == cipher.len) {
@@ -134,12 +126,22 @@ error_t challenge_12(string *plain) {
   }
   keylen = cipher.len - cipherlen;
 
+  /**
+   * length of the plaintext is the length of the cipher, minus the length of
+   * the scratch, minus the pkcs7 padding which is a full keylength now
+   */
+  err = string_alloc(plain, cipher.len - scratch.len - keylen);
+  if (err) {
+    goto end;
+  }
+  plainptr = plain->ptr;
+  plainend = &(plain->ptr[plain->len]);
+
   /* detect the encryption method being used */
   err = string_resize(&scratch, keylen * 3);
   if (err) {
     goto end;
   }
-
   memset(scratch.ptr, (int)'a', keylen * 3);
 
   err = encrypt_oracle(&cipher, scratch);
@@ -163,46 +165,42 @@ error_t challenge_12(string *plain) {
   if (err) {
     goto end;
   }
-
   memset(dec.ptr, 'a', dec.len);
 
-  while (scratch.len <= cipherlen) {
-    size_t i;
+  while (plainptr < plainend) {
+    int byte = -1;
+    int c;
 
     err = encrypt_oracle(&enc, dec);
     if (err) {
       goto end;
     }
 
-    byte = -1;
-
     /**
      * mimic encrypting the one byte short string, switching out the last
      * byte until it matches the encrypted string
      */
-    for (i = 0; i < UCHAR_MAX + 1; i++) {
-      scratch.ptr[scratch.len - 1] = (unsigned char)i;
+    for (c = 0; c <= UCHAR_MAX; c++) {
+      scratch.ptr[scratch.len - 1] = (unsigned char)c;
       err = encrypt_oracle(&cipher, scratch);
       if (err) {
         goto end;
       }
       if (memcmp(cipher.ptr, enc.ptr, scratch.len) == 0) {
-        byte = (int)i;
+        byte = c;
         break;
       }
     }
 
     if (byte == -1) {
       /**
-       * this is probably the end of the message, so fix the length of the
-       * decoded plaintext, but fail if there's more than a keylength left to
-       * decrypt
+       * fail if we couldn't decode a byte, and we haven't reached the end of
+       * the message
        */
-      plain->len = (plainptr - plain->ptr) - 1;
-      if (cipherlen - plain->len > keylen) {
+      if (plainptr < plainend) {
         err = EDECRYPT;
       }
-      goto end;
+      break;
     }
 
     *plainptr++ = scratch.ptr[scratch.len - 1] = (unsigned char)byte;
