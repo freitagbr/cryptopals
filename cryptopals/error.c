@@ -39,6 +39,6 @@ void error_print(error_t e, const char *file, int line) {
 
 void error_expect(const char *expected, const char *found) {
   if (strcmp(expected, found) != 0) {
-    fprintf(stderr, "Expected:\n\t%s\nFound:\n\t%s\n", expected, found);
+    fprintf(stderr, "Expected: \"%s\"\nFound: \"%s\"\n", expected, found);
   }
 }

@@ -277,10 +277,10 @@ error_t aes_rand(unsigned int *n) {
   return 0;
 }
 
-error_t aes_random_bytes(string *str) {
+error_t aes_random_nbytes(string *str, size_t len) {
   error_t err;
 
-  err = string_alloc(str, AES_BLOCK_SIZE) ||
+  err = string_alloc(str, len) ||
         aes_seed_rand();
   if (err) {
     return err;
@@ -291,4 +291,8 @@ error_t aes_random_bytes(string *str) {
   }
 
   return 0;
+}
+
+error_t aes_random_bytes(string *str) {
+  return aes_random_nbytes(str, AES_BLOCK_SIZE);
 }

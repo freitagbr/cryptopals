@@ -10,7 +10,7 @@
 #define AES_RAND_SIZE 32
 
 typedef enum {
-  AES_128_ECB = 0, /* aes-128-ecb */
+  AES_128_ECB = 1, /* aes-128-ecb */
   AES_128_CBC      /* aes-128-cbc */
 } aes_mode_t;
 
@@ -33,6 +33,8 @@ error_t aes_pkcs7_pad(string *str, size_t len, size_t *padding);
 error_t aes_pkcs7_strip(string *str);
 
 error_t aes_rand(unsigned int *n);
+
+error_t aes_random_nbytes(string *str, size_t len);
 
 error_t aes_random_bytes(string *str);
 
