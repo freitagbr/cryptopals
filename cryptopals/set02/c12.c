@@ -165,7 +165,7 @@ error_t challenge_12(string *plain) {
   if (err) {
     goto end;
   }
-  memset(dec.ptr, 'a', dec.len);
+  memset(dec.ptr, (int)'a', dec.len);
 
   while (plainptr < plainend) {
     int byte = -1;

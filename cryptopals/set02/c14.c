@@ -201,7 +201,7 @@ error_t challenge_14(string *plain) {
   if (err) {
     goto end;
   }
-  memset(dec.ptr, 'a', dec.len);
+  memset(dec.ptr, (int)'a', dec.len);
 
   err = string_resize(&scratch, dec.len + 1);
   if (err) {

@@ -21,7 +21,7 @@ error_t pad_bytes(string *dst, const string src, const size_t len,
     return err;
   }
 
-  memset(dst->ptr, iv, dst->len);
+  memset(dst->ptr, (int)iv, dst->len);
   memcpy(dst->ptr, src.ptr, src.len);
 
   return 0;
