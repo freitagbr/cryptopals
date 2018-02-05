@@ -8,20 +8,20 @@ LIBDIR   := $(BUILDDIR)/lib
 OBJDIR   := $(BUILDDIR)/obj
 INCLUDES := -I./
 
-CSTD     := -std=c89
+CXXSTD   := -std=c++11
 WARNINGS := -Wall -Wextra -Werror -pedantic
 OPTIMIZE := -O
 
-CFLAGS   := $(CSTD) $(WARNINGS) $(OPTIMIZE) $(INCLUDES)
+CXXFLAGS := $(CXXSTD) $(WARNINGS) $(OPTIMIZE) $(INCLUDES)
 LDLIBS   := -lm -lssl -lcrypto
 VALGRIND := valgrind
 
-LIBSRCS  := $(wildcard $(SRCDIR)/*.c)
-LIBOBJS  := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(LIBSRCS))
+LIBSRCS  := $(wildcard $(SRCDIR)/*.cpp)
+LIBOBJS  := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(LIBSRCS))
 LIB      := $(LIBDIR)/lib$(NAME).a
 
-BINSRCS  := $(wildcard $(SRCDIR)/set*/*.c)
-BINOBJS  := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(BINSRCS))
+BINSRCS  := $(wildcard $(SRCDIR)/set*/*.cpp)
+BINOBJS  := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(BINSRCS))
 BINS     := $(patsubst $(OBJDIR)/%.o,$(BINDIR)/%,$(BINOBJS))
 
 
@@ -32,7 +32,7 @@ BINS     := $(patsubst $(OBJDIR)/%.o,$(BINDIR)/%,$(BINOBJS))
 all: sets
 
 debug: clean
-debug: CFLAGS += -DDEBUG
+debug: CXXFLAGS += -DDEBUG
 debug: sets
 
 test: sets
@@ -46,9 +46,9 @@ sets: $(BINS)
 
 # objects
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 
 # library
@@ -63,7 +63,7 @@ $(LIB): $(LIBOBJS)
 
 $(BINS): $(BINDIR)/%: $(OBJDIR)/%.o $(LIB)
 	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS)
 
 
 clean:
