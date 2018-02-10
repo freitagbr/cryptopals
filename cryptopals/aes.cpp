@@ -54,11 +54,13 @@ std::string aes::rand::bytes(size_t len /* = AES_BLOCK_SIZE */) {
   return str;
 }
 
-std::string aes::ecb::decrypt(const std::string &src, const std::string &key) {
+std::string aes::ecb::decrypt(const std::string &cipher,
+                              const std::string &key) {
   AES_KEY aes_key;
-  std::string dst;
-  const unsigned char *sptr = reinterpret_cast<const unsigned char *>(&src[0]);
-  unsigned char *dptr;
+  std::string plain;
+  const unsigned char *cptr =
+      reinterpret_cast<const unsigned char *>(&cipher[0]);
+  unsigned char *pptr;
   unsigned char *end;
 
   if (0 > AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
@@ -66,26 +68,28 @@ std::string aes::ecb::decrypt(const std::string &src, const std::string &key) {
     throw error::Error("Failed to set AES ECB decrypt key");
   }
 
-  dst.resize(src.length());
-  dptr = reinterpret_cast<unsigned char *>(&dst[0]);
-  end = reinterpret_cast<unsigned char *>(&dst[dst.length()]);
+  plain.resize(cipher.length());
+  pptr = reinterpret_cast<unsigned char *>(&plain[0]);
+  end = reinterpret_cast<unsigned char *>(&plain[plain.length()]);
 
-  while (dptr < end) {
-    AES_decrypt(sptr, dptr, &aes_key);
-    dptr += AES_BLOCK_SIZE;
-    sptr += AES_BLOCK_SIZE;
+  while (pptr < end) {
+    AES_decrypt(cptr, pptr, &aes_key);
+    pptr += AES_BLOCK_SIZE;
+    cptr += AES_BLOCK_SIZE;
   }
 
-  aes::pkcs7::strip(dst);
+  aes::pkcs7::strip(plain);
 
-  return dst;
+  return plain;
 }
 
-std::string aes::ecb::encrypt(const std::string &src, const std::string &key) {
+std::string aes::ecb::encrypt(const std::string &plain,
+                              const std::string &key) {
   AES_KEY aes_key;
-  std::string dst;
-  const unsigned char *sptr = reinterpret_cast<const unsigned char *>(&src[0]);
-  unsigned char *dptr;
+  std::string cipher;
+  const unsigned char *pptr =
+      reinterpret_cast<const unsigned char *>(&plain[0]);
+  unsigned char *cptr;
   unsigned char *end;
   size_t padding;
 
@@ -94,29 +98,31 @@ std::string aes::ecb::encrypt(const std::string &src, const std::string &key) {
     throw error::Error("Failed to set AES ECB encrypt key");
   }
 
-  padding = aes::pkcs7::pad(dst, src.length());
-  dptr = reinterpret_cast<unsigned char *>(&dst[0]);
-  end = reinterpret_cast<unsigned char *>(&dst[dst.length() - AES_BLOCK_SIZE]);
+  padding = aes::pkcs7::pad(cipher, plain.length());
+  cptr = reinterpret_cast<unsigned char *>(&cipher[0]);
+  end = reinterpret_cast<unsigned char *>(
+      &cipher[cipher.length() - AES_BLOCK_SIZE]);
 
-  while (dptr < end) {
-    AES_encrypt(sptr, dptr, &aes_key);
-    dptr += AES_BLOCK_SIZE;
-    sptr += AES_BLOCK_SIZE;
+  while (cptr < end) {
+    AES_encrypt(pptr, cptr, &aes_key);
+    cptr += AES_BLOCK_SIZE;
+    pptr += AES_BLOCK_SIZE;
   }
 
-  std::memcpy(dptr, sptr, AES_BLOCK_SIZE - padding);
-  AES_encrypt(dptr, dptr, &aes_key);
+  std::memcpy(cptr, pptr, AES_BLOCK_SIZE - padding);
+  AES_encrypt(cptr, cptr, &aes_key);
 
-  return dst;
+  return cipher;
 }
 
-std::string aes::cbc::decrypt(const std::string &src, const std::string &key,
+std::string aes::cbc::decrypt(const std::string &cipher, const std::string &key,
                               const std::string &iv) {
   AES_KEY aes_key;
-  std::string dst;
+  std::string plain;
   const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
-  const unsigned char *sptr = reinterpret_cast<const unsigned char *>(&src[0]);
-  unsigned char *dptr;
+  const unsigned char *cptr =
+      reinterpret_cast<const unsigned char *>(&cipher[0]);
+  unsigned char *pptr;
   unsigned char *end;
 
   if (0 > AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
@@ -124,30 +130,31 @@ std::string aes::cbc::decrypt(const std::string &src, const std::string &key,
     throw error::Error("Failed to set AES CBC decrypt key");
   }
 
-  dst.resize(src.length());
-  dptr = reinterpret_cast<unsigned char *>(&dst[0]);
-  end = reinterpret_cast<unsigned char *>(&dst[dst.length()]);
+  plain.resize(cipher.length());
+  pptr = reinterpret_cast<unsigned char *>(&plain[0]);
+  end = reinterpret_cast<unsigned char *>(&plain[plain.length()]);
 
-  while (dptr < end) {
-    AES_decrypt(sptr, dptr, &aes_key);
-    xor_::inplace(dptr, ivptr, AES_BLOCK_SIZE);
-    ivptr = sptr;
-    dptr += AES_BLOCK_SIZE;
-    sptr += AES_BLOCK_SIZE;
+  while (pptr < end) {
+    AES_decrypt(cptr, pptr, &aes_key);
+    xor_::inplace(pptr, ivptr, AES_BLOCK_SIZE);
+    ivptr = cptr;
+    pptr += AES_BLOCK_SIZE;
+    cptr += AES_BLOCK_SIZE;
   }
 
-  aes::pkcs7::strip(dst);
+  aes::pkcs7::strip(plain);
 
-  return dst;
+  return plain;
 }
 
-std::string aes::cbc::encrypt(const std::string &src, const std::string &key,
+std::string aes::cbc::encrypt(const std::string &plain, const std::string &key,
                               const std::string &iv) {
   AES_KEY aes_key;
-  std::string dst;
+  std::string cipher;
   const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
-  const unsigned char *sptr = reinterpret_cast<const unsigned char *>(&src[0]);
-  unsigned char *dptr;
+  const unsigned char *pptr =
+      reinterpret_cast<const unsigned char *>(&plain[0]);
+  unsigned char *cptr;
   unsigned char *end;
   size_t padding;
 
@@ -156,57 +163,51 @@ std::string aes::cbc::encrypt(const std::string &src, const std::string &key,
     throw error::Error("Failed to set AES CBC encrypt key");
   }
 
-  padding = aes::pkcs7::pad(dst, src.length());
-  dptr = reinterpret_cast<unsigned char *>(&dst[0]);
-  end = reinterpret_cast<unsigned char *>(&dst[dst.length() - AES_BLOCK_SIZE]);
+  padding = aes::pkcs7::pad(cipher, plain.length());
+  cptr = reinterpret_cast<unsigned char *>(&cipher[0]);
+  end = reinterpret_cast<unsigned char *>(
+      &cipher[cipher.length() - AES_BLOCK_SIZE]);
 
-  while (dptr < end) {
-    xor_::bytes(dptr, sptr, ivptr, AES_BLOCK_SIZE);
-    AES_encrypt(dptr, dptr, &aes_key);
-    ivptr = dptr;
-    dptr += AES_BLOCK_SIZE;
-    sptr += AES_BLOCK_SIZE;
+  while (cptr < end) {
+    xor_::bytes(cptr, pptr, ivptr, AES_BLOCK_SIZE);
+    AES_encrypt(cptr, cptr, &aes_key);
+    ivptr = cptr;
+    cptr += AES_BLOCK_SIZE;
+    pptr += AES_BLOCK_SIZE;
   }
 
-  std::memcpy(dptr, sptr, AES_BLOCK_SIZE - padding);
-  xor_::inplace(dptr, ivptr, AES_BLOCK_SIZE);
-  AES_encrypt(dptr, dptr, &aes_key);
+  std::memcpy(cptr, pptr, AES_BLOCK_SIZE - padding);
+  xor_::inplace(cptr, ivptr, AES_BLOCK_SIZE);
+  AES_encrypt(cptr, cptr, &aes_key);
 
-  return dst;
+  return cipher;
 }
 
-std::string aes::oracle::encrypt(const std::string &src, aes::mode &mode) {
-  std::string str;
+std::string aes::oracle::encrypt(const std::string &body, aes::mode &mode) {
+  // pad front and back of string with 5-10 random bytes
+  std::string prefix = aes::rand::bytes((aes::rand::uint() % 6) + 5);
+  std::string suffix = aes::rand::bytes((aes::rand::uint() % 6) + 5);
+  std::string plain = prefix + body + suffix;
   std::string key = aes::rand::bytes();
 
-  unsigned int a = aes::rand::uint();
-  unsigned int b = aes::rand::uint();
-  unsigned int c = aes::rand::uint();
-
-  // pad front and back of string with 5-10 bytes
-  std::string front = aes::rand::bytes((a % 6) + 5);
-  std::string back = aes::rand::bytes((b % 6) + 5);
-
-  str = front + src + back;
-
   // c will be odd 50% of the time
-  if (c & 1) {
+  if (aes::rand::uint() & 1) {
     // encrypt using cbc
     std::string iv = aes::rand::bytes();
     mode = aes::mode::AES_128_CBC;
-    return aes::cbc::encrypt(str, key, iv);
+    return aes::cbc::encrypt(plain, key, iv);
   }
 
   // encrypt using ecb
   mode = aes::mode::AES_128_ECB;
-  return aes::ecb::encrypt(str, key);
+  return aes::ecb::encrypt(plain, key);
 }
 
-aes::mode aes::oracle::detect(const std::string &str) {
+aes::mode aes::oracle::detect(const std::string &cipher) {
   const unsigned char *block_a =
-      reinterpret_cast<const unsigned char *>(&str[AES_BLOCK_SIZE]);
+      reinterpret_cast<const unsigned char *>(&cipher[AES_BLOCK_SIZE]);
   const unsigned char *block_b =
-      reinterpret_cast<const unsigned char *>(&str[AES_BLOCK_SIZE * 2]);
+      reinterpret_cast<const unsigned char *>(&cipher[AES_BLOCK_SIZE * 2]);
   return std::memcmp(block_a, block_b, AES_BLOCK_SIZE) == 0
              ? aes::mode::AES_128_ECB
              : aes::mode::AES_128_CBC;

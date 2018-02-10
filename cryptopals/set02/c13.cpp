@@ -96,7 +96,7 @@ int main() {
     // there is nothing to test here, because my url encoder encodes binary
     // correctly, so it is immune to this type of attack
     cryptopals::challenge_13(email);
-    /* cryptopals::assert::equal(output, expected); */
+    // cryptopals::assert::equal(output, expected);
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;

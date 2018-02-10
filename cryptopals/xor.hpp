@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_XOR_H_
-#define CRYPTOPALS_XOR_H_
+#ifndef CRYPTOPALS_XOR_HPP_
+#define CRYPTOPALS_XOR_HPP_
 
 #include <string>
 
@@ -17,10 +17,10 @@ namespace xor_ {
 
 static const unsigned char english_cipher_chars[14] = "etaoin shrdlu";
 
-inline void bytes(unsigned char *dst, const unsigned char *a,
+inline void bytes(unsigned char *val, const unsigned char *a,
                   const unsigned char *b, const size_t len) {
   for (size_t i = 0; i < len; i++) {
-    *dst++ = *a++ ^ *b++;
+    *val++ = *a++ ^ *b++;
   }
 }
 
@@ -39,4 +39,4 @@ unsigned char find_key(const std::string &str);
 } // namespace xor_
 } // namespace cryptopals
 
-#endif /* CRYPTOPALS_XOR_H_ */
+#endif // CRYPTOPALS_XOR_HPP_

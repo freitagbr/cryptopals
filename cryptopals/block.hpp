@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_BLOCK_H_
-#define CRYPTOPALS_BLOCK_H_
+#ifndef CRYPTOPALS_BLOCK_HPP_
+#define CRYPTOPALS_BLOCK_HPP_
 
 #include <string>
 
@@ -17,4 +17,4 @@ std::string transpose_get_key(const std::string &str, size_t max_keysize);
 } // namespace block
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_BLOCK_H_
+#endif // CRYPTOPALS_BLOCK_HPP_

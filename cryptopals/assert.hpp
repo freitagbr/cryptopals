@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_ASSERT_H_
-#define CRYPTOPALS_ASSERT_H_
+#ifndef CRYPTOPALS_ASSERT_HPP_
+#define CRYPTOPALS_ASSERT_HPP_
 
 #include <ostream>
 #include <sstream>
@@ -26,4 +26,4 @@ template <typename T> void equal(const T &actual, const T &expected) {
 } // namespace assert
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_ASSERT_H_
+#endif // CRYPTOPALS_ASSERT_HPP_

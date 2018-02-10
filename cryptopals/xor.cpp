@@ -7,38 +7,38 @@
 namespace cryptopals {
 
 std::string operator^(const std::string &lhs, const std::string &rhs) {
-  std::string dst;
-  std::string::iterator d;
+  std::string val;
+  std::string::iterator v;
   std::string::const_iterator l = lhs.cbegin();
   std::string::const_iterator r = rhs.cbegin();
-  dst.resize(lhs.length());
-  d = dst.begin();
+  val.resize(lhs.length());
+  v = val.begin();
   if (lhs.length() == rhs.length()) {
-    while (d != dst.end()) {
-      *d++ = *l++ ^ *r++;
+    while (v != val.end()) {
+      *v++ = *l++ ^ *r++;
     }
   } else {
-    while (d != dst.end()) {
+    while (v != val.end()) {
       // rhs is repeating key
-      *d++ = *l++ ^ *r++;
+      *v++ = *l++ ^ *r++;
       if (r == rhs.cend()) {
         r = rhs.cbegin();
       }
     }
   }
-  return dst;
+  return val;
 }
 
 std::string operator^(const std::string &lhs, const unsigned char rhs) {
-  std::string dst;
-  std::string::iterator d;
+  std::string val;
+  std::string::iterator v;
   std::string::const_iterator l = lhs.cbegin();
-  dst.resize(lhs.length());
-  d = dst.begin();
-  while (d != dst.end()) {
-    *d++ = *l++ ^ rhs;
+  val.resize(lhs.length());
+  v = val.begin();
+  while (v != val.end()) {
+    *v++ = *l++ ^ rhs;
   }
-  return dst;
+  return val;
 }
 
 std::string &operator^=(std::string &lhs, const std::string &rhs) {

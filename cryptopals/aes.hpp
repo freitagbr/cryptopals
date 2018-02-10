@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_AES_H_
-#define CRYPTOPALS_AES_H_
+#ifndef CRYPTOPALS_AES_HPP_
+#define CRYPTOPALS_AES_HPP_
 
 #include <openssl/aes.h>
 
@@ -30,27 +30,27 @@ std::string bytes(size_t len = AES_BLOCK_SIZE);
 
 namespace ecb {
 
-std::string decrypt(const std::string &src, const std::string &key);
+std::string decrypt(const std::string &cipher, const std::string &key);
 
-std::string encrypt(const std::string &src, const std::string &key);
+std::string encrypt(const std::string &plain, const std::string &key);
 
 } // namespace ecb
 
 namespace cbc {
 
-std::string decrypt(const std::string &src, const std::string &key,
+std::string decrypt(const std::string &cipher, const std::string &key,
                     const std::string &iv);
 
-std::string encrypt(const std::string &src, const std::string &key,
+std::string encrypt(const std::string &plain, const std::string &key,
                     const std::string &iv);
 
 } // namespace cbc
 
 namespace oracle {
 
-std::string encrypt(const std::string &src, aes::mode &mode);
+std::string encrypt(const std::string &body, aes::mode &mode);
 
-aes::mode detect(const std::string &str);
+aes::mode detect(const std::string &cipher);
 
 } // namespace oracle
 
@@ -65,4 +65,4 @@ void strip(std::string &str);
 } // namespace aes
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_AES_H_
+#endif // CRYPTOPALS_AES_HPP_

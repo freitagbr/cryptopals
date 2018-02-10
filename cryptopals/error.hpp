@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_ERROR_H_
-#define CRYPTOPALS_ERROR_H_
+#ifndef CRYPTOPALS_ERROR_HPP_
+#define CRYPTOPALS_ERROR_HPP_
 
 #include <exception>
 #include <string>
@@ -21,4 +21,4 @@ public:
 } // namespace error
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_ERROR_H_
+#endif // CRYPTOPALS_ERROR_HPP_

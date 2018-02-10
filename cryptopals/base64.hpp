@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_BASE64_H_
-#define CRYPTOPALS_BASE64_H_
+#ifndef CRYPTOPALS_BASE64_HPP_
+#define CRYPTOPALS_BASE64_HPP_
 
 #include <string>
 
@@ -50,4 +50,4 @@ std::string decode_file(const char *file);
 } // namespace base64
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_BASE64_H_
+#endif // CRYPTOPALS_BASE64_HPP_

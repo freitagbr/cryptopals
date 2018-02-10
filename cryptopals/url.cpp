@@ -21,17 +21,17 @@ inline bool url::qs::should_escape(unsigned char c) {
   return true;
 }
 
-std::string url::qs::unescape(const std::string &src) {
-  std::string::const_iterator s = src.cbegin();
+std::string url::qs::unescape(const std::string &escaped) {
+  std::string::const_iterator e = escaped.cbegin();
   size_t percents = 0;
   bool hasplus = false;
 
-  while (s < src.cend()) {
-    switch (*s) {
+  while (e < escaped.cend()) {
+    switch (*e) {
     case '%':
       percents++;
-      if (s + 2 >= src.cend() || hex::htob(s[1]) == 255 ||
-          hex::htob(s[2]) == 255) {
+      if (e + 2 >= escaped.cend() || hex::htob(e[1]) == -1 ||
+          hex::htob(e[2]) == -1) {
         throw error::Error("URL contains invalid character sequence");
       }
       break;
@@ -41,111 +41,115 @@ std::string url::qs::unescape(const std::string &src) {
     default:
       break;
     }
-    ++s;
+    ++e;
   }
 
   if (percents == 0 && !hasplus) {
-    return src;
+    return escaped;
   }
 
-  std::string dst;
-  std::string::iterator d;
+  std::string unescaped;
+  std::string::iterator u;
 
-  dst.resize(src.length());
-  d = dst.begin();
-  s = src.cbegin();
+  unescaped.resize(escaped.length());
+  u = unescaped.begin();
+  e = escaped.cbegin();
 
-  while (s < src.cend()) {
-    switch (*s) {
+  while (e < escaped.cend()) {
+    unsigned char upper;
+    unsigned char lower;
+
+    switch (*e) {
     case '%':
-      *d++ =
-          static_cast<unsigned char>((hex::htob(s[1]) << 4) | hex::htob(s[2]));
-      s += 3;
+      upper = static_cast<unsigned char>(hex::htob(e[1])) << 4;
+      lower = static_cast<unsigned char>(hex::htob(e[2]));
+      *u++ = upper | lower;
+      e += 3;
       break;
     case '+':
-      *d++ = ' ';
-      ++s;
+      *u++ = ' ';
+      ++e;
       break;
     default:
-      *d++ = *s++;
+      *u++ = *e++;
       break;
     }
   }
 
-  dst.shrink_to_fit();
+  unescaped.shrink_to_fit();
 
-  return dst;
+  return unescaped;
 }
 
-std::string url::qs::escape(const std::string &src) {
-  std::string::const_iterator s = src.cbegin();
+std::string url::qs::escape(const std::string &unescaped) {
+  std::string::const_iterator u = unescaped.cbegin();
   size_t spaces = 0;
   size_t hexes = 0;
 
-  while (s < src.cend()) {
-    if (url::qs::should_escape(*s)) {
-      if (*s == ' ') {
+  while (u < unescaped.cend()) {
+    if (url::qs::should_escape(*u)) {
+      if (*u == ' ') {
         spaces++;
       } else {
         hexes++;
       }
     }
-    ++s;
+    ++u;
   }
 
   if (spaces == 0 && hexes == 0) {
-    return src;
+    return unescaped;
   }
 
-  std::string dst;
-  std::string::iterator d;
+  std::string escaped;
+  std::string::iterator e;
   unsigned char h[2];
 
-  dst.resize(src.length() + (hexes * 2));
-  d = dst.begin();
-  s = src.cbegin();
+  escaped.resize(unescaped.length() + (hexes * 2));
+  e = escaped.begin();
+  u = unescaped.cbegin();
 
-  while (s < src.cend()) {
-    if (*s == ' ') {
-      *d++ = '+';
-      ++s;
-    } else if (url::qs::should_escape(*s)) {
-      hex::btoh(h, *s++);
-      *d++ = '%';
-      *d++ = h[0];
-      *d++ = h[1];
+  while (u < unescaped.cend()) {
+    if (*u == ' ') {
+      *e++ = '+';
+      ++u;
+    } else if (url::qs::should_escape(*u)) {
+      hex::btoh(h, *u++);
+      *e++ = '%';
+      *e++ = h[0];
+      *e++ = h[1];
     } else {
-      *d++ = *s++;
+      *e++ = *u++;
     }
   }
 
-  dst.shrink_to_fit();
+  escaped.shrink_to_fit();
 
-  return dst;
+  return escaped;
 }
 
 std::string url::qs::encode(url::qs::map &qsmap) {
-  std::string dst;
+  std::string encoded;
   url::qs::map::const_iterator m = qsmap.cbegin();
 
   while (m != qsmap.cend()) {
     std::string key = url::qs::escape(m->first);
     std::string val = url::qs::escape(m->second);
 
-    dst += key;
+    encoded += key;
     if (val.length() > 0) {
-      dst += EQ;
-      dst += val;
+      encoded += EQ;
+      encoded += val;
     }
 
     ++m;
 
     if (m != qsmap.cend()) {
-      dst += SEP;
+      encoded += SEP;
     }
   }
 
-  return dst;
+  return encoded;
 }
 
 url::qs::map url::qs::decode(const std::string &qs) {
@@ -161,7 +165,7 @@ url::qs::map url::qs::decode(const std::string &qs) {
     size_t valend = qs.find(SEP, valpos);
 
     if (keypos == valend) {
-      qsmap[EMPTY] = EMPTY;
+      qsmap[""] = "";
       break;
     }
 
@@ -169,7 +173,7 @@ url::qs::map url::qs::decode(const std::string &qs) {
 
     if (keyend == std::string::npos) {
       std::string key = url::qs::unescape(qs.substr(keypos, keyend - keypos));
-      qsmap[key] = EMPTY;
+      qsmap[key] = "";
       break;
     }
 

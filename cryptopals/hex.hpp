@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Brandon Freitag <freitagbr@gmail.com>
 
-#ifndef CRYPTOPALS_HEX_H_
-#define CRYPTOPALS_HEX_H_
+#ifndef CRYPTOPALS_HEX_HPP_
+#define CRYPTOPALS_HEX_HPP_
 
 #include <string>
 
@@ -38,15 +38,15 @@ inline void btoh(unsigned char *h, unsigned char b) {
   h[1] = encode_table[b & 0x0F];
 }
 
-inline unsigned char htob(const unsigned char h) {
-  return static_cast<unsigned char>(decode_table[h]);
+inline int htob(const unsigned char h) {
+  return static_cast<int>(decode_table[h]);
 }
 
-std::string encode(const std::string &src);
+std::string encode(const std::string &str);
 
-std::string decode(const std::string &src);
+std::string decode(const std::string &str);
 
 } // namespace hex
 } // namespace cryptopals
 
-#endif // CRYPTOPALS_HEX_H_
+#endif // CRYPTOPALS_HEX_HPP_
