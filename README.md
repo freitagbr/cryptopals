@@ -6,8 +6,8 @@ Challenges](https://cryptopals.com).
 
 ## Structure
 
-Solutions for set X are located in `src/setX/*.c`. Common library code is
-located in `src/*.c`, with the associated headers in `include/*.h`. Each
+Solutions for set X are located in `src/setX/*.cpp`. Common library code is
+located in `src/*.cpp`, with the corresponding headers in `src/*.hpp`. Each
 challenge is implemented as a single function in its source file, with the
 `main` function in that file providing a test case.
 
