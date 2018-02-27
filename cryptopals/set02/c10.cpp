@@ -41,7 +41,7 @@ std::string challenge_10(const char *file, const std::string &key,
 
 int main() {
   const std::string key("YELLOW SUBMARINE");
-  const std::string iv("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
+  const std::string iv(16, '\0');
 
   try {
     std::ifstream f("data/c10_test.txt");
