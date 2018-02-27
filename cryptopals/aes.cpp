@@ -5,6 +5,7 @@
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 
+#include <algorithm>
 #include <cstring>
 #include <string>
 
@@ -12,6 +13,18 @@
 #include "cryptopals/xor.hpp"
 
 namespace cryptopals {
+
+inline void aes::decrypt(std::string::const_iterator c, std::string::iterator p,
+                         AES_KEY &aes_key) {
+  AES_decrypt(reinterpret_cast<const unsigned char *>(&(*c)),
+              reinterpret_cast<unsigned char *>(&(*p)), &aes_key);
+}
+
+inline void aes::encrypt(std::string::iterator p, std::string::iterator c,
+                         AES_KEY &aes_key) {
+  AES_encrypt(reinterpret_cast<unsigned char *>(&(*p)),
+              reinterpret_cast<unsigned char *>(&(*c)), &aes_key);
+}
 
 unsigned int aes::rand::uint() {
   unsigned char bytes[sizeof(unsigned int)];
@@ -31,10 +44,9 @@ unsigned int aes::rand::uint() {
 }
 
 std::string aes::rand::bytes(size_t len /* = AES_BLOCK_SIZE */) {
-  std::string str;
+  std::string str(len, '\0');
 
   aes::rand::seed();
-  str.resize(len);
 
   if (1 !=
       RAND_bytes(reinterpret_cast<unsigned char *>(&str[0]), str.length())) {
@@ -47,25 +59,20 @@ std::string aes::rand::bytes(size_t len /* = AES_BLOCK_SIZE */) {
 std::string aes::ecb::decrypt(const std::string &cipher,
                               const std::string &key) {
   AES_KEY aes_key;
-  std::string plain;
-  const unsigned char *cptr =
-      reinterpret_cast<const unsigned char *>(&cipher[0]);
-  unsigned char *pptr;
-  unsigned char *end;
 
   if (0 > AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
                               key.length() * 8, &aes_key)) {
     throw error::Error("Failed to set AES ECB decrypt key");
   }
 
-  plain.resize(cipher.length());
-  pptr = reinterpret_cast<unsigned char *>(&plain[0]);
-  end = reinterpret_cast<unsigned char *>(&plain[plain.length()]);
+  std::string plain(cipher.length(), '\0');
+  std::string::iterator p = plain.begin();
+  std::string::const_iterator c = cipher.cbegin();
 
-  while (pptr < end) {
-    AES_decrypt(cptr, pptr, &aes_key);
-    pptr += AES_BLOCK_SIZE;
-    cptr += AES_BLOCK_SIZE;
+  while (p < plain.end()) {
+    aes::decrypt(c, p, aes_key);
+    c += AES_BLOCK_SIZE;
+    p += AES_BLOCK_SIZE;
   }
 
   aes::pkcs7::strip(plain);
@@ -76,31 +83,19 @@ std::string aes::ecb::decrypt(const std::string &cipher,
 std::string aes::ecb::encrypt(const std::string &plain,
                               const std::string &key) {
   AES_KEY aes_key;
-  std::string cipher;
-  const unsigned char *pptr =
-      reinterpret_cast<const unsigned char *>(&plain[0]);
-  unsigned char *cptr;
-  unsigned char *end;
-  size_t padding;
 
   if (0 > AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
                               key.length() * 8, &aes_key)) {
     throw error::Error("Failed to set AES ECB encrypt key");
   }
 
-  padding = aes::pkcs7::pad(cipher, plain.length());
-  cptr = reinterpret_cast<unsigned char *>(&cipher[0]);
-  end = reinterpret_cast<unsigned char *>(
-      &cipher[cipher.length() - AES_BLOCK_SIZE]);
+  std::string cipher = aes::pkcs7::pad(plain);
+  std::string::iterator c = cipher.begin();
 
-  while (cptr < end) {
-    AES_encrypt(pptr, cptr, &aes_key);
-    cptr += AES_BLOCK_SIZE;
-    pptr += AES_BLOCK_SIZE;
+  while (c < cipher.end()) {
+    aes::encrypt(c, c, aes_key);
+    c += AES_BLOCK_SIZE;
   }
-
-  std::memcpy(cptr, pptr, AES_BLOCK_SIZE - padding);
-  AES_encrypt(cptr, cptr, &aes_key);
 
   return cipher;
 }
@@ -108,28 +103,23 @@ std::string aes::ecb::encrypt(const std::string &plain,
 std::string aes::cbc::decrypt(const std::string &cipher, const std::string &key,
                               const std::string &iv) {
   AES_KEY aes_key;
-  std::string plain;
-  const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
-  const unsigned char *cptr =
-      reinterpret_cast<const unsigned char *>(&cipher[0]);
-  unsigned char *pptr;
-  unsigned char *end;
 
   if (0 > AES_set_decrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
                               key.length() * 8, &aes_key)) {
     throw error::Error("Failed to set AES CBC decrypt key");
   }
 
-  plain.resize(cipher.length());
-  pptr = reinterpret_cast<unsigned char *>(&plain[0]);
-  end = reinterpret_cast<unsigned char *>(&plain[plain.length()]);
+  std::string plain(cipher.length(), '\0');
+  std::string::iterator p = plain.begin();
+  std::string::const_iterator c = cipher.cbegin();
+  const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
 
-  while (pptr < end) {
-    AES_decrypt(cptr, pptr, &aes_key);
-    xor_::inplace(pptr, ivptr, AES_BLOCK_SIZE);
-    ivptr = cptr;
-    pptr += AES_BLOCK_SIZE;
-    cptr += AES_BLOCK_SIZE;
+  while (p < plain.end()) {
+    aes::decrypt(c, p, aes_key);
+    xor_::inplace(p, ivptr, AES_BLOCK_SIZE);
+    ivptr = reinterpret_cast<const unsigned char *>(&(*c));
+    p += AES_BLOCK_SIZE;
+    c += AES_BLOCK_SIZE;
   }
 
   aes::pkcs7::strip(plain);
@@ -140,35 +130,22 @@ std::string aes::cbc::decrypt(const std::string &cipher, const std::string &key,
 std::string aes::cbc::encrypt(const std::string &plain, const std::string &key,
                               const std::string &iv) {
   AES_KEY aes_key;
-  std::string cipher;
-  const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
-  const unsigned char *pptr =
-      reinterpret_cast<const unsigned char *>(&plain[0]);
-  unsigned char *cptr;
-  unsigned char *end;
-  size_t padding;
 
   if (0 > AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
                               key.length() * 8, &aes_key)) {
     throw error::Error("Failed to set AES CBC encrypt key");
   }
 
-  padding = aes::pkcs7::pad(cipher, plain.length());
-  cptr = reinterpret_cast<unsigned char *>(&cipher[0]);
-  end = reinterpret_cast<unsigned char *>(
-      &cipher[cipher.length() - AES_BLOCK_SIZE]);
+  std::string cipher = aes::pkcs7::pad(plain);
+  std::string::iterator c = cipher.begin();
+  const unsigned char *ivptr = reinterpret_cast<const unsigned char *>(&iv[0]);
 
-  while (cptr < end) {
-    xor_::bytes(cptr, pptr, ivptr, AES_BLOCK_SIZE);
-    AES_encrypt(cptr, cptr, &aes_key);
-    ivptr = cptr;
-    cptr += AES_BLOCK_SIZE;
-    pptr += AES_BLOCK_SIZE;
+  while (c < cipher.end()) {
+    xor_::inplace(c, ivptr, AES_BLOCK_SIZE);
+    aes::encrypt(c, c, aes_key);
+    ivptr = reinterpret_cast<const unsigned char *>(&(*c));
+    c += AES_BLOCK_SIZE;
   }
-
-  std::memcpy(cptr, pptr, AES_BLOCK_SIZE - padding);
-  xor_::inplace(cptr, ivptr, AES_BLOCK_SIZE);
-  AES_encrypt(cptr, cptr, &aes_key);
 
   return cipher;
 }
@@ -194,24 +171,22 @@ std::string aes::oracle::encrypt(const std::string &body, aes::mode &mode) {
 }
 
 aes::mode aes::oracle::detect(const std::string &cipher) {
-  const unsigned char *block_a =
-      reinterpret_cast<const unsigned char *>(&cipher[AES_BLOCK_SIZE]);
-  const unsigned char *block_b =
-      reinterpret_cast<const unsigned char *>(&cipher[AES_BLOCK_SIZE * 2]);
-  return std::memcmp(block_a, block_b, AES_BLOCK_SIZE) == 0
-             ? aes::mode::AES_128_ECB
-             : aes::mode::AES_128_CBC;
+  std::string::const_iterator a = cipher.cbegin() + AES_BLOCK_SIZE;
+  std::string::const_iterator b = a + AES_BLOCK_SIZE;
+
+  return std::equal(a, b, b) ? aes::mode::AES_128_ECB : aes::mode::AES_128_CBC;
 }
 
-size_t aes::pkcs7::pad(std::string &str, size_t len,
-                       size_t boundary /* = AES_BLOCK_SIZE */) {
+std::string aes::pkcs7::pad(const std::string &str,
+                            size_t boundary /* = AES_BLOCK_SIZE */) {
+  std::string padded = str;
+  size_t len = str.length();
   size_t padding = boundary - (len % boundary);
   size_t padlen = len + padding;
 
-  str.resize(padlen);
-  std::memset(&str[str.length() - padding], static_cast<int>(padding), padding);
+  padded.resize(padlen, static_cast<char>(padding));
 
-  return padding;
+  return padded;
 }
 
 void aes::pkcs7::strip(std::string &str) {

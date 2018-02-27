@@ -31,9 +31,7 @@ namespace cryptopals {
 // "YELLOW SUBMARINE\x04\x04\x04\x04"
 
 std::string challenge_09(const std::string &src, const size_t len) {
-  std::string padded = src;
-  aes::pkcs7::pad(padded, padded.length(), len);
-  return padded;
+  return aes::pkcs7::pad(src, len);
 }
 
 } // namespace cryptopals

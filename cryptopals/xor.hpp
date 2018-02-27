@@ -32,6 +32,14 @@ inline void inplace(unsigned char *a, const unsigned char *b,
   }
 }
 
+inline void inplace(std::string::iterator a, const unsigned char *b,
+                    const size_t len) {
+  for (size_t i = 0; i < len; i++) {
+    *a = *a ^ *b++;
+    ++a;
+  }
+}
+
 unsigned char find_key(const std::string &str, int &max);
 
 unsigned char find_key(const std::string &str);

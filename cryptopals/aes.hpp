@@ -21,6 +21,12 @@ enum class mode {
   AES_128_CBC  // aes-128-cbc
 };
 
+inline void decrypt(std::string::const_iterator c, std::string::iterator p,
+                    AES_KEY &aes_key);
+
+inline void encrypt(std::string::iterator p, std::string::iterator c,
+                    AES_KEY &aes_key);
+
 namespace rand {
 
 inline void seed() {
@@ -67,7 +73,7 @@ aes::mode detect(const std::string &cipher);
 
 namespace pkcs7 {
 
-size_t pad(std::string &str, size_t len, size_t boundary = AES_BLOCK_SIZE);
+std::string pad(const std::string &str, size_t boundary = AES_BLOCK_SIZE);
 
 void strip(std::string &str);
 
