@@ -8,7 +8,14 @@
 namespace cryptopals {
 namespace hamming {
 
-static inline size_t popcount(unsigned char n);
+inline size_t popcount(unsigned char n) {
+  size_t count = 0;
+  while (n) {
+    n &= n - 1;
+    count++;
+  }
+  return count;
+}
 
 size_t distance(const std::string &str, const size_t pos, const size_t len);
 

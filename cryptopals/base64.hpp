@@ -33,13 +33,32 @@ static const char decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-static inline size_t decoded_length(const std::string &str);
+inline size_t decoded_length(const std::string &str) {
+  std::string::const_reverse_iterator end = str.crbegin();
+  size_t eqs = 0;
+  while (*end-- == '=') {
+    ++eqs;
+  }
+  return ((str.length() * 3) / 4) - eqs;
+}
 
-static inline size_t encoded_length(const std::string &str);
+inline size_t encoded_length(const std::string &str) {
+  const size_t len = str.length();
+  return (len + 2 - ((len + 2) % 3)) / 3 * 4;
+}
 
-static inline void btoa(unsigned char *a, unsigned char *b);
+inline void btoa(unsigned char *a, unsigned char *b) {
+  a[0] = encode_table[(b[0] & 0xfc) >> 2];
+  a[1] = encode_table[((b[0] & 0x03) << 4) + ((b[1] & 0xf0) >> 4)];
+  a[2] = encode_table[((b[1] & 0x0f) << 2) + ((b[2] & 0xc0) >> 6)];
+  a[3] = encode_table[b[2] & 0x3f];
+}
 
-static inline void atob(unsigned char *b, unsigned char *a);
+inline void atob(unsigned char *b, unsigned char *a) {
+  b[0] = (a[0] << 2) + ((a[1] & 0x30) >> 4);
+  b[1] = ((a[1] & 0xf) << 4) + ((a[2] & 0x3c) >> 2);
+  b[2] = ((a[2] & 0x3) << 6) + a[3];
+}
 
 std::string encode(const std::string &src);
 

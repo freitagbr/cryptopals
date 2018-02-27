@@ -4,8 +4,11 @@
 #define CRYPTOPALS_AES_HPP_
 
 #include <openssl/aes.h>
+#include <openssl/rand.h>
 
 #include <string>
+
+#include "cryptopals/error.hpp"
 
 #define AES_RAND_SOURCE "/dev/urandom"
 #define AES_RAND_SIZE 32
@@ -20,7 +23,15 @@ enum class mode {
 
 namespace rand {
 
-static inline void seed();
+inline void seed() {
+  static bool seeded = false;
+  if (!seeded) {
+    if (AES_RAND_SIZE != RAND_load_file(AES_RAND_SOURCE, AES_RAND_SIZE)) {
+      throw error::Error("Failed to seed from " AES_RAND_SOURCE);
+    }
+    seeded = true;
+  }
+}
 
 unsigned int uint();
 

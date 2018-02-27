@@ -8,33 +8,6 @@
 
 namespace cryptopals {
 
-inline size_t base64::decoded_length(const std::string &str) {
-  std::string::const_reverse_iterator end = str.crbegin();
-  size_t eqs = 0;
-  while (*end-- == '=') {
-    ++eqs;
-  }
-  return ((str.length() * 3) / 4) - eqs;
-}
-
-inline size_t base64::encoded_length(const std::string &str) {
-  const size_t len = str.length();
-  return (len + 2 - ((len + 2) % 3)) / 3 * 4;
-}
-
-inline void base64::btoa(unsigned char *a, unsigned char *b) {
-  a[0] = base64::encode_table[(b[0] & 0xfc) >> 2];
-  a[1] = base64::encode_table[((b[0] & 0x03) << 4) + ((b[1] & 0xf0) >> 4)];
-  a[2] = base64::encode_table[((b[1] & 0x0f) << 2) + ((b[2] & 0xc0) >> 6)];
-  a[3] = base64::encode_table[b[2] & 0x3f];
-}
-
-inline void base64::atob(unsigned char *b, unsigned char *a) {
-  b[0] = (a[0] << 2) + ((a[1] & 0x30) >> 4);
-  b[1] = ((a[1] & 0xf) << 4) + ((a[2] & 0x3c) >> 2);
-  b[2] = ((a[2] & 0x3) << 6) + a[3];
-}
-
 std::string base64::encode(const std::string &src) {
   std::string encoded;
   std::string::const_iterator s;

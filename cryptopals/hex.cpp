@@ -6,15 +6,6 @@
 
 namespace cryptopals {
 
-inline size_t hex::decoded_length(const std::string &str) {
-  size_t len = str.length();
-  return (len + (len % 2)) / 2;
-}
-
-inline size_t hex::encoded_length(const std::string &str) {
-  return str.length() * 2;
-}
-
 std::string hex::encode(const std::string &str) {
   std::string encoded;
   std::string::const_iterator s;

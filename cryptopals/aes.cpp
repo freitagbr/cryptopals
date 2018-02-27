@@ -13,16 +13,6 @@
 
 namespace cryptopals {
 
-inline void aes::rand::seed() {
-  static bool seeded = false;
-  if (!seeded) {
-    if (RAND_load_file(AES_RAND_SOURCE, AES_RAND_SIZE) != AES_RAND_SIZE) {
-      throw error::Error("Failed to seed from " AES_RAND_SOURCE);
-    }
-    seeded = true;
-  }
-}
-
 unsigned int aes::rand::uint() {
   unsigned char bytes[sizeof(unsigned int)];
   unsigned int n = 0;

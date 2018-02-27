@@ -29,9 +29,14 @@ static const char decode_table[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
-static inline size_t decoded_length(const std::string &str);
+inline size_t decoded_length(const std::string &str) {
+  size_t len = str.length();
+  return (len + (len % 2)) / 2;
+}
 
-static inline size_t encoded_length(const std::string &str);
+inline size_t encoded_length(const std::string &str) {
+  return str.length() * 2;
+}
 
 inline void btoh(unsigned char *h, unsigned char b) {
   h[0] = encode_table[(b & 0xF0) >> 4];

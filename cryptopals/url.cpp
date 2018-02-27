@@ -13,14 +13,6 @@
 
 namespace cryptopals {
 
-inline bool url::qs::should_escape(unsigned char c) {
-  if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') ||
-      ('0' <= c && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~') {
-    return false;
-  }
-  return true;
-}
-
 std::string url::qs::unescape(const std::string &escaped) {
   std::string::const_iterator e = escaped.cbegin();
   size_t percents = 0;
