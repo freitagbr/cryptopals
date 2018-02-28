@@ -19,7 +19,31 @@
 
 namespace cryptopals {
 
-static std::vector<std::string> plaintexts = {
+namespace {
+
+std::string &get_key() {
+  static bool init = false;
+  static std::string key;
+  if (!init) {
+    key = aes::rand::bytes();
+    init = true;
+  }
+  return key;
+}
+
+std::string &get_iv() {
+  static bool init = false;
+  static std::string iv;
+  if (!init) {
+    iv = aes::rand::bytes();
+    init = true;
+  }
+  return iv;
+}
+
+} // namespace
+
+static const char *plaintexts[10] = {
     "MDAwMDAwTm93IHRoYXQgdGhlIHBhcnR5IGlzIGp1bXBpbmc=",
     "MDAwMDAxV2l0aCB0aGUgYmFzcyBraWNrZWQgaW4gYW5kIHRoZSBWZWdhJ3MgYXJlIHB1bXBpbi"
     "c=",
@@ -33,28 +57,13 @@ static std::vector<std::string> plaintexts = {
     "MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93",
 };
 
-namespace {
-
-static std::string key;
-static std::string iv;
-
-} // namespace
-
 std::string encrypt_plaintext(const std::string &plain) {
-  static bool init = false;
-
-  if (!init) {
-    key = aes::rand::bytes();
-    iv = aes::rand::bytes();
-    init = true;
-  }
-
-  return aes::cbc::encrypt(plain, key, iv);
+  return aes::cbc::encrypt(plain, get_key(), get_iv());
 }
 
 bool cipher_padding_is_valid(std::string &cipher) {
   try {
-    aes::cbc::decrypt(cipher, key, iv);
+    aes::cbc::decrypt(cipher, get_key(), get_iv());
     return true;
   } catch (std::exception &e) {
     return false;
@@ -197,10 +206,8 @@ std::string challenge_17(const std::string &cipher) {
 
 int main() {
   try {
-    std::vector<std::string>::const_iterator p =
-        cryptopals::plaintexts.cbegin();
-    while (p != cryptopals::plaintexts.cend()) {
-      std::string plain = *p++;
+    for (size_t i = 0; i < 10; i++) {
+      std::string plain(cryptopals::plaintexts[i]);
       std::string cipher = cryptopals::encrypt_plaintext(plain);
       std::string output = cryptopals::challenge_17(cipher);
       cryptopals::assert::equal(output, plain.substr(AES_BLOCK_SIZE));

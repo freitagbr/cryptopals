@@ -17,8 +17,8 @@ namespace cryptopals {
 
 namespace {
 
-static std::string prefix("comment1=cooking%20MCs;userdata=");
-static std::string suffix(";comment2=%20like%20a%20pound%20of%20bacon");
+static const char prefix[33] = "comment1=cooking%20MCs;userdata=";
+static const char suffix[43] = ";comment2=%20like%20a%20pound%20of%20bacon";
 
 std::string &get_key() {
   static bool init = false;
