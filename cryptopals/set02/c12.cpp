@@ -124,7 +124,7 @@ std::string challenge_12() {
     // mimic encrypting the one byte short string, switching out the last
     // byte until it matches the encrypted string
     for (int c = 0; c <= UCHAR_MAX; c++) {
-      scratch.back() = static_cast<unsigned char>(c);
+      scratch.back() = static_cast<char>(c);
       cipher = encrypt_oracle(scratch);
       if (0 == cipher.compare(0, scratch.length(), enc, 0, scratch.length())) {
         byte = c;
@@ -141,7 +141,7 @@ std::string challenge_12() {
       break;
     }
 
-    *p++ = scratch.back() = static_cast<unsigned char>(byte);
+    *p++ = scratch.back() = static_cast<char>(byte);
     decoded++;
 
     if (decoded % keylen == 0) {
