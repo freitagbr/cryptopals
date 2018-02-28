@@ -2,9 +2,10 @@
 
 #include <openssl/aes.h>
 
-#include <deque>
 #include <exception>
+#include <future>
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -133,70 +134,79 @@ bool cipher_padding_is_valid(std::string &cipher) {
 // decryption. You can mount a padding oracle on any CBC block, whether it's
 // padded or not.
 
-std::string challenge_17(const std::string &cipher) {
-  std::deque<std::string> plaintext_blocks;
-  std::deque<std::string> guesses;
-  size_t num_blocks = cipher.length() / AES_BLOCK_SIZE;
+std::string challenge_17(const std::string &ciphertext) {
+  size_t num_blocks = (ciphertext.length() / AES_BLOCK_SIZE) - 1;
+  std::vector<std::future<std::string>> blocks(num_blocks);
 
   // decrypting a block depends on modifying the ciphertext of the block before
-  // it, so loop over every block. the first block cannot be decrypted without
-  // knowing what the iv is, however
-  for (size_t b = 0; b < num_blocks - 1; b++) {
-    std::string scratch =
-        cipher.substr(0, cipher.length() - (b * AES_BLOCK_SIZE));
-    guesses.push_back("");
+  // it, so loop over every pair of blocks. the first block cannot be decrypted
+  // without knowing the iv, however
+  for (size_t i = 0; i < blocks.size(); i++) {
+    blocks[i] = std::async(std::launch::async, [i, &ciphertext] {
+      size_t count = (i + 2) * AES_BLOCK_SIZE;
+      std::string cipher = ciphertext.substr(0, count);
+      std::queue<std::string> guesses;
+      guesses.push("");
 
-    // increasing the padding allows subsequent bytes to be decrypted, so start
-    // with a padding of 0x01 (last byte in the block) and iterate up to 0x10
-    // (first byte in the block)
-    for (size_t pad = 1; pad <= AES_BLOCK_SIZE; pad++) {
-      size_t pos = scratch.length() - pad - AES_BLOCK_SIZE;
-      size_t num_guesses = guesses.size();
+      // increasing the padding allows subsequent bytes to be decrypted, so
+      // start with a padding of 0x01 (last byte in the block) and iterate up to
+      // the blocks size (first byte in the block)
+      for (size_t pad = 1; pad <= AES_BLOCK_SIZE; pad++) {
+        size_t pos = cipher.length() - AES_BLOCK_SIZE - pad;
+        size_t num_guesses = guesses.size();
+        std::string cipher_slice = cipher.substr(pos, pad);
 
-      // check every possible byte in the first position of the guess. multiple
-      // guess bytes may map decrypt to a valid padding (especially when the
-      // padding is just 0x01 or 0x02 0x02), so keep all of the guesses in a
-      // queue and loop over the queue
-      for (size_t i = 0; i < num_guesses; i++) {
-        std::string guess = guesses.front();
-        guess.insert(0, 1, '\0');
-        guesses.pop_front();
-        size_t count = guess.length();
-        std::string pre = scratch.substr(pos, count);
+        // check every possible byte in the first position of the guess.
+        // multiple guess bytes may map to a valid padding (especially when the
+        // padding is just [0x01] or [0x02 0x02]), so keep all of the guesses
+        // in a queue and loop over the queue
+        for (size_t j = 0; j < num_guesses; j++) {
+          std::string guess = guesses.front();
+          guesses.pop();
+          guess.insert(0, 1, '\0');
 
-        for (int g = 0; g <= UCHAR_MAX; g++) {
-          guess.at(0) = static_cast<char>(g);
-          std::string sub = pre ^ guess ^ pad;
-          scratch.replace(pos, count, sub);
-          if (cipher_padding_is_valid(scratch)) {
-            guesses.push_back(guess);
+          for (int g = 0; g <= UCHAR_MAX; g++) {
+            guess.at(0) = static_cast<char>(g);
+            // performing the following modification to the ciphertext:
+            //   cipher slice XOR guess XOR padding
+            // and check if the cipher is valid. if it is, our guess is
+            // probably correct, because it cancelled out the same byte in the
+            // next cipher block, leaving just the valid padding
+            std::string mod = cipher_slice ^ guess ^ pad;
+            cipher.replace(pos, pad, mod);
+            if (cipher_padding_is_valid(cipher)) {
+              guesses.push(guess);
+            }
           }
-          scratch.replace(pos, count, pre);
         }
+
+        cipher.replace(pos, pad, cipher_slice);
       }
-    }
 
-    // there should be exactly 1 guess at this point, otherwise something went
-    // terribly wrong
-    if (guesses.size() != 1) {
-      throw error::Error("Failed to decrypt cipher");
-    }
+      // there should be exactly 1 guess at this point, otherwise something went
+      // terribly wrong
+      if (guesses.size() != 1) {
+        throw error::Error("Failed to decrypt cipher");
+      }
 
-    std::string plain = guesses.front();
-    guesses.pop_front();
+      std::string plain = guesses.front();
+      guesses.pop();
 
-    if (b == 0) {
-      aes::pkcs7::strip(plain);
-    }
+      if (count == ciphertext.size()) {
+        // strip padding on the last block
+        aes::pkcs7::strip(plain);
+      }
 
-    plaintext_blocks.push_front(plain);
+      return plain;
+    });
   }
 
   std::stringstream plain;
-  std::deque<std::string>::const_iterator p = plaintext_blocks.cbegin();
+  std::vector<std::future<std::string>>::iterator b = blocks.begin();
 
-  while (p != plaintext_blocks.cend()) {
-    plain << *p++;
+  while (b != blocks.end()) {
+    plain << b->get();
+    ++b;
   }
 
   return plain.str();
