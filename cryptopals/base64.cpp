@@ -19,7 +19,7 @@ std::string base64::encode(const std::string &src) {
   encoded.reserve(len);
 
   for (s = src.cbegin(); s != src.cend(); ++s) {
-    b[i++] = *s;
+    b[i++] = static_cast<unsigned char>(*s);
 
     if (i == 3) {
       base64::btoa(a, b);
@@ -59,14 +59,13 @@ std::string base64::decode(const std::string &src) {
       break;
     }
 
-    unsigned char c = static_cast<unsigned char>(
-        base64::decode_table[static_cast<size_t>(*s)]);
-
+    unsigned char c = static_cast<unsigned char>(*s);
+    c = static_cast<unsigned char>(
+        base64::decode_table[static_cast<size_t>(c)]);
     // skip this character if it was not a base64 character
     if (static_cast<char>(c) == -1) {
       continue;
     }
-
     a[i++] = c;
 
     if (i == 4) {
@@ -78,13 +77,8 @@ std::string base64::decode(const std::string &src) {
 
   if (i) {
     for (int j = i; j < 4; j++) {
-      a[j] = '\0';
+      a[j] = base64::decode_table[0];
     }
-
-    a[0] = base64::decode_table[a[0]];
-    a[1] = base64::decode_table[a[1]];
-    a[2] = base64::decode_table[a[2]];
-    a[3] = base64::decode_table[a[3]];
 
     base64::atob(b, a);
     decoded.append(reinterpret_cast<const char *>(b), i - 1);
@@ -108,12 +102,10 @@ std::string base64::decode_file(const char *file) {
 
     c = static_cast<unsigned char>(
         base64::decode_table[static_cast<size_t>(c)]);
-
     // skip this character if it was not a base64 character
     if (static_cast<char>(c) == -1) {
       continue;
     }
-
     a[i++] = c;
 
     if (i == 4) {
