@@ -150,6 +150,41 @@ std::string aes::cbc::encrypt(const std::string &plain, const std::string &key,
   return cipher;
 }
 
+std::string aes::ctr::decrypt(const std::string &cipher, const std::string &key,
+                              const uint64_t nonce /* = 0 */) {
+  static_assert(2 * sizeof(uint64_t) == AES_BLOCK_SIZE, "AES Block Size is not twice the size of uint64_t");
+  // TODO: add static_assert to ensure platform is little endian
+  AES_KEY aes_key;
+  std::string plain(cipher.length(), '\0');
+  unsigned char keystream[AES_BLOCK_SIZE];
+  union {
+    uint64_t u64[2];
+    uint8_t u8[AES_BLOCK_SIZE];
+  } iv = {{nonce, 0}};
+  size_t i = 0;
+
+  if (0 > AES_set_encrypt_key(reinterpret_cast<const unsigned char *>(&key[0]),
+                              key.length() * 8, &aes_key)) {
+    throw error::Error("Failed to set AES CTR key");
+  }
+
+  while (i < cipher.length()) {
+    AES_encrypt(reinterpret_cast<const unsigned char *>(&iv.u8), keystream,
+                &aes_key);
+    for (size_t j = 0; (i < cipher.length()) && (j < AES_BLOCK_SIZE); i++, j++) {
+      plain.at(i) = cipher.at(i) ^ keystream[j];
+    }
+    iv.u64[1] += 1;
+  }
+
+  return plain;
+}
+
+std::string aes::ctr::encrypt(const std::string &plain, const std::string &key,
+                              const uint64_t nonce /* = 0 */) {
+  return aes::ctr::decrypt(plain, key, nonce);
+}
+
 std::string aes::oracle::encrypt(const std::string &body, aes::mode &mode) {
   // pad front and back of string with 5-10 random bytes
   std::string prefix = aes::rand::bytes((aes::rand::uint() % 6) + 5);
@@ -178,7 +213,7 @@ aes::mode aes::oracle::detect(const std::string &cipher) {
 }
 
 std::string aes::pkcs7::pad(const std::string &str,
-                            size_t boundary /* = AES_BLOCK_SIZE */) {
+                            const size_t boundary /* = AES_BLOCK_SIZE */) {
   std::string padded = str;
   size_t len = str.length();
   size_t padding = boundary - (len % boundary);

@@ -63,6 +63,16 @@ std::string encrypt(const std::string &plain, const std::string &key,
 
 } // namespace cbc
 
+namespace ctr {
+
+std::string decrypt(const std::string &cipher, const std::string &key,
+                    const uint64_t nonce = 0);
+
+std::string encrypt(const std::string &cipher, const std::string &key,
+                    const uint64_t nonce = 0);
+
+} // namespace ctr
+
 namespace oracle {
 
 std::string encrypt(const std::string &body, aes::mode &mode);
@@ -73,7 +83,7 @@ aes::mode detect(const std::string &cipher);
 
 namespace pkcs7 {
 
-std::string pad(const std::string &str, size_t boundary = AES_BLOCK_SIZE);
+std::string pad(const std::string &str, const size_t boundary = AES_BLOCK_SIZE);
 
 void strip(std::string &str);
 
